@@ -64,7 +64,8 @@ setup(
         'torch',
         'torchvision',
         'scikit-learn',
-        'src @ git+http://github.com/rafaelpadilla/review_object_detection_metrics.git#egg=src'
+        'src @ git+http://github.com/rafaelpadilla/review_object_detection_metrics.git#egg=src',
+        'gibson'
     ],
     entry_points={
         'console_scripts': [

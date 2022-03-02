@@ -1,0 +1,10344 @@
+Ackermanville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Adairsville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Adrian:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Airport:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Akiak:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Albertville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Aldine:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Aldrich:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Alfred:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Allensville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 3.0
+      - 7.0
+      - 0.05
+Almena:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Almota:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Aloha:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Alstown:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+American:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Anaheim:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ancor:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Andover:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Angiola:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Annawan:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Annona:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Anthoston:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Apache:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Applewold:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Arbutus:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Archer:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Arkansaw:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Arona:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Artois:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ashport:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Assinippi:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Athens:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Auburn:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Aulander:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Avonia:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Azusa:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Badger:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ballantine:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ballou:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Baneberry:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Barahona:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Barboursville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Barranquitas:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Bautista:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Beach:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Beechwood:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Bellemeade:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Bellwood:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Belpre:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Benevolence:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Benicia:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Bertram:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Bethlehem:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Bettendorf:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Biltmore:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Blackstone:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Blenheim:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Bohemia:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Bolton:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Bonesteel:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Bonfield:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Bonnie:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Booth:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Bountiful:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Bowlus:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Bowmore:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Branford:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Braxton:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Bremerton:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Brentsville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Brevort:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Brewton:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Brinnon:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Broadwell:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Broseley:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Brown:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Browntown:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Burien:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Bushong:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Byers:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cabin:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Calavo:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Callicoon:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Calmar:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cantwell:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Capistrano:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Carneiro:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Carpendale:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Carpio:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Caruthers:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cashel:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cason:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Castor:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Castroville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cauthron:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cayuse:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cebolla:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Channel:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Checotah:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Chesaning:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Chesterbrook:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Chilhowie:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Chiloquin:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Chireno:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Chrisney:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Churchton:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Circleville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cisne:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Clairton:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Clarkridge:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Clive:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cobalt:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cochranton:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Codell:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Coeburn:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Coffeen:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cohoes:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cokeville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Colebrook:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Collierville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Connellsville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Connoquenessing:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Convoy:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cooperstown:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Copemish:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Corder:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cornville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Coronado:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Corozal:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cosmos:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cottonport:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Couderay:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Country:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cousins:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Crandon:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Creede:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Crookston:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Crugers:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Culbertson:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cullison:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Cutlerville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Dalcour:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Dansville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Darden:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Darnestown:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Darrtown:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Dauberville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Deatsville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Dedham:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Deemston:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Delton:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Denmark:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Destin:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Divide:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Donaldson:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Dryville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Duarte:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Duluth:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Dunmor:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Eagan:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Eagerville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Eastville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Edgemere:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Edson:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ellaville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Elmira:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Elton:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Emmaus:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Espanola:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Eudora:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Euharlee:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Everton:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ewansville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ewell:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Experiment:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Fedora:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Fishersville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Fitchburg:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Fleming:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Fonda:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Forkland:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Foyil:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Frankfort:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Frankton:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Fredericksburg:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Freedom:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Frierson:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Frontenac:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Funkstown:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Galatia:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Gasburg:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Gastonia:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Gaylord:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+German:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Germfask:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Gilbert:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Gladstone:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Glassboro:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Glenmoor:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Globe:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Gloria:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Gluck:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Gluek:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Goffs:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Goodfield:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Goodview:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Goodwine:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Goodyear:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Gough:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Grace:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Graceville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Gracey:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Grainola:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Grangeville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Grantsville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Grassy:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Gratz:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Gravelly:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Greigsville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Grigston:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Haaswood:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hacienda:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hainesburg:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Halfway:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hallettsville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hambleton:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hammon:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hanson:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Harkeyville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Harrellsville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hartline:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hatfield:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Haxtun:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Haymarket:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Helix:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Helton:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hendrix:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hennepin:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hercules:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Herricks:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Highspire:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hildebran:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hillsdale:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hindsboro:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hitchland:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hiteman:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hobson:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Holcut:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hometown:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hominy:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hordville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hornsby:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hortense:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Howie:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Hurley:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Idanha:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ihlen:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Imbery:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Inkom:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Irvine:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Islandton:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Jacobus:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Jenners:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Jennie:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Judith:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kangley:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kankakee:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kathryn:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Keiser:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kemblesville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kendall:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kerrtown:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kettle:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kevin:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Keweenaw:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kihei:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kildare:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kinde:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kingdom:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kingfisher:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kinney:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kirksville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kirwin:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Klickitat:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kobuk:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kopperl:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kremlin:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Kronborg:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Lacon:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ladue:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Lajas:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Lakeville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Landing:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Lathrup:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Laupahoehoe:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Laytonsville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Leavittsburg:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Leilani:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Lenoir:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Leonardo:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Lessley:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Liddieville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Lincolnwood:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Lindberg:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Lindenwood:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Lindsborg:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Lineville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Lluveras:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Losantville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Lovilia:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Lucan:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ludlowville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Lynchburg:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Lynxville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Maben:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+MacArthur:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Macedon:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Macksville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Macland:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Maguayo:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Mahtomedi:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Maida:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Maiden:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Maitland:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Mammoth:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Manassas:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Maricopa:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Markleeville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Marksville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Marland:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Marstons:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Martinville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Maryhill:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Mashulaville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Matoaca:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Maugansville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Maunawili:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Mayesville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Mazomanie:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+McCloud:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+McClure:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+McDade:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+McEwen:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+McKeesport:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+McNary:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Melstone:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Mentasta:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Mentmore:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Merchantville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Merlin:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Merom:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Mesic:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Micanopy:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Michiana:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Mifflinburg:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Mifflintown:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Milaca:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Milford:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Millbury:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Moark:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Moberly:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Mobridge:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Model:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Mogadore:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Mogote:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Monson:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Monticello:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Montreal:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Moonachie:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Morris:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Mosinee:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Mosquito:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Muleshoe:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Mullica:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Munsons:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Murchison:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Musicks:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Natural:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Neibert:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Nemacolin:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Neshkoro:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Newcomb:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Newfields:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Nicut:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Nimmons:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Noonday:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Northgate:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Norvelt:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Noxapater:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Nuevo:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ogilvie:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ohoopee:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Okabena:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Onaga:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ooltewah:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ophir:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Orangeburg:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Orason:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Oriole:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ossipee:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ovalo:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Oyens:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Pablo:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Paige:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Pamelia:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Parole:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Pasatiempo:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Peacock:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Pearce:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Peconic:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Peden:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Pettigrew:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Pinesdale:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Pittsburg:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Placida:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Pleasant:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Plessis:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Plumerville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Pocasset:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Pocopson:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Poipu:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Pomaria:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Portal:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Portola:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Potosi:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Potterville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Poyen:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Purple:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Quantico:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Rabbit:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ranchester:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Rancocas:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Random:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Readsboro:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Redbank:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Reserve:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Retsof:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Reyno:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ribera:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Roane:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Rockport:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Roeville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Rogue:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Rosenberg:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Rosser:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Rough:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Roxboro:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Ruckersville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Rutherford:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sagerton:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Samuels:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sanctuary:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sands:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sarcoxie:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sargents:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sasakwa:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sawpit:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Scandinavia:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Schiller:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Schoolcraft:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Scioto:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Scottsmoor:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Seatonville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Seeley:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Seiling:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Seward:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sharon:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Shauck:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Shelbiana:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Shelbyville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Shellsburg:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sherrill:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Shingler:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Shumway:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Silas:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Silerton:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Silva:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Siren:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sisters:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Smoketown:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sodaville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Soldier:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sontag:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Southfield:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Spencerville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Spotswood:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Spread:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Springerville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Springhill:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Stanleyville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Starks:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Stigler:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Stilwell:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Stockertown:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Stockman:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Stockwell:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Stokes:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sugarville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sultan:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sumas:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sundown:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sunshine:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Superior:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sussex:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Sweatman:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Swisshome:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Swormville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Tallmadge:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Tansboro:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Tariffville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Terrell:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Texasville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Thrall:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Tilghmanton:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Tillman:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Timberon:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Tippecanoe:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Tokeland:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Tolstoy:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Tomales:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Tomkins:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Torrington:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Touhy:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Tradewinds:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Trail:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Traver:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Tyler:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Tysons:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Umpqua:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Uncertain:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Upham:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Uvalda:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Vacherie:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Vails:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Victorville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Voorhees:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Waimea:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Wainscott:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Waipahu:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Wakeman:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Waldenburg:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Wando:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Wappingers:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Warrenville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Wattsville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Waucousta:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Waukeenah:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Webster:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Weleetka:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Wells:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Wesley:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Westerville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Westfield:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Whiteriver:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Whitethorn:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Wiconisco:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Wilbraham:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Wilkesboro:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Wilkinsburg:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Willow:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Wilseyville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Windhorst:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Winfield:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Winooski:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Winthrop:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Woodbine:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Woonsocket:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Wyatt:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Wyldwood:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Yadkinville:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Yankeetown:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+Yscloskey:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+area2:
+  dataset: stanford
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.05
+      orientation:
+      - 0.0
+      - 0.0
+      - 1.6
+      position:
+      - 10.0
+      - 10.0
+      - 0.0
+    1:
+      floor_height: 0.7
+      orientation:
+        - 0.0
+        - 0.0
+        - 1.6
+      position:
+        - 10.0
+        - 10.0
+        - 0.0
+area3:
+  dataset: stanford
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+area4:
+  dataset: stanford
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 5.0
+      - 7.0
+      - 0.0
+area5:
+  dataset: stanford
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+area5_2:
+  dataset: stanford
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+area6:
+  dataset: stanford
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 3.14
+      position:
+      - 0.0
+      - 5.0
+      - 0.0
+house1:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.01
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.01
+house10:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -3.25
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - -3.0
+    1:
+      floor_height: 0.01
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - -3.0
+    2:
+      floor_height: 3.0
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - -3.0
+house11:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -1.51
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: -1.51
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: -1.05
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house12:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.1
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house13:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -2.6
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.04
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 2.84
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    3:
+      floor_height: 5.6
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house14:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.01
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house15:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -3.03
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: -2.5
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 0.03
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    3:
+      floor_height: 0.61
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    4:
+      floor_height: 3.35
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house16:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -1.2
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 2.95
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house17:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.01
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house18:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -3.28
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.01
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 2.85
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house19:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.01
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house2:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.05
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.05
+house20:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -3.35
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    1:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house21:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house22:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -5.74
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: -2.73
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: -0.89
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    3:
+      floor_height: 0.0
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    4:
+      floor_height: 2.06
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    5:
+      floor_height: 2.69
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house23:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house24:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 2.87
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house25:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.02
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house26:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 3.27
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house27:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house28:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house29:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 3.43
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house3:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -0.61
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 1.0
+      - -0.8
+      - -0.65
+    1:
+      floor_height: 0.21
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house30:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -3.53
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.04
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 3.22
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house31:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house32:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house33:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -6.5
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: -2.05
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 0.02
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    3:
+      floor_height: 2.25
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    4:
+      floor_height: 3.31
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    5:
+      floor_height: 7.4
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house34:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 3.22
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house35:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -2.33
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.0
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 2.99
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    3:
+      floor_height: 5.85
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house36:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house37:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house38:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -2.83
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.0
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 2.91
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house39:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -1.71
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.0
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 1.26
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house4:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 1.6
+      position:
+      - -1.0
+      - 0.0
+      - 0.02
+house40:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house41:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -5.11
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: -2.19
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 0.0
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    3:
+      floor_height: 2.05
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    4:
+      floor_height: 3.1
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house42:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.02
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house43:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -0.34
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 2.6
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house44:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -3.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.08
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house45:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house46:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -6.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.05
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house47:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 1.05
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house48:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.8
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house49:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -2.89
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.0
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house5:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.015
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.03
+house50:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -3.98
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: -3.08
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: -0.82
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    3:
+      floor_height: 0.0
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    4:
+      floor_height: 2.49
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    5:
+      floor_height: 3.03
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house51:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -3.31
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.035
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house52:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -3.57
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: -3.57
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: -0.0
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    3:
+      floor_height: 3.81
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house53:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.03
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.72
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house54:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.02
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.55
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 3.52
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house55:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -3.06
+      orientation:
+      - 0.0
+      - 0.0
+      - 1.0
+      position:
+      - 0.5
+      - 2.0
+      - 0.0
+    1:
+      floor_height: 0.02
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house56:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house57:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 3.43
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house58:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -2.7
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.0
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 3.05
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house59:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -3.11
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.0
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 0.32
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    3:
+      floor_height: 3.38
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    4:
+      floor_height: 3.74
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house6:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house60:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house61:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house62:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 2.6
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house63:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 4.11
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 7.62
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house64:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house65:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house66:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -2.73
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.0
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 3.41
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house67:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -3.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.0
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 2.88
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    3:
+      floor_height: 5.79
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house68:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 3.3
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house69:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house7:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -0.44
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.01
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 3.31
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    3:
+      floor_height: 6.67
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house70:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -3.6
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: -3.25
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 0.0
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house71:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 2.79
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house72:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -1.02
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: -0.7
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 0.0
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    3:
+      floor_height: 0.75
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house73:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -2.5
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.0
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 3.54
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    3:
+      floor_height: 3.54
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house74:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house75:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 3.2
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house76:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house77:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -3.26
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.16
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house78:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -3.32
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: -0.35
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 2.78
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house79:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 2.8
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house8:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+house80:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -3.13
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 3.07
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house81:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 3.57
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house82:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -2.26
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: 0.0
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    2:
+      floor_height: 3.04
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+    3:
+      floor_height: 5.91
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+house9:
+  dataset: matterport
+  has_semantics: true
+  floors:
+    0:
+      floor_height: -3.2
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+    1:
+      floor_height: -0.03
+      orientation:
+        - 0.0
+        - 0.0
+        - 0.0
+      position:
+        - 0.0
+        - 0.0
+        - 0.0
+space2:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+space3:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+space4:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+space5:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+space6:
+  dataset: stanford
+  has_semantics: false
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 0.0
+      position:
+      - 0.0
+      - 0.0
+      - 0.0
+space7:
+  dataset: stanford
+  has_semantics: true
+  floors:
+    0:
+      floor_height: 0.0
+      orientation:
+      - 0.0
+      - 0.0
+      - 4.71
+      position:
+      - -14.3
+      - 5.0
+      - 0.0
