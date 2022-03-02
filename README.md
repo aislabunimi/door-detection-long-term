@@ -15,7 +15,7 @@ The door dataset has been acquired by virtualizing through Gibson the environmen
 * 
 ## Pose extractor
 
-The code to extract plausible positions of a mobile robot to acquire the images is in []
+The code to extract plausible positions of a mobile robot to acquire the images is in [positions_extractor](doors_detection_long_term/positions_extractor) package, with some example scripts.
 
 * The code of the proposed door detector and the baseline [link](https://github.com/micheleantonazzi/master-thesis-robust-door-detector)
 * The proposed simulation environment [link](https://github.com/micheleantonazzi/GibsonEnv.git)
