@@ -12,7 +12,7 @@ The door dataset has been acquired by virtualizing through Gibson the environmen
 
 * The relabelled version of *DeepDoors2* dataset [link](https://drive.google.com/file/d/1wSmFUHF9aSJkomwFdOmepMevBvkRpf3D/view?usp=sharing)
 * The collected dataset [link](https://drive.google.com/file/d/1BqjBpobjKTomFjDkzhWjmCryAXOEluO2/view?usp=sharing)
-* 
+
 ## Pose extractor
 
 The code to extract plausible positions of a mobile robot to acquire the images is in [positions_extractor](doors_detection_long_term/positions_extractor) package, with some example scripts.
