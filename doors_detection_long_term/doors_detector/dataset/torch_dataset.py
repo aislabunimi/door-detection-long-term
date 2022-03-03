@@ -3,9 +3,9 @@ from typing import Type, List, Tuple
 from PIL import Image
 import numpy as np
 import torch
-from gibson_env_utilities.doors_dataset.door_sample import DoorSample
+from doors_detection_long_term.positions_extractor.doors_dataset.door_sample import DoorSample
 
-import doors_detector.utilities.transforms as T
+import doors_detection_long_term.doors_detector.utilities.transforms as T
 import pandas as pd
 from torch.utils.data import Dataset
 

@@ -3,11 +3,11 @@ import pandas as pd
 import torch
 from generic_dataset.dataset_manager import DatasetManager
 from generic_dataset.utilities.color import Color
-from doors_detector.dataset.dataset_doors_final.door_sample import DoorSample
+from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.door_sample import DoorSample
 import doors_detector.utilities.transforms as T
 from PIL import Image
 from typing import Type, List, Tuple
-from doors_detector.dataset.torch_dataset import TorchDataset, SET, TRAIN_SET, TEST_SET
+from doors_detection_long_term.doors_detector.dataset.torch_dataset import TorchDataset, SET, TRAIN_SET, TEST_SET
 
 
 class DatasetDoorsFinal(TorchDataset):

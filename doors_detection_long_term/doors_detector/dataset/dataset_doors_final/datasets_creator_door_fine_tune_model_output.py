@@ -8,9 +8,9 @@ from PIL import Image
 from generic_dataset.dataset_manager import DatasetManager
 from sklearn.utils import shuffle
 
-from doors_detector.dataset.dataset_doors_final.door_sample import DoorSample
-from doors_detector.dataset.dataset_doors_final.final_doors_dataset import DatasetDoorsFinal
-from doors_detector.dataset.torch_dataset import TorchDataset, TRAIN_SET, SET, TEST_SET
+from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.door_sample import DoorSample
+from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.final_doors_dataset import DatasetDoorsFinal
+from doors_detection_long_term.doors_detector.dataset.torch_dataset import TorchDataset, TRAIN_SET, SET, TEST_SET
 
 
 class TorchDatasetModelOutput(DatasetDoorsFinal):

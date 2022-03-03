@@ -2,7 +2,7 @@ import os
 
 import cv2
 import numpy as np
-from gibson_env_utilities.doors_dataset.door_sample import DoorSample
+from doors_detection_long_term.positions_extractor.doors_dataset.door_sample import DoorSample
 
 from doors_detector.dataset.torch_dataset import TorchDataset
 

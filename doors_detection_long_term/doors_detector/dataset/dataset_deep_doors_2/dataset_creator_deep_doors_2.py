@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 import pandas as pd
 import generic_dataset.utilities.save_load_methods as slm
-from doors_detection_long_ter.doors_dataset.door_sample import DoorSample
+from doors_detection_long_term.positions_extractor.doors_dataset.door_sample import DoorSample
 from sklearn.model_selection import train_test_split
 
 from doors_detector.dataset.dataset_deep_doors_2.dataset_deep_doors_2 import DatasetDeepDoors2

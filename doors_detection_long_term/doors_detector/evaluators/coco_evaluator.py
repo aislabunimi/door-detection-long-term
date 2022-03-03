@@ -2,7 +2,7 @@ from typing import Dict
 
 from src.evaluators.coco_evaluator import get_coco_summary
 
-from doors_detector.evaluators.model_evaluator import ModelEvaluator
+from doors_detection_long_term.doors_detector.evaluators.model_evaluator import ModelEvaluator
 
 
 class CocoEvaluator(ModelEvaluator):

@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 from src.bounding_box import BoundingBox
 from src.evaluators.pascal_voc_evaluator import calculate_ap_every_point
 
-from doors_detector.evaluators.model_evaluator import ModelEvaluator
+from doors_detection_long_term.doors_detector.evaluators.model_evaluator import ModelEvaluator
 
 
 class DoorNoDoorEvaluator(ModelEvaluator):

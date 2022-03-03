@@ -2,7 +2,7 @@ from typing import Dict
 
 from src.evaluators.pascal_voc_evaluator import get_pascalvoc_metrics
 
-from doors_detector.evaluators.model_evaluator import ModelEvaluator
+from doors_detection_long_term.doors_detector.evaluators.model_evaluator import ModelEvaluator
 
 
 class PascalEvaluator(ModelEvaluator):

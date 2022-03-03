@@ -2,8 +2,8 @@ import torch.nn.functional as F
 import torch
 from torch import nn
 
-from doors_detector.models.model_names import ModelName
-from doors_detector.utilities import utils
+from doors_detection_long_term.doors_detector.models.model_names import ModelName
+from doors_detection_long_term.doors_detector.utilities import utils
 
 
 class PostProcess(nn.Module):

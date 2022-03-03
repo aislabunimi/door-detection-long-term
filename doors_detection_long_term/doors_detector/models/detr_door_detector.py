@@ -4,9 +4,9 @@ from typing import Tuple
 import torch
 from torch import nn
 
-from doors_detector.dataset.torch_dataset import DATASET
-from doors_detector.models.mlp import MLP
-from doors_detector.models.model_names import ModelName
+from doors_detection_long_term.doors_detector.dataset.torch_dataset import DATASET
+from doors_detection_long_term.doors_detector.models.mlp import MLP
+from doors_detection_long_term.doors_detector.models.model_names import ModelName
 
 DESCRIPTION = int
 

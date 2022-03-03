@@ -4,9 +4,9 @@ from generic_dataset.dataset_manager import DatasetManager
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 
-from doors_detector.dataset.dataset_doors_final.door_sample import DoorSample, DOOR_LABELS
-from doors_detector.dataset.dataset_doors_final.final_doors_dataset import DatasetDoorsFinal
-from doors_detector.dataset.torch_dataset import TRAIN_SET, TEST_SET
+from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.door_sample import DoorSample, DOOR_LABELS
+from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.final_doors_dataset import DatasetDoorsFinal
+from doors_detection_long_term.doors_detector.dataset.torch_dataset import TRAIN_SET, TEST_SET
 
 
 class DatasetsCreatorDoorsNoDoorTask:

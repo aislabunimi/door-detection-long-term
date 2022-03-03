@@ -1,8 +1,8 @@
 import pandas as pd
-from deep_doors_2.door_sample import DoorSample
+from doors_detection_long_term.doors_detector.dataset.dataset_deep_doors_2_labelled.door_sample import DoorSample
 from generic_dataset.dataset_manager import DatasetManager
 from typing import List, Tuple
-from doors_detector.dataset.torch_dataset import TorchDataset, SET
+from doors_detection_long_term.doors_detector.dataset.torch_dataset import TorchDataset, SET
 
 
 class DatasetDeepDoors2Labelled(TorchDataset):

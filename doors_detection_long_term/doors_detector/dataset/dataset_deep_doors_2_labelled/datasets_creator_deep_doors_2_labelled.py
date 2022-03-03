@@ -1,10 +1,11 @@
 from typing import Union
-from doors_detector.dataset.torch_dataset import TRAIN_SET, TEST_SET
+from doors_detection_long_term.doors_detector.dataset.torch_dataset import TRAIN_SET, TEST_SET
 from generic_dataset.dataset_manager import DatasetManager
-from deep_doors_2.door_sample import DoorSample, DOOR_LABELS
 from sklearn.model_selection import train_test_split
+from doors_detection_long_term.doors_detector.dataset.dataset_deep_doors_2_labelled.door_sample import DoorSample, DOOR_LABELS
 
-from doors_detector.dataset.dataset_deep_doors_2_labelled.dataset_deep_door_2_labelled import DatasetDeepDoors2Labelled
+
+from doors_detection_long_term.doors_detector.dataset.dataset_deep_doors_2_labelled.dataset_deep_door_2_labelled import DatasetDeepDoors2Labelled
 
 
 class DatasetsCreatorDeepDoors2Labelled:
