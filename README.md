@@ -21,3 +21,18 @@ The code to extract plausible positions of a mobile robot to acquire the images 
 * The proposed simulation environment [link](https://github.com/micheleantonazzi/GibsonEnv.git)
 * The code to determine a set of relevant poses for a mobile robot in an environment [link](https://github.com/micheleantonazzi/gibson-env-utilities) 
 
+## Results
+
+In this paper, we present a door detector for autonomous robots to find doors and their status (open or closed) in RGB images. We built a *general detector* and a technique to increase its performance in the specific operational environment of the robot. This technique, based on the fine-tune paradigm, produces a *qualified detector* fine-tuned with new examples acquired directly from the target environment *e*. We test this approach in 10 different photorealistic simulated environments, producing a general detector *GD<sub>-e</sub>* without any knowledge about *e* and three qualified modules (starting from *GD<sub>-e</sub>*) fine-tuned with the 25%, 50%, and 75% of the new examples collected in *e*. We call these detectors *QD<sup>25</sup><sub>e</sub>*, *QD<sup>50</sup><sub>e</sub>*, *QD<sup>75</sup><sub>e</sub>*. 
+
+Our results shows that the proposed general detector *GD<sub>-e</sub>*  correctly detects doors also with any knowledge of a target environment *e*.
+
+![](images/gd_examples.png)
+
+We also demonstrate that the detection accuracy increases with consecutive fine-tune operations.
+
+![](images/increment_examples.png)
+
+Another interesting outcome is that the best performance increment is reached with the smallest fine-tune operation (*QD<sup>25</sup><sub>e</sub>*) which requires the lowest effort to acquire and label the new examples.
+
+![](images/gd_qd_25_examples.png)
