@@ -7,6 +7,7 @@ from torch import nn
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import DATASET
 from doors_detection_long_term.doors_detector.models.mlp import MLP
 from doors_detection_long_term.doors_detector.models.model_names import ModelName
+from doors_detection_long_term.scripts.doors_detector.dataset_configurator import trained_models_path
 
 DESCRIPTION = int
 
@@ -107,15 +108,14 @@ class DetrDoorDetector(nn.Module):
         self.model.to(device)
 
     def save(self, epoch, optimizer_state_dict, lr_scheduler_state_dict, params, logs):
-        path = os.path.join(os.path.dirname(__file__), 'train_params', self._model_name + '_' + str(self._description))
+        path = os.path.join('train_params', self._model_name + '_' + str(self._description), str(self._dataset_name))
+        if trained_models_path == "":
+            path = os.path.join(os.path.dirname(__file__), path)
+        else:
+            path = os.path.join(trained_models_path, path)
 
         if not os.path.exists(path):
-            os.mkdir(path)
-
-        path = os.path.join(path, str(self._dataset_name))
-
-        if not os.path.exists(path):
-            os.mkdir(path)
+            os.makedirs(path)
 
         torch.save(self.model.state_dict(), os.path.join(path, 'model.pth'))
         torch.save(
@@ -134,7 +134,12 @@ class DetrDoorDetector(nn.Module):
         )
 
     def load_checkpoint(self,):
-        path = os.path.join(os.path.dirname(__file__), 'train_params', self._model_name + '_' + str(self._description), str(self._dataset_name))
+        path = os.path.join('train_params', self._model_name + '_' + str(self._description), str(self._dataset_name))
+        if trained_models_path == "":
+            path = os.path.join(os.path.dirname(__file__), path)
+        else:
+            path = os.path.join(trained_models_path, path)
+
         checkpoint = torch.load(os.path.join(path, 'checkpoint.pth'))
         training_data = torch.load(os.path.join(path, 'training_data.pth'))
 
