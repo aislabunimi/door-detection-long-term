@@ -79,7 +79,11 @@ class DetrDoorDetector(nn.Module):
         self.model.class_embed = nn.Linear(256, n_labels + 1)
 
         if pretrained:
-            path = os.path.join(os.path.dirname(__file__), 'train_params', self._model_name + '_' + str(self._description), str(self._dataset_name))
+            path = os.path.join('train_params', self._model_name + '_' + str(self._description), str(self._dataset_name))
+            if trained_models_path == "":
+                path = os.path.join(os.path.dirname(__file__), path)
+            else:
+                path = os.path.join(trained_models_path, path)
             self.model.load_state_dict(torch.load(os.path.join(path, 'model.pth')))
 
     def forward(self, x):
