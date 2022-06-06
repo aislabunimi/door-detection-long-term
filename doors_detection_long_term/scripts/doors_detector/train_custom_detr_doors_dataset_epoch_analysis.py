@@ -21,7 +21,7 @@ device = 'cuda'
 
 # Params
 params = {
-    'epochs': 100,
+    'epochs': 1,
     'batch_size': 1,
     'seed': 0,
     'lr': 1e-5,
@@ -51,8 +51,8 @@ if __name__ == '__main__':
 
     print(f'Train set size: {len(train)}', f'Validation set size: {len(validation)}', f'Test set size: {len(test)}')
 
-    model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=reload_model, dataset_name=FINAL_DOORS_DATASET, description=EXP_1_HOUSE_1)
-    model.set_description(description=EXP_2_HOUSE_1_25)
+    model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=reload_model, dataset_name=FINAL_DOORS_DATASET, description=EXP_1_HOUSE_1_EPOCHS_ANALYSIS)
+    #model.set_description(description=EXP_2_HOUSE_1_25_EPOCHS_ANALYSIS)
     #model.set_dataset_name(dataset_name=GIBSON_DATASET_SMALL)
     model.to(device)
 

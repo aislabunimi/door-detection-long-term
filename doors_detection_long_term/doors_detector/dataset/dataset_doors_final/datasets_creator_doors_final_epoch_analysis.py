@@ -30,8 +30,9 @@ class DatasetsCreatorDoorsFinalEpochAnalysis:
         1) This first experiment consists on training a general model on a set of environment E \ {e}
             the model is validated using a subset of the examples collected in E \ {e}
             and it is tested using the 25% of the examples collected in e
-        2) The second experiment involves fine-tuning the previously trained model using some examples of the test data used in experiment 1.
-        This new training data belongs to a new environment, never seen in the first training phase. The remaining sample of the k-th folder are used as a test set.
+        2) The second experiment consists of fine-tune the previously trained model using some examples collected in e.
+            It is trained using the 25%, 50% and 75% of the examples collected in e and tested with the remaining 25% of images (that are the same in the experiment1)
+            It is validated using the previous validation set to understand the model forgetting.
         :param experiment: the number of the experiment to perform. It's value must be 0 or 1
         :param folder_name: the name of the folder to use as a test set in experiment 1 or to split into training a test sets in experiment 2.
         :return: the instance of DatasetsCreatorDoorsFinal
@@ -64,7 +65,7 @@ class DatasetsCreatorDoorsFinalEpochAnalysis:
         if self._experiment == 1:
             # Extract the dataframe for training the generic model (with the examples acquired in the set of environment E \ {e}
             generic_dataframe = shuffled_dataframe[(shuffled_dataframe.folder_name != self._folder_name)]
-            train_index, validation_index = train_test_split(generic_dataframe.index.tolist(), train_size=0.01, test_size=0.01, random_state=random_state)
+            train_index, validation_index = train_test_split(generic_dataframe.index.tolist(), train_size=0.95, random_state=random_state)
 
             train_dataframe_generic = generic_dataframe.loc[train_index]
             # Remove negative images for training
@@ -74,7 +75,7 @@ class DatasetsCreatorDoorsFinalEpochAnalysis:
 
             # Extract the dataframe for testing in the environment e (not used during the training)
             qualified_dataframe = shuffled_dataframe[shuffled_dataframe.folder_name == self._folder_name]
-            _, test_index= train_test_split(qualified_dataframe.index.tolist(), test_size=0.25, random_state=random_state)
+            _, test_index = train_test_split(qualified_dataframe.index.tolist(), test_size=0.25, random_state=random_state)
 
             test_dataframe = qualified_dataframe.loc[test_index]
 
@@ -83,18 +84,28 @@ class DatasetsCreatorDoorsFinalEpochAnalysis:
                 test_dataframe = test_dataframe[test_dataframe.label == 1]
 
         elif self._experiment == 2:
-            shuffled_dataframe = shuffled_dataframe[shuffled_dataframe.folder_name == self._folder_name]
-            positive_dataframe = shuffled_dataframe[shuffled_dataframe.label == 1]
-            negative_dataframe = shuffled_dataframe[shuffled_dataframe.label == 0]
-            train, test = train_test_split(positive_dataframe.index.tolist(), test_size=0.25, random_state=random_state)
+            # Extract the dataframe for training the generic model (with the examples acquired in the set of environment E \ {e}
+            generic_dataframe = shuffled_dataframe[(shuffled_dataframe.folder_name != self._folder_name)]
+            _, validation_index = train_test_split(generic_dataframe.index.tolist(), train_size=0.95, random_state=random_state)
+
+
+            validation_dataframe = generic_dataframe.loc[validation_index]
+
+            # Extract the dataframe for testing in the environment e (not used during the training)
+            qualified_dataframe = shuffled_dataframe[shuffled_dataframe.folder_name == self._folder_name]
+            train_index, test_index = train_test_split(qualified_dataframe.index.tolist(), test_size=0.25, random_state=random_state)
+
+            train_dataframe = qualified_dataframe.loc[train_index]
+            # Remove the negative images (without door)
+            train_dataframe = train_dataframe[train_dataframe.label == 1]
 
             if train_size < 0.75:
-                train, _ = train_test_split(train, train_size=train_size * (4 / 3), random_state=random_state)
+                train_dataframe = train_dataframe[: int(len(train_dataframe.index) * (train_size * 4 / 3))]
 
-            train_dataframe = shuffled_dataframe.loc[train]
-            test_dataframe = shuffle(pd.concat([shuffled_dataframe.loc[test], negative_dataframe]), random_state=random_state)
+            test_dataframe = qualified_dataframe.loc[test_index]
 
             if not self._use_negatives:
+                validation_dataframe = validation_dataframe[validation_dataframe.label == 1]
                 test_dataframe = test_dataframe[test_dataframe.label == 1]
 
         def print_information(dataframe):

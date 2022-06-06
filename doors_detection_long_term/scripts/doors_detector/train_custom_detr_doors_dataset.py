@@ -21,7 +21,7 @@ device = 'cuda'
 
 # Params
 params = {
-    'epochs': 20,
+    'epochs': 100,
     'batch_size': 1,
     'seed': 0,
     'lr': 1e-5,
@@ -38,7 +38,7 @@ params = {
     'set_cost_giou': 2,
 }
 
-reload_model = True
+reload_model = False
 restart_checkpoint = False
 
 if __name__ == '__main__':
