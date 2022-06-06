@@ -21,7 +21,7 @@ device = 'cuda'
 
 # Params
 params = {
-    'epochs': 1,
+    'epochs': 100,
     'batch_size': 1,
     'seed': 0,
     'lr': 1e-5,
