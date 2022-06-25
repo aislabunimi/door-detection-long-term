@@ -44,6 +44,7 @@ params = {
 
 
 def prepare_model(description, reload_model, restart_checkpoint):
+    print(labels.keys())
     model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=reload_model, dataset_name=FINAL_DOORS_DATASET, description=description)
     model.to(device)
     start_epoch = 0
@@ -99,16 +100,16 @@ if __name__ == '__main__':
     seed_everything(params['seed'])
 
     # Train the general detector with multiple epochs
-    epoch_count = 0
     for house in houses:
+        epoch_count = 0
         train, validation, test, labels, _ = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name=house.replace('_', ''), train_size=0.25, use_negatives=False)
         print(f'Train set size: {len(train)}', f'Validation set size: {len(validation)}', f'Test set size: {len(test)}')
         data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_fn=collate_fn, shuffle=False, num_workers=4)
         data_loader_validation = DataLoader(validation, batch_size=params['batch_size'], collate_fn=collate_fn, drop_last=False, num_workers=4)
         data_loader_test = DataLoader(test, batch_size=params['batch_size'], collate_fn=collate_fn, drop_last=False, num_workers=4)
 
-        model, criterion, lr_scheduler, optimizer, logs = prepare_model(f'EXP_1_{house}_EPOCHS_ANALYSIS_{epochs_general_detector[0]}', reload_model=False, restart_checkpoint=False)
-
+        model, criterion, lr_scheduler, optimizer, logs = prepare_model(globals()[f'EXP_1_{house}_EPOCHS_ANALYSIS_{epochs_general_detector[0]}'.upper()], reload_model=False, restart_checkpoint=False)
+        print(model._description)
         print_logs_every = 10
 
         start_time = time.time()
@@ -305,8 +306,7 @@ if __name__ == '__main__':
             # Change the model description on each epoch step
             if epoch == epochs_general_detector[epoch_count] -1 and epoch_count < len(epochs_general_detector) -1:
                 epoch_count += 1
-                model.set_description(f'EXP_1_{house}_EPOCHS_ANALYSIS_{epochs_general_detector[epoch_count]}')
-
+                model.set_description(globals()[f'EXP_1_{house}_EPOCHS_ANALYSIS_{epochs_general_detector[epoch_count]}'.upper()])
 
     # Qualify the general detectors trained before
     for house, epochs, quantity in [(h, e, q) for h in houses for e in epochs_general_detector for q in fine_tune_quantity]:
@@ -317,8 +317,8 @@ if __name__ == '__main__':
         data_loader_validation = DataLoader(validation, batch_size=params['batch_size'], collate_fn=collate_fn, drop_last=False, num_workers=4)
         data_loader_test = DataLoader(test, batch_size=params['batch_size'], collate_fn=collate_fn, drop_last=False, num_workers=4)
 
-        model, criterion, lr_scheduler, optimizer, logs = prepare_model(f'EXP_1_{house}_EPOCHS_ANALYSIS_{epochs}', reload_model=True, restart_checkpoint=False)
-        model.set_description(f'EXP_2_{house}_{quantity}_EPOCHS_ANALYSIS_{epochs}')
+        model, criterion, lr_scheduler, optimizer, logs = prepare_model(globals()[f'EXP_1_{house}_EPOCHS_ANALYSIS_{epochs}'.upper()], reload_model=True, restart_checkpoint=False)
+        model.set_description(globals()[f'EXP_2_{house}_{quantity}_EPOCHS_ANALYSIS_{epochs}'.upper()])
         print_logs_every = 10
 
         start_time = time.time()
