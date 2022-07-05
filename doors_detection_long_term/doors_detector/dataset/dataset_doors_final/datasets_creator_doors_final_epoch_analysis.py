@@ -1,5 +1,6 @@
 from typing import Union, Tuple, List
 
+import numpy as np
 import pandas as pd
 from sklearn.utils import shuffle
 
@@ -64,49 +65,42 @@ class DatasetsCreatorDoorsFinalEpochAnalysis:
 
         if self._experiment == 1:
             # Extract the dataframe for training the generic model (with the examples acquired in the set of environment E \ {e}
-            generic_dataframe = shuffled_dataframe[(shuffled_dataframe.folder_name != self._folder_name)]
-            train_index, validation_index = train_test_split(generic_dataframe.index.tolist(), train_size=0.95, random_state=random_state)
 
-            train_dataframe_generic = generic_dataframe.loc[train_index]
-            # Remove negative images for training
-            train_dataframe = train_dataframe_generic[shuffled_dataframe.label == 1]
+            # Build train and validation set
+            generic_dataframe = shuffled_dataframe[(shuffled_dataframe.folder_name != self._folder_name) & (shuffled_dataframe.label == 1)]
+            train_index, _ = train_test_split(generic_dataframe.index.tolist(), train_size=0.95, random_state=random_state)
 
-            validation_dataframe = generic_dataframe.loc[validation_index]
+            train_dataframe = generic_dataframe.loc[train_index]
 
-            # Extract the dataframe for testing in the environment e (not used during the training)
-            qualified_dataframe = shuffled_dataframe[shuffled_dataframe.folder_name == self._folder_name]
-            _, test_index = train_test_split(qualified_dataframe.index.tolist(), test_size=0.25, random_state=random_state)
-
-            test_dataframe = qualified_dataframe.loc[test_index]
-
-            if not self._use_negatives:
-                validation_dataframe = validation_dataframe[validation_dataframe.label == 1]
-                test_dataframe = test_dataframe[test_dataframe.label == 1]
 
         elif self._experiment == 2:
-            # Extract the dataframe for training the generic model (with the examples acquired in the set of environment E \ {e}
-            generic_dataframe = shuffled_dataframe[(shuffled_dataframe.folder_name != self._folder_name)]
-            _, validation_index = train_test_split(generic_dataframe.index.tolist(), train_size=0.95, random_state=random_state)
-
-
-            validation_dataframe = generic_dataframe.loc[validation_index]
 
             # Extract the dataframe for testing in the environment e (not used during the training)
-            qualified_dataframe = shuffled_dataframe[shuffled_dataframe.folder_name == self._folder_name]
-            train_index, test_index = train_test_split(qualified_dataframe.index.tolist(), test_size=0.25, random_state=random_state)
+            qualified_dataframe = shuffled_dataframe[(shuffled_dataframe.folder_name == self._folder_name) & (shuffled_dataframe.label == 1)]
+            [fold_1, fold_2, fold_3, _] = np.array_split(qualified_dataframe.index.to_numpy(), 4)
 
-            train_dataframe = qualified_dataframe.loc[train_index]
-            # Remove the negative images (without door)
-            train_dataframe = train_dataframe[train_dataframe.label == 1]
+            if train_size == 0.25:
+                train_dataframe = qualified_dataframe.loc[fold_1.tolist()]
+            elif train_size == 0.50:
+                train_dataframe = qualified_dataframe.loc[fold_1.tolist() + fold_2.tolist()]
+            elif train_size == 0.75:
+                train_dataframe = qualified_dataframe.loc[fold_1.tolist() + fold_2.tolist() + fold_3.tolist()]
+            else:
+                raise Exception('Train size must be 0.25, 0.50 or 0.75')
 
-            if train_size < 0.75:
-                train_dataframe = train_dataframe[: int(len(train_dataframe.index) * (train_size * 4 / 3))]
+        # Build validation set
+        generic_dataframe = shuffled_dataframe[(shuffled_dataframe.folder_name != self._folder_name) & (shuffled_dataframe.label == 1)]
+        _, validation_index = train_test_split(generic_dataframe.index.tolist(), train_size=0.95, random_state=random_state)
+        validation_dataframe = generic_dataframe.loc[validation_index]
 
-            test_dataframe = qualified_dataframe.loc[test_index]
+        # Build test set
+        qualified_dataframe = shuffled_dataframe[(shuffled_dataframe.folder_name == self._folder_name) & (shuffled_dataframe.label == 1)]
+        [_, _, _, fold_4] = np.array_split(qualified_dataframe.index.to_numpy(), 4)
 
-            if not self._use_negatives:
-                validation_dataframe = validation_dataframe[validation_dataframe.label == 1]
-                test_dataframe = test_dataframe[test_dataframe.label == 1]
+        test_dataframe = qualified_dataframe.loc[fold_4.tolist()]
+
+        if self._use_negatives:
+            test_dataframe = test_dataframe.append(shuffled_dataframe[(shuffled_dataframe.folder_name == self._folder_name) & (shuffled_dataframe.label == 0)], ignore_index = True)
 
         def print_information(dataframe):
             print(f'    - total samples = {len(dataframe.index)}\n'
