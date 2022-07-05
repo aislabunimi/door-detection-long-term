@@ -47,7 +47,7 @@ params = {
 def prepare_model(description, reload_model, restart_checkpoint):
     print(labels.keys())
     model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=reload_model, dataset_name=FINAL_DOORS_DATASET, description=description)
-    model.to(device)
+
     start_epoch = 0
     logs = {'train': [], 'train_after_backpropagation': [], 'validation': [], 'test': [], 'time': []}
     optimizer_state_dict = {}
@@ -74,8 +74,10 @@ def prepare_model(description, reload_model, restart_checkpoint):
             "lr": params['lr_backbone'],
         },
     ]
+    [p.to(device) for n, p in model.named_parameters()]
 
     optimizer = torch.optim.AdamW(param_dicts, lr=params['lr'], weight_decay=params['weight_decay'])
+
 
     # StepLR decays the learning rate of each parameter group by gamma every step_size epochs
     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, params['lr_drop'])
@@ -90,6 +92,7 @@ def prepare_model(description, reload_model, restart_checkpoint):
     matcher = HungarianMatcher(cost_class=params['set_cost_class'], cost_bbox=params['set_cost_bbox'], cost_giou=params['set_cost_giou'])
     criterion = SetCriterion(len(labels.keys()), matcher=matcher, weight_dict=weight_dict,
                              eos_coef=params['eos_coef'], losses=losses)
+    model.to(device)
     criterion.to(device)
 
     return model, criterion, lr_scheduler, optimizer, logs
