@@ -23,7 +23,8 @@ if __name__ == '__main__':
     seed_everything(params['seed'])
 
     #train, test, labels, COLORS = get_deep_doors_2_labelled_sets()
-    train, test, labels, COLORS = get_final_doors_dataset(2, 'house1', train_size=0.25, use_negatives=True)
+    #train, test, labels, COLORS = get_final_doors_dataset(2, 'house1', train_size=0.25, use_negatives=False)
+    train, validation, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name='house1', train_size=0.75, use_negatives=True)
 
     print(f'Train set size: {len(train)}', f'Test set size: {len(test)}')
 
