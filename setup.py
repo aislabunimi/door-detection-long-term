@@ -58,12 +58,14 @@ setup(
     tests_require=test_deps,
     # Add here the package dependencies
     install_requires=[
+        'PyQt5',
         'numpy',
         'opencv-python',
         'generic-dataset',
         'torch',
         'torchvision',
         'scikit-learn',
+        'git+http://github.com/micheleantonazzi/detr.git',
         'src @ git+http://github.com/rafaelpadilla/review_object_detection_metrics.git#egg=src',
         'gibson'
     ],
