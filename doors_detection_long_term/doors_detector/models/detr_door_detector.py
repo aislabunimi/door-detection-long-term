@@ -584,7 +584,7 @@ class DetrDoorDetector(nn.Module):
                 path = os.path.join(os.path.dirname(__file__), path)
             else:
                 path = os.path.join(trained_models_path, path)
-            self.model.load_state_dict(torch.load(os.path.join(path, 'model.pth')))
+            self.model.load_state_dict(torch.load(os.path.join(path, 'model.pth'), map_location=torch.device('cpu')))
 
     def forward(self, x):
         x = self.model(x)
