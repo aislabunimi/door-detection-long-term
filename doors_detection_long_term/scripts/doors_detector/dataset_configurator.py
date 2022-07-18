@@ -1,5 +1,11 @@
 import numpy as np
 from doors_detection_long_term.doors_detector.dataset.dataset_deep_doors_2_labelled.datasets_creator_deep_doors_2_labelled import DatasetsCreatorDeepDoors2Labelled
+from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.dataset_creator_all_envs import \
+    DatasetsCreatorAllEnvs
+from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.dataset_creator_deep_doors_2_relabelled_gd import \
+    DatasetsCreatorDeepDoors2LabelledGD
+from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.dataset_creator_gibson_and_deep_doors_2 import \
+    DatasetsCreatorGibsonAndDeepDoors2
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_final import DatasetsCreatorDoorsFinal
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_final_epoch_analysis import \
     DatasetsCreatorDoorsFinalEpochAnalysis
@@ -49,3 +55,27 @@ def get_final_doors_dataset_door_no_door_task(folder_name: str, train_size: floa
     labels = dataset_creator.get_labels()
 
     return train, test, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
+
+def get_final_doors_dataset_all_envs():
+    dataset_creator = DatasetsCreatorAllEnvs(dataset_path=final_doors_dataset_path)
+    train, validation = dataset_creator.create_datasets()
+    labels = dataset_creator.get_labels()
+
+    return train, validation, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
+
+def get_deep_doors_2_relabelled_dataset_for_gd():
+    dataset_creator = DatasetsCreatorDeepDoors2LabelledGD(dataset_path=deep_doors_2_labelled_dataset_path)
+
+    train, validation = dataset_creator.creates_dataset()
+    labels = dataset_creator.get_labels()
+
+    return train, validation, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
+
+def get_gibson_and_deep_door_2_dataset(half: bool):
+    dataset_creator = DatasetsCreatorGibsonAndDeepDoors2(dataset_path_gibson=final_doors_dataset_path, dataset_path_deep_doors_2=deep_doors_2_labelled_dataset_path)
+
+    train, validation = dataset_creator.creates_dataset(half=half)
+    labels = dataset_creator.get_labels()
+
+    return train, validation, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
+
