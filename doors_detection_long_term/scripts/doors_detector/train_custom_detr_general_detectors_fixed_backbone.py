@@ -25,7 +25,7 @@ model_names = [(EXP_GENERAL_DETECTOR_FIXED_BACKBONE_GIBSON_40_EPOCHS, EXP_GENERA
                (EXP_GENERAL_DETECTOR_FIXED_BACKBONE_GIBSON_DEEP_DOORS_2_HALF_40_EPOCHS, EXP_GENERAL_DETECTOR_FIXED_BACKBONE_GIBSON_DEEP_DOORS_2_HALF_60_EPOCHS),
                (EXP_GENERAL_DETECTOR_FIXED_BACKBONE_GIBSON_DEEP_DOORS_2_40_EPOCHS, EXP_GENERAL_DETECTOR_FIXED_BACKBONE_GIBSON_DEEP_DOORS_2_60_EPOCHS)]
 
-datasets = [get_final_doors_dataset_all_envs(), get_deep_doors_2_relabelled_dataset_for_gd(), get_gibson_and_deep_door_2_dataset(False), get_gibson_and_deep_door_2_dataset(True)]
+datasets = [get_final_doors_dataset_all_envs(), get_deep_doors_2_relabelled_dataset_for_gd(), get_gibson_and_deep_door_2_dataset(True), get_gibson_and_deep_door_2_dataset(False)]
 # Params
 params = {
     'epochs': 40,
