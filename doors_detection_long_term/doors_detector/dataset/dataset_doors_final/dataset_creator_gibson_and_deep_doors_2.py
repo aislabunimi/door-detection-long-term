@@ -35,7 +35,7 @@ class DatasetsCreatorGibsonAndDeepDoors2:
         shuffled_dataframe = shuffle(self._dataframe, random_state=random_state)
 
         if half:
-            shuffled_dataframe = shuffled_dataframe[: len(shuffled_dataframe.index)]
+            shuffled_dataframe = shuffled_dataframe[: int(len(shuffled_dataframe.index) / 2)]
 
         train, validation = train_test_split(shuffled_dataframe.index.tolist(), train_size=0.95, random_state=random_state)
         train_dataframe = self._dataframe.loc[train]
