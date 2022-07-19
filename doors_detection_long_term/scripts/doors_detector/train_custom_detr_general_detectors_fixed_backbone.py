@@ -66,8 +66,8 @@ def prepare_model(description, labels, reload_model, restart_checkpoint):
         if p.requires_grad:
             print(n)
 
-    #for p in [p for n, p in model.named_parameters() if "backbone" in n]:
-        #p.requires_grad = False
+    for p in [p for n, p in model.named_parameters() if "backbone" in n]:
+        p.requires_grad = False
 
     param_dicts = [
         {"params": [p for n, p in model.named_parameters() if "backbone" not in n and p.requires_grad]},
