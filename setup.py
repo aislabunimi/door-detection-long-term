@@ -55,6 +55,7 @@ setup(
         'Programming Language :: Python :: 3'
     ],
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
+    tests_require=test_deps,
     # Add here the package dependencies
     install_requires=[
         'PyQt5',
@@ -64,7 +65,7 @@ setup(
         'torch',
         'torchvision',
         'scikit-learn',
-        'git+http://github.com/micheleantonazzi/detr.git',
+        'detr @ git+http://github.com/micheleantonazzi/detr.git',
         'src @ git+http://github.com/rafaelpadilla/review_object_detection_metrics.git#egg=src',
         'gibson',
         "pytest",
@@ -74,6 +75,5 @@ setup(
         'console_scripts': [
         ],
     },
-    test_deps=test_deps,
     extras_require=extras,
 )
