@@ -12,7 +12,7 @@ fig, ax = subplots(figsize=(10, 5))
 
 for backbone, epochs_general, epochs in [(b, e_g, e) for b in ['fixed', '2_layers'] for e_g in [40, 60] for e in [20, 40]]:
     y = [results.loc[(backbone, 'GD',epochs_general, epochs_general, 0), 'AP']] + [results.loc[(backbone, d,epochs_general, epochs, 0), 'AP'] for d in ['QD_25', 'QD_50', 'QD_75']]
-    ax.plot([0, 1, 2, 3], y, label=f'Backbone {backbone}, {epochs_general} epochs GD, {epochs} epochs')
+    ax.plot([0, 1, 2, 3], y, '--' if backbone == 'fixed' else '-', label=f'Backbone {backbone}, {epochs_general} epochs GD, {epochs} epochs')
 
 
 
@@ -29,7 +29,7 @@ fig, ax = subplots(figsize=(10, 5))
 
 for backbone, epochs_general, epochs in [(b, e_g, e) for b in ['fixed', '2_layers'] for e_g in [40, 60] for e in [20, 40]]:
     y = [results.loc[(backbone, 'GD',epochs_general, epochs_general, 1), 'AP']] + [results.loc[(backbone, d,epochs_general, epochs, 1), 'AP'] for d in ['QD_25', 'QD_50', 'QD_75']]
-    ax.plot([0, 1, 2, 3], y, label=f'Backbone {backbone}, {epochs_general} epochs GD, {epochs} epochs')
+    ax.plot([0, 1, 2, 3], y, '--' if backbone == 'fixed' else '-', label=f'Backbone {backbone}, {epochs_general} epochs GD, {epochs} epochs')
 
 
 
