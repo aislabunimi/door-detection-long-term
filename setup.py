@@ -55,7 +55,6 @@ setup(
         'Programming Language :: Python :: 3'
     ],
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
-    tests_require=test_deps,
     # Add here the package dependencies
     install_requires=[
         'PyQt5',
@@ -67,7 +66,9 @@ setup(
         'scikit-learn',
         'git+http://github.com/micheleantonazzi/detr.git',
         'src @ git+http://github.com/rafaelpadilla/review_object_detection_metrics.git#egg=src',
-        'gibson'
+        'gibson',
+        "pytest",
+        "pytest-cov",
     ],
     entry_points={
         'console_scripts': [
