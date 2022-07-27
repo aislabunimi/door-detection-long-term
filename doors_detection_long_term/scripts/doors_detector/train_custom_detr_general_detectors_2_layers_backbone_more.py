@@ -122,14 +122,14 @@ if __name__ == '__main__':
         start_time = time.time()
 
         for epoch in range(start_epoch, epochs_general_detector[-1]):
-
+            dataset_train = [training_data for training_data in data_loader_train]
             temp_logs = {'train': [], 'train_after_backpropagation': [], 'validation': []}
             accumulate_losses = {}
 
             model.train()
             criterion.train()
 
-            for i, training_data in enumerate(data_loader_train):
+            for i, training_data in enumerate(dataset_train):
                 # Data is a tuple where
                 #   - data[0]: a tensor containing all images shape = [batch_size, channels, img_height, img_width]
                 #   - data[1]: a tuple of dictionaries containing the images' targets
