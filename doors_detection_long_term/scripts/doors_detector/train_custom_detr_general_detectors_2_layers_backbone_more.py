@@ -76,7 +76,6 @@ def prepare_model(description, labels, reload_model, restart_checkpoint):
             "lr": params['lr_backbone'],
         },
     ]
-    [p.to(device) for n, p in model.named_parameters()]
 
     optimizer = torch.optim.AdamW(param_dicts, lr=params['lr'], weight_decay=params['weight_decay'])
 
@@ -86,6 +85,10 @@ def prepare_model(description, labels, reload_model, restart_checkpoint):
 
     if restart_checkpoint:
         optimizer.load_state_dict(optimizer_state_dict)
+        for state in optimizer.state.values():
+            for k, v in state.items():
+                if isinstance(v, torch.Tensor):
+                    state[k] = v.cuda()
         lr_scheduler.load_state_dict(lr_scheduler_state_dict)
 
     # Create criterion to calculate losses
