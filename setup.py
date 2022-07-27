@@ -65,14 +65,15 @@ setup(
         'torch',
         'torchvision',
         'scikit-learn',
-        'git+http://github.com/micheleantonazzi/detr.git',
+        'detr @ git+http://github.com/micheleantonazzi/detr.git',
         'src @ git+http://github.com/rafaelpadilla/review_object_detection_metrics.git#egg=src',
-        'gibson'
+        'gibson',
+        "pytest",
+        "pytest-cov",
     ],
     entry_points={
         'console_scripts': [
         ],
     },
-    test_deps=test_deps,
     extras_require=extras,
 )
