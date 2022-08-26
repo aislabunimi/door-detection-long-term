@@ -79,3 +79,10 @@ def get_gibson_and_deep_door_2_dataset(half: bool):
 
     return train, validation, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
 
+def get_final_doors_dataset_real_data(folder_name: str, train_size: float = 0.1):
+    dataset_creator = DatasetsCreatorRealData(dataset_path=real_final_doors_dataset_path)
+    train, test = dataset_creator.create_datasets(folder_name=folder_name, train_size=train_size, )
+    labels = dataset_creator.get_labels()
+
+    return train, test, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
+
