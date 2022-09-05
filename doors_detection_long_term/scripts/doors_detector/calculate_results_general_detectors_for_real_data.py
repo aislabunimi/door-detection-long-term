@@ -11,7 +11,7 @@ from doors_detection_long_term.doors_detector.models.model_names import DETR_RES
 from doors_detection_long_term.doors_detector.utilities.utils import collate_fn
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import get_final_doors_dataset_real_data
 
-envs = ['floor4',] #'floor2', 'chemistry_floor0']
+envs = ['floor1', 'floor4',]# 'chemistry_floor0']
 
 
 device = 'cuda'
