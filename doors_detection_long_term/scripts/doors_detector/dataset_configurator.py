@@ -18,6 +18,8 @@ trained_models_path = ""
 
 deep_doors_2_labelled_dataset_path = '/home/michele/myfiles/deep_doors_2_labelled'
 final_doors_dataset_path = '/home/michele/myfiles/final_doors_dataset'
+real_final_doors_dataset_path = '/home/michele/myfiles/final_doors_dataset_real'
+
 
 
 def get_deep_doors_2_labelled_sets():
