@@ -6,6 +6,8 @@ from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datase
     DatasetsCreatorDeepDoors2LabelledGD
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.dataset_creator_gibson_and_deep_doors_2 import \
     DatasetsCreatorGibsonAndDeepDoors2
+from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.dataset_creator_real_data import \
+    DatasetsCreatorRealData
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_final import DatasetsCreatorDoorsFinal
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_final_epoch_analysis import \
     DatasetsCreatorDoorsFinalEpochAnalysis
@@ -14,11 +16,11 @@ from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datase
 
 # The path in which the trained model are saved and loaded
 # If the string is empty, they are saved in a folder in this repository (/models/train_params/)
-trained_models_path = ""
+trained_models_path = "/media/antonazzi/hdd/door_detection_long_term_data"
 
-deep_doors_2_labelled_dataset_path = '/home/michele/myfiles/deep_doors_2_labelled'
-final_doors_dataset_path = '/home/michele/myfiles/final_doors_dataset'
-real_final_doors_dataset_path = '/home/michele/myfiles/final_doors_dataset_real'
+deep_doors_2_labelled_dataset_path = '/home/antonazzi/myfiles/deep_doors_2_labelled'
+final_doors_dataset_path = '/home/antonazzi/myfiles/final_doors_dataset'
+real_final_doors_dataset_path = '/home/antonazzi/myfiles/final_doors_dataset_real'
 
 
 
