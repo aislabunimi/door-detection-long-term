@@ -115,7 +115,7 @@ if __name__ == '__main__':
         epoch_count = 0
         start_time = time.time()
 
-        for epoch in range(epochs_general_detector[-1]):
+        for epoch in range(epochs_fine_tune[-1]):
 
             temp_logs = {'train': [], 'train_after_backpropagation': [], 'test': []}
             accumulate_losses = {}
