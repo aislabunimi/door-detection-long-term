@@ -3,6 +3,8 @@ import pandas as pd
 import torch
 from generic_dataset.dataset_manager import DatasetManager
 from generic_dataset.utilities.color import Color
+from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.door_sample_real_data import DoorSample as DoorSampleRealData
+
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.door_sample import DoorSample as DoorSampleFinalDoorsDataset
 from doors_detection_long_term.doors_detector.dataset.dataset_deep_doors_2_labelled.door_sample import DoorSample as DoorSampleDeepDoors2
 from PIL import Image
@@ -80,3 +82,28 @@ class DatasetDoorsFinalAndDeepDoors2(TorchDataset):
 
         return door_sample, folder_name, absolute_count
 
+class DatasetDoorsFinalRealData(TorchDataset):
+    def __init__(self, dataset_path: str,
+                 dataframe: pd.DataFrame,
+                 set_type: SET,
+                 std_size: int,
+                 max_size: int,
+                 scales: List[int]):
+
+        super(DatasetDoorsFinalRealData, self).__init__(
+            dataset_path=dataset_path,
+            dataframe=dataframe,
+            set_type=set_type,
+            std_size=std_size,
+            max_size=max_size,
+            scales=scales)
+
+        self._doors_dataset = DatasetManager(dataset_path=dataset_path, sample_class=DoorSampleRealData)
+
+    def load_sample(self, idx) -> Tuple[DoorSampleFinalDoorsDataset, str, int]:
+        row = self._dataframe.iloc[idx]
+        folder_name, absolute_count = row.folder_name, row.folder_absolute_count
+
+        door_sample: DoorSampleFinalDoorsDataset = self._doors_dataset.load_sample(folder_name=folder_name, absolute_count=absolute_count, use_thread=False)
+
+        return door_sample, folder_name, absolute_count

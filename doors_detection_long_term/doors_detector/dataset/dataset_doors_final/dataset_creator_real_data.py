@@ -2,14 +2,14 @@ from typing import Union
 
 import numpy as np
 import pandas as pd
-from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.final_doors_dataset import DatasetDoorsFinal
+from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.final_doors_dataset import DatasetDoorsFinalRealData
 from sklearn.utils import shuffle
 
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import TRAIN_SET, TEST_SET
 from generic_dataset.dataset_manager import DatasetManager
 from sklearn.model_selection import train_test_split
-from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.door_sample import DOOR_LABELS
-from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.door_sample import DoorSample
+from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.door_sample_real_data import DOOR_LABELS
+from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.door_sample_real_data import DoorSample
 
 
 class DatasetsCreatorRealData:
@@ -51,6 +51,6 @@ class DatasetsCreatorRealData:
             print_information(d)
 
         return (
-            DatasetDoorsFinal(self._dataset_path, train_dataframe, TRAIN_SET, std_size=256, max_size=800, scales=[256 + i * 32 for i in range(11)]),
-            DatasetDoorsFinal(self._dataset_path, test_dataframe, TEST_SET, std_size=256, max_size=800, scales=[480 + i * 32 for i in range(11)])
+            DatasetDoorsFinalRealData(self._dataset_path, train_dataframe, TRAIN_SET, std_size=256, max_size=800, scales=[256 + i * 32 for i in range(11)]),
+            DatasetDoorsFinalRealData(self._dataset_path, test_dataframe, TEST_SET, std_size=256, max_size=800, scales=[480 + i * 32 for i in range(11)])
         )
