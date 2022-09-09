@@ -30,11 +30,11 @@ open_doors = open_doors.sort_values(['house'])
 fig, ax = subplots(figsize=(10, 5))
 
 X = np.arange(11)
-
-ax.bar(X, closed_doors[('AP', experiments[0])].tolist() + [closed_doors[('AP', experiments[0])].mean()], width=0.2, label=labels[0])
-ax.bar(X + 0.2, closed_doors[('AP', experiments[1])].tolist() + [closed_doors[('AP', experiments[1])].mean()],  width=0.2, label=labels[1])
-ax.bar(X + 0.4, closed_doors[('AP', experiments[2])].tolist() + [closed_doors[('AP', experiments[2])].mean()],  width=0.2, label=labels[2])
-ax.bar(X + 0.6, closed_doors[('AP', experiments[3])].tolist() + [closed_doors[('AP', experiments[3])].mean()],  width=0.2, label=labels[3])
+print([closed_doors[('AP', experiments[0])].mean() - closed_doors[('AP', experiments[0])].std(), closed_doors[('AP', experiments[0])].mean() + closed_doors[('AP', experiments[0])].std()])
+ax.bar(X, closed_doors[('AP', experiments[0])].tolist() + [closed_doors[('AP', experiments[0])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[closed_doors[('AP', experiments[0])].std(), closed_doors[('AP', experiments[0])].std()]]).T,width=0.2, label=labels[0])
+ax.bar(X + 0.2, closed_doors[('AP', experiments[1])].tolist() + [closed_doors[('AP', experiments[1])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[closed_doors[('AP', experiments[1])].std(), closed_doors[('AP', experiments[1])].std()]]).T,  width=0.2, label=labels[1])
+ax.bar(X + 0.4, closed_doors[('AP', experiments[2])].tolist() + [closed_doors[('AP', experiments[2])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[closed_doors[('AP', experiments[2])].std(), closed_doors[('AP', experiments[2])].std()]]).T, width=0.2, label=labels[2])
+ax.bar(X + 0.6, closed_doors[('AP', experiments[3])].tolist() + [closed_doors[('AP', experiments[3])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[closed_doors[('AP', experiments[3])].std(), closed_doors[('AP', experiments[3])].std()]]).T, width=0.2, label=labels[3])
 
 ax.set_title('AP results over all houses - closed doors', fontsize=18)
 ax.set_ylim([0, 110])
@@ -54,13 +54,13 @@ plt.close()
 
 fig, ax = subplots(figsize=(10, 5))
 
-print(closed_doors[('AP', '1')].tolist())
+#print(closed_doors[('AP', '1')].tolist())
 
 X = np.arange(11)
-ax.bar(X, open_doors[('AP', experiments[0])].tolist() + [open_doors[('AP', experiments[0])].mean()], width=0.2, label=labels[0])
-ax.bar(X + 0.2, open_doors[('AP', experiments[1])].tolist() + [open_doors[('AP', experiments[1])].mean()],  width=0.2, label=labels[1])
-ax.bar(X + 0.4, open_doors[('AP', experiments[2])].tolist() + [open_doors[('AP', experiments[2])].mean()],  width=0.2, label=labels[2])
-ax.bar(X + 0.6, open_doors[('AP', experiments[3])].tolist() + [open_doors[('AP', experiments[3])].mean()],  width=0.2, label=labels[3])
+ax.bar(X, open_doors[('AP', experiments[0])].tolist() + [open_doors[('AP', experiments[0])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[open_doors[('AP', experiments[0])].std(), open_doors[('AP', experiments[0])].std()]]).T, width=0.2, label=labels[0])
+ax.bar(X + 0.2, open_doors[('AP', experiments[1])].tolist() + [open_doors[('AP', experiments[1])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[open_doors[('AP', experiments[1])].std(), open_doors[('AP', experiments[1])].std()]]).T,  width=0.2, label=labels[1])
+ax.bar(X + 0.4, open_doors[('AP', experiments[2])].tolist() + [open_doors[('AP', experiments[2])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[open_doors[('AP', experiments[2])].std(), open_doors[('AP', experiments[2])].std()]]).T, width=0.2, label=labels[2])
+ax.bar(X + 0.6, open_doors[('AP', experiments[3])].tolist() + [open_doors[('AP', experiments[3])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[open_doors[('AP', experiments[3])].std(), open_doors[('AP', experiments[3])].std()]]).T, width=0.2, label=labels[3])
 
 ax.set_title('AP results over all houses - open doors', fontsize=18)
 ax.set_ylim([0, 110])
@@ -74,3 +74,24 @@ ax.legend(prop={"size": 16}, loc='upper center', ncol=4)
 
 fig.tight_layout()
 plt.show()
+
+closed_std = closed_doors.std()
+closed_mean = closed_doors.mean()
+open_std = open_doors.std()
+open_mean = open_doors.mean()
+
+print('closed_doors mean:', closed_mean)
+print('closed_doors std:', closed_std)
+
+print('open_doors mean:', open_mean)
+print('open_std:', open_std)
+
+increments = pd.DataFrame()
+# Calculate increment
+for i, exp in enumerate(experiments):
+    i += 1
+    closed_doors_increment = (closed_doors.iloc[:, i + 1] - closed_doors.iloc[:, i]) / closed_doors.iloc[:, i] * 100
+    open_doors_increment = (open_doors.iloc[:, i + 1] - open_doors.iloc[:, i]) / open_doors.iloc[:, i] * 100
+    print(f'{exp}')
+    print(f'\t- closed doors: mean = {closed_doors_increment.mean()}, std = {closed_doors_increment.std()}')
+    print(f'\t- open doors: mean = {open_doors_increment.mean()}, std = {open_doors_increment.std()}')
