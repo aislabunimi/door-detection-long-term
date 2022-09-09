@@ -85,3 +85,13 @@ print('closed_doors std:', closed_std)
 
 print('open_doors mean:', open_mean)
 print('open_std:', open_std)
+
+increments = pd.DataFrame()
+# Calculate increment
+for i, exp in enumerate(experiments):
+    i += 1
+    closed_doors_increment = (closed_doors.iloc[:, i + 1] - closed_doors.iloc[:, i]) / closed_doors.iloc[:, i] * 100
+    open_doors_increment = (open_doors.iloc[:, i + 1] - open_doors.iloc[:, i]) / open_doors.iloc[:, i] * 100
+    print(f'{exp}')
+    print(f'\t- closed doors: mean = {closed_doors_increment.mean()}, std = {closed_doors_increment.std()}')
+    print(f'\t- open doors: mean = {open_doors_increment.mean()}, std = {open_doors_increment.std()}')
