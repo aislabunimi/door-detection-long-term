@@ -88,7 +88,7 @@ print('open_std:', open_std)
 
 increments = pd.DataFrame()
 # Calculate increment
-for i, exp in enumerate(experiments):
+for i, exp in enumerate(experiments[1:]):
     i += 1
     closed_doors_increment = (closed_doors.iloc[:, i + 1] - closed_doors.iloc[:, i]) / closed_doors.iloc[:, i] * 100
     open_doors_increment = (open_doors.iloc[:, i + 1] - open_doors.iloc[:, i]) / open_doors.iloc[:, i] * 100
