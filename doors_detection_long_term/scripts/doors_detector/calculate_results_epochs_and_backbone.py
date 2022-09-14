@@ -30,7 +30,7 @@ def compute_results(model_name, data_loader_test, COLORS):
         outputs = model(images)
         evaluator.add_predictions(targets=targets, predictions=outputs)
 
-    metrics = evaluator.get_metrics(iou_threshold=0.75, confidence_threshold=0.5, door_no_door_task=False, plot_curves=True, colors=COLORS)
+    metrics = evaluator.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=True, colors=COLORS)
     mAP = 0
     print('Results per bounding box:')
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
@@ -82,4 +82,4 @@ for model_name, house, quantity, epochs_general, backbone, epochs_qualified in m
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
         results += [[backbone, house.replace('_', ''), 'QD_' + str(quantity), epochs_general, epochs_qualified, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
-save_file(results, 'epochs_and_backbone_analysis.xlsx')
+save_file(results, 'epochs_and_backbone_analysis_confidence_75.xlsx')

@@ -30,7 +30,7 @@ def compute_results(model, data_loader_test):
         outputs = model(images)
         evaluator.add_predictions(targets=targets, predictions=outputs)
 
-    metrics = evaluator.get_metrics(iou_threshold=0.75, confidence_threshold=0.5, door_no_door_task=False, plot_curves=False)
+    metrics = evaluator.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False)
     mAP = 0
     print('Results per bounding box:')
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
@@ -84,4 +84,4 @@ for house, dataset, epoch_general, fine_tune, epoch_qualified in [(h, d, eg, f, 
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
         results += [[house, f'QD_{fine_tune}', dataset, epoch_general, epoch_qualified, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
-save_file(results, 'results_real_data.xlsx')
+save_file(results, 'results_real_data_confidence_75.xlsx')
