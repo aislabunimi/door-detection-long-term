@@ -7,7 +7,8 @@ To use this package and install all the dependencies, clone this repository and 
 
 Datasets links:
 * The relabelled version of *DeepDoors2* dataset [link](https://drive.google.com/file/d/1wSmFUHF9aSJkomwFdOmepMevBvkRpf3D/view?usp=sharing)
-* The collected dataset [link](https://drive.google.com/file/d/1BqjBpobjKTomFjDkzhWjmCryAXOEluO2/view?usp=sharing)
+* The collected dataset in simulation [link](https://drive.google.com/file/d/1BqjBpobjKTomFjDkzhWjmCryAXOEluO2/view?usp=sharing)
+* The collected dataset in the real world [link](https://drive.google.com/file/d/1CVPtAUwd3i950y71KqFK3c2LQMOa-EkH/view?usp=sharing)
 
 ## Simulation Environment
 
