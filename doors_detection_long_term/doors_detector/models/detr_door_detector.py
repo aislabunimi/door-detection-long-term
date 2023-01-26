@@ -2,15 +2,14 @@ import os
 from typing import Tuple
 
 import torch
+from PIL.ImageCms import DESCRIPTION
 from torch import nn
 
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import DATASET
+from doors_detection_long_term.doors_detector.models.generic_model import GenericModel
 from doors_detection_long_term.doors_detector.models.mlp import MLP
 from doors_detection_long_term.doors_detector.models.model_names import ModelName
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import trained_models_path
-
-DESCRIPTION = int
-
 
 DEEP_DOORS_2_LABELLED_EXP: DESCRIPTION = 0
 EXP_1_HOUSE_1: DESCRIPTION = 1
@@ -755,7 +754,7 @@ EXP_2_CHEMISTRY_FLOOR0_DEEP_DOORS_2_60_FINE_TUNE_75_EPOCHS_40: DESCRIPTION = 685
 EXP_2_CHEMISTRY_FLOOR0_DEEP_DOORS_2_60_FINE_TUNE_75_EPOCHS_60: DESCRIPTION = 686
 
 
-class DetrDoorDetector(nn.Module):
+class DetrDoorDetector(GenericModel):
     """
     This class builds a door detector starting from a detr pretrained module.
     Basically it loads a dtr module and modify its structure to recognize door.
@@ -768,11 +767,8 @@ class DetrDoorDetector(nn.Module):
         :param pretrained: it refers to the DetrDoorDetector class, not to detr base model.
                             It True, the DetrDoorDetector's weights are loaded, otherwise the weights are loaded only for the detr base model
         """
-        super(DetrDoorDetector, self).__init__()
-        self._model_name = model_name
+        super(DetrDoorDetector, self).__init__(model_name, dataset_name, description)
         self.model = torch.hub.load('facebookresearch/detr', model_name, pretrained=True)
-        self._dataset_name = dataset_name
-        self._description = description
 
         # Change the last part of the model
         self.model.query_embed = nn.Embedding(10, self.model.transformer.d_model)
@@ -811,46 +807,7 @@ class DetrDoorDetector(nn.Module):
     def to(self, device):
         self.model.to(device)
 
-    def save(self, epoch, optimizer_state_dict, lr_scheduler_state_dict, params, logs):
-        path = os.path.join('train_params', self._model_name + '_' + str(self._description), str(self._dataset_name))
-        if trained_models_path == "":
-            path = os.path.join(os.path.dirname(__file__), path)
-        else:
-            path = os.path.join(trained_models_path, path)
 
-        if not os.path.exists(path):
-            os.makedirs(path)
-
-        torch.save(self.model.state_dict(), os.path.join(path, 'model.pth'))
-        torch.save(
-            {
-                'optimizer_state_dict': optimizer_state_dict,
-                'lr_scheduler_state_dict': lr_scheduler_state_dict
-            }, os.path.join(path, 'checkpoint.pth')
-        )
-
-        torch.save(
-            {
-                'epoch': epoch,
-                'logs': logs,
-                'params': params,
-            }, os.path.join(path, 'training_data.pth')
-        )
-
-    def load_checkpoint(self,):
-        path = os.path.join('train_params', self._model_name + '_' + str(self._description), str(self._dataset_name))
-        if trained_models_path == "":
-            path = os.path.join(os.path.dirname(__file__), path)
-        else:
-            path = os.path.join(trained_models_path, path)
-
-        checkpoint = torch.load(os.path.join(path, 'checkpoint.pth'))
-        training_data = torch.load(os.path.join(path, 'training_data.pth'))
-
-        return {**checkpoint, **training_data}
-
-    def set_description(self, description: DESCRIPTION):
-        self._description = description
 
 
 

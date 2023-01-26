@@ -67,7 +67,6 @@ setup(
         'scikit-learn',
         'detr @ git+http://github.com/micheleantonazzi/detr.git',
         'src @ git+http://github.com/rafaelpadilla/review_object_detection_metrics.git#egg=src',
-        'gibson',
         "pytest",
         "pytest-cov",
     ],

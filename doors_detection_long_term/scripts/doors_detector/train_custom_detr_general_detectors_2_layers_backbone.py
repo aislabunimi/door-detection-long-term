@@ -6,7 +6,6 @@ import torch.optim
 from models.detr import SetCriterion
 from models.matcher import HungarianMatcher
 from torch.utils.data import DataLoader
-from engine import evaluate, train_one_epoch
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_final import DatasetsCreatorDoorsFinal
 from doors_detection_long_term.doors_detector.models.detr_door_detector import *
 from doors_detection_long_term.doors_detector.models.model_names import DETR_RESNET50
