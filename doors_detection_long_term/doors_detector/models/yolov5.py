@@ -60,7 +60,7 @@ class YOLOv5Model(GenericModel):
                             It True, the DetrDoorDetector's weights are loaded, otherwise the weights are loaded only for the detr base model
         """
         super(YOLOv5Model, self).__init__(model_name, dataset_name, description)
-        self.model = torch.hub.load('ultralytics/yolov5', 'yolov5m', pretrained=True)
+        self.model = torch.hub.load('ultralytics/yolov5', 'yolov5m', autoshape=True, pretrained=True, classes=n_labels)
 
         if pretrained:
             path = os.path.join('train_params', self._model_name + '_' + str(self._description), str(self._dataset_name))
@@ -71,6 +71,7 @@ class YOLOv5Model(GenericModel):
             self.model.load_state_dict(torch.load(os.path.join(path, 'model.pth'), map_location=torch.device('cpu')))
 
     def forward(self, x):
+
         x = self.model(x)
 
         """

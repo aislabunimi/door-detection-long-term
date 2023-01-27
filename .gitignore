@@ -3,3 +3,4 @@ door_detection_long_term.iml
 doors_detection_long_term.egg-info/*
 checkpoint.pth
 model.pth
+*.pt

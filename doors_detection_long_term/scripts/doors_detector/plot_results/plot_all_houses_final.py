@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt, font_manager
 from matplotlib.pyplot import subplots
 from pandas import CategoricalDtype
 
-houses = pd.read_csv('./../results/risultati_tesi_antonazzi.csv')
+houses = pd.read_csv('../../results/risultati_tesi_antonazzi.csv')
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 
