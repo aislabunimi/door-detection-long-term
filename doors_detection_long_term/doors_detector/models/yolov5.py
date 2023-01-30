@@ -1,12 +1,16 @@
 import os
 
 import torch
+import yaml
 from torch import nn
 
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import DATASET
 from doors_detection_long_term.doors_detector.models.generic_model import DESCRIPTION
 from doors_detection_long_term.doors_detector.models.generic_model import GenericModel
 from doors_detection_long_term.doors_detector.models.model_names import ModelName
+from doors_detection_long_term.doors_detector.models.yolov5_repo.models.yolo import Model
+from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.downloads import attempt_download
+from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import intersect_dicts
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import trained_models_path
 
 EXP_1_HOUSE_1: DESCRIPTION = 1
@@ -60,9 +64,24 @@ class YOLOv5Model(GenericModel):
                             It True, the DetrDoorDetector's weights are loaded, otherwise the weights are loaded only for the detr base model
         """
         super(YOLOv5Model, self).__init__(model_name, dataset_name, description)
-        self.model = torch.hub.load('ultralytics/yolov5', 'yolov5m', autoshape=True, pretrained=True, classes=n_labels)
+        #weights = attempt_download(os.path.join(os.path.dirname(__file__), 'yolov5_repo', 'models', 'yolov5m.pt'))  # download if not found locally
+        #print('WEIGHTSSSS', weights)
+        #ckpt = torch.load(weights, map_location='cpu', weights_only=False)
+        #torch.save(ckpt['model'].state_dict(), os.path.join(os.path.dirname(__file__), 'yolov7m_state_dict.pth'))
+        with open(os.path.join(os.path.dirname(__file__), 'yolov5_repo', 'models', 'hyp.scratch-low.yaml'), errors='ignore') as f:
+            hyp = yaml.safe_load(f)  # load hyps dict
 
-        if pretrained:
+        self.model = Model(os.path.join(os.path.dirname(__file__), 'yolov5_repo', 'models', 'yolov5m.yaml'), ch=3, nc=n_labels, anchors=hyp.get('anchors'))
+        self.model.hyp = hyp
+        self.hyp = hyp
+
+        # Load pretrained yolov5
+        if not pretrained:
+            state_dict = torch.load(os.path.join(os.path.dirname(__file__), 'yolov5_repo', 'models', 'yolov7m_state_dict.pth'))
+            csd = intersect_dicts(state_dict, self.model.state_dict(), exclude=[])  # intersect
+            self.model.load_state_dict(csd, strict=False)
+
+        else:
             path = os.path.join('train_params', self._model_name + '_' + str(self._description), str(self._dataset_name))
             if trained_models_path == "":
                 path = os.path.join(os.path.dirname(__file__), path)
