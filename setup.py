@@ -69,6 +69,12 @@ setup(
         'src @ git+http://github.com/rafaelpadilla/review_object_detection_metrics.git#egg=src',
         "pytest",
         "pytest-cov",
+        'ipython',
+        'pyyaml',
+        'psutil',
+        'tqdm',
+        'seaborn'
+
     ],
     entry_points={
         'console_scripts': [
