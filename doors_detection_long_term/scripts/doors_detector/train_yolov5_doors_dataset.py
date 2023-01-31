@@ -1,6 +1,8 @@
 import random
 import time
 
+
+from matplotlib import pyplot as plt
 from torch.optim import lr_scheduler
 
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import DEEP_DOORS_2_LABELLED, FINAL_DOORS_DATASET
@@ -16,6 +18,7 @@ from doors_detection_long_term.doors_detector.utilities.utils import collate_fn
 from dataset_configurator import *
 from doors_detection_long_term.doors_detector.utilities.utils import seed_everything
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.loss import ComputeLoss
+import torchvision.transforms as T
 
 
 device = 'cuda'
@@ -27,7 +30,7 @@ fine_tune_quantity = [25, 50, 75]
 
 # Params
 params = {
-    'batch_size': 4,
+    'batch_size': 2,
     'epochs': 40
 }
 
@@ -37,9 +40,7 @@ data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_f
 data_loader_validation = DataLoader(validation, batch_size=params['batch_size'], collate_fn=collate_fn, drop_last=False, num_workers=4)
 data_loader_test = DataLoader(test, batch_size=params['batch_size'], collate_fn=collate_fn, drop_last=False, num_workers=4)
 model = YOLOv5Model(model_name=YOLOv5, n_labels=2, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=EXP_1_HOUSE_1)
-#model = torch.hub.load('ultralytics/yolov5', 'yolov5s', classes=2)
-#print(model('https://ultralytics.com/images/zidane.jpg'))
-model.model.max_det = 4
+
 model.train()
 model.to('cuda')
 compute_loss = ComputeLoss(model.model)
@@ -51,7 +52,6 @@ optimizer = smart_optimizer(model, 'AdamW', model.hyp['lr0'], model.hyp['momentu
 lf = lambda x: (1 - x / params['epochs']) * (1.0 - model.hyp['lrf']) + model.hyp['lrf']  # linear
 scheduler = lr_scheduler.LambdaLR(optimizer, lr_lambda=lf)  # plot_lr_scheduler(optimizer, scheduler, epochs)
 
-#print('NW', max(round(model.hyp['warmup_epochs'] * len(data_loader_train)), 100))
 logs = {'train': [], 'train_after_backpropagation': [], 'validation': [], 'test': []}
 for epoch in range(params['epochs']):
     temp_logs = {'train': [], 'train_after_backpropagation': [], 'validation': [], 'test': []}
@@ -59,15 +59,19 @@ for epoch in range(params['epochs']):
 
     for d, data in enumerate(data_loader_train):
         images, targets = data
+        batch_size_width, batch_size_height = images.size()[2], images.size()[3]
         converted_boxes = []
         for i, target in enumerate(targets):
+            real_size_width, real_size_height = target['size'][0], target['size'][1]
+            scale_boxes = torch.tensor([[real_size_width / batch_size_width, real_size_height / batch_size_height, real_size_width / batch_size_width, real_size_height / batch_size_height]])
             converted_boxes.append(torch.cat([
                 torch.tensor([[i] for _ in range(int(list(target['labels'].size())[0]))]),
                 torch.reshape(target['labels'], (target['labels'].size()[0], 1)),
-                target['boxes']
+                target['boxes'] * scale_boxes
                 ], dim=1))
-
+            #print('PRINT?', target['size'], images.size()[2:], target['boxes'], target['boxes'] * scale_boxes)
         converted_boxes = torch.cat(converted_boxes, dim=0)
+
 
         images = images.to('cuda')
         output = model(images)
@@ -81,9 +85,10 @@ for epoch in range(params['epochs']):
         #print(temp_logs)
         if d % 10 == 0:
             print(f'EPOCHS {epoch}, [{d}:{len(data_loader_train)}]')
-        logs['train'].append(sum(temp_logs['train']) / len(temp_logs['train']))
 
-        print(logs['train'])
+    logs['train'].append(sum(temp_logs['train']) / len(temp_logs['train']))
+
+    print(logs['train'])
 
 
 
