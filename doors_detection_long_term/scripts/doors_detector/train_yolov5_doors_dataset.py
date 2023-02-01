@@ -48,6 +48,14 @@ model.train()
 model.to('cuda')
 compute_loss = ComputeLoss(model.model)
 
+# General paramaters
+nb = len(data_loader_train)
+nw = max(round(model.hyp['warmup_epochs'] * nb), 100)  # number of warmup iterations, max(3 epochs, 100 iterations)
+nbs = 64
+accumulate = max(round(nbs / params['batch_size']), 1)
+model.hyp['weight_decay'] *= params['batch_size'] * accumulate / nbs
+model.model.hyp['weight_decay'] *= params['batch_size'] * accumulate / nbs
+
 # Optimizer
 optimizer = smart_optimizer(model.model, 'SGD', model.hyp['lr0'], model.hyp['momentum'], model.hyp['weight_decay'])
 
@@ -55,12 +63,27 @@ optimizer = smart_optimizer(model.model, 'SGD', model.hyp['lr0'], model.hyp['mom
 lf = lambda x: (1 - x / params['epochs']) * (1.0 - model.hyp['lrf']) + model.hyp['lrf']  # linear
 scheduler = lr_scheduler.LambdaLR(optimizer, lr_lambda=lf)  # plot_lr_scheduler(optimizer, scheduler, epochs)
 
+
+
 logs = {'train': [], 'train_after_backpropagation': [], 'validation': [], 'test': []}
 for epoch in range(params['epochs']):
     temp_logs = {'train': [], 'train_after_backpropagation': [], 'validation': [], 'test': []}
     model.train()
 
     for d, data in enumerate(data_loader_train):
+
+        ni = d + nb * epoch
+
+        # warmup
+        if ni <= nw:
+            xi = [0, nw]  # x interp
+            accumulate = max(1, np.interp(ni, xi, [1, nbs / params['batch_size']]).round())
+            for j, x in enumerate(optimizer.param_groups):
+                # bias lr falls from 0.1 to lr0, all other lrs rise from 0.0 to lr0
+                x['lr'] = np.interp(ni, xi, [model.hyp['warmup_bias_lr'] if j == 0 else 0.0, x['initial_lr'] * lf(epoch)])
+                if 'momentum' in x:
+                    x['momentum'] = np.interp(ni, xi, [model.hyp['warmup_momentum'], model.hyp['momentum']])
+
         images, targets = data
         batch_size_width, batch_size_height = images.size()[2], images.size()[3]
         converted_boxes = []
@@ -79,6 +102,7 @@ for epoch in range(params['epochs']):
         images = images.to('cuda')
         output = model(images)
         loss, loss_items = compute_loss(output, converted_boxes.to('cuda'))
+        #print(loss.item())
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
