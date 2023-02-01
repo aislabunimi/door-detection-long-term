@@ -10,7 +10,7 @@ from doors_detection_long_term.doors_detector.models.detr import PostProcess
 from doors_detection_long_term.doors_detector.models.detr_door_detector import *
 from doors_detection_long_term.doors_detector.models.model_names import DETR_RESNET50
 from doors_detection_long_term.doors_detector.utilities.utils import seed_everything
-from dataset_configurator import *
+from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 params = {
     'seed': 0
