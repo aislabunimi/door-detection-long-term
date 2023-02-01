@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_final import DatasetsCreatorDoorsFinal
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5
-from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.torch_utils import smart_optimizer
+from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.torch_utils import smart_optimizer, de_parallel
 from doors_detection_long_term.doors_detector.utilities.plot import plot_losses
 from doors_detection_long_term.doors_detector.utilities.utils import collate_fn
 from dataset_configurator import *
@@ -30,7 +30,7 @@ fine_tune_quantity = [25, 50, 75]
 
 # Params
 params = {
-    'batch_size': 2,
+    'batch_size': 1,
     'epochs': 40
 }
 
@@ -41,12 +41,15 @@ data_loader_validation = DataLoader(validation, batch_size=params['batch_size'],
 data_loader_test = DataLoader(test, batch_size=params['batch_size'], collate_fn=collate_fn, drop_last=False, num_workers=4)
 model = YOLOv5Model(model_name=YOLOv5, n_labels=2, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=EXP_1_HOUSE_1)
 
+# Model parameters
+nl = de_parallel(model.model).model[-1].nl
+
 model.train()
 model.to('cuda')
 compute_loss = ComputeLoss(model.model)
 
 # Optimizer
-optimizer = smart_optimizer(model, 'AdamW', model.hyp['lr0'], model.hyp['momentum'], model.hyp['weight_decay'])
+optimizer = smart_optimizer(model.model, 'SGD', model.hyp['lr0'], model.hyp['momentum'], model.hyp['weight_decay'])
 
 # Scheduler
 lf = lambda x: (1 - x / params['epochs']) * (1.0 - model.hyp['lrf']) + model.hyp['lrf']  # linear
@@ -76,7 +79,6 @@ for epoch in range(params['epochs']):
         images = images.to('cuda')
         output = model(images)
         loss, loss_items = compute_loss(output, converted_boxes.to('cuda'))
-
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()

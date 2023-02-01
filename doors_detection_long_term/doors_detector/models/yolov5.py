@@ -10,7 +10,9 @@ from doors_detection_long_term.doors_detector.models.generic_model import Generi
 from doors_detection_long_term.doors_detector.models.model_names import ModelName
 from doors_detection_long_term.doors_detector.models.yolov5_repo.models.yolo import Model
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.downloads import attempt_download
-from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import intersect_dicts
+from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import intersect_dicts, \
+    labels_to_class_weights
+from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.torch_utils import de_parallel
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import trained_models_path
 
 EXP_1_HOUSE_1: DESCRIPTION = 1
@@ -72,8 +74,23 @@ class YOLOv5Model(GenericModel):
             hyp = yaml.safe_load(f)  # load hyps dict
 
         self.model = Model(os.path.join(os.path.dirname(__file__), 'yolov5_repo', 'models', 'yolov5m.yaml'), ch=3, nc=n_labels, anchors=hyp.get('anchors'))
+
+        # Set model hyper-parameters
+        nl = de_parallel(self.model).model[-1].nl  # number of detection layers (to scale hyps)
+        hyp['box'] *= 3 / nl  # scale to layers
+        hyp['cls'] *= n_labels / 80 * 3 / nl  # scale to classes and layers
+        #hyp['obj'] *= (imgsz / 640) ** 2 * 3 / nl  # scale to image size and layers
+        hyp['label_smoothing'] = .0
+        self.model.nc = n_labels
+        self.nc = self.model.nc # attach number of classes to model
+        self.model.class_weights = torch.Tensor()
+        self.class_weights = self.model.class_weights
+        self.model.names = {i: '' for i in range(n_labels)}
+        self.names = self.model.names
+
         self.model.hyp = hyp
         self.hyp = hyp
+        self.yaml = self.model.yaml
 
         # Load pretrained yolov5
         if not pretrained:
@@ -92,18 +109,6 @@ class YOLOv5Model(GenericModel):
     def forward(self, x):
 
         x = self.model(x)
-
-        """
-        It returns a dict with the following elements:
-               - "pred_logits": the classification logits (including no-object) for all queries.
-                                Shape=[batch_size x num_queries x (num_classes + 1)]
-               - "pred_boxes": The normalized boxes coordinates for all queries, represented as
-                               (center_x, center_y, height, width). These values are normalized in [0, 1],
-                               relative to the size of each individual image (disregarding possible padding).
-                               See PostProcess for information on how to retrieve the un-normalized bounding box.
-               - "aux_outputs": Optional, only returned when auxiliary losses are activated. It is a list of
-                                dictionaries containing the two above keys for each decoder layer.
-        """
         return x
 
     def eval(self):
