@@ -12,6 +12,8 @@ from torch.utils.data import DataLoader
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_final import DatasetsCreatorDoorsFinal
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5
+from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.autobatch import check_train_batch_size
+from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import check_amp
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.torch_utils import smart_optimizer, de_parallel
 from doors_detection_long_term.doors_detector.utilities.plot import plot_losses
 from doors_detection_long_term.doors_detector.utilities.utils import collate_fn
@@ -56,6 +58,15 @@ accumulate = max(round(nbs / params['batch_size']), 1)
 model.hyp['weight_decay'] *= params['batch_size'] * accumulate / nbs
 model.model.hyp['weight_decay'] *= params['batch_size'] * accumulate / nbs
 
+last_opt_step = -1
+
+# Scaler
+amp = check_amp(model.model)
+scaler = torch.cuda.amp.GradScaler(enabled=amp)
+
+# EMA exponential moving average
+#ema = ModelEMA(model)
+
 # Optimizer
 optimizer = smart_optimizer(model.model, 'SGD', model.hyp['lr0'], model.hyp['momentum'], model.hyp['weight_decay'])
 
@@ -63,12 +74,14 @@ optimizer = smart_optimizer(model.model, 'SGD', model.hyp['lr0'], model.hyp['mom
 lf = lambda x: (1 - x / params['epochs']) * (1.0 - model.hyp['lrf']) + model.hyp['lrf']  # linear
 scheduler = lr_scheduler.LambdaLR(optimizer, lr_lambda=lf)  # plot_lr_scheduler(optimizer, scheduler, epochs)
 
-
-
 logs = {'train': [], 'train_after_backpropagation': [], 'validation': [], 'test': []}
+
+#print('BTACH OPTIMAL', check_train_batch_size(model.model, 800, amp))
+
 for epoch in range(params['epochs']):
     temp_logs = {'train': [], 'train_after_backpropagation': [], 'validation': [], 'test': []}
     model.train()
+    optimizer.zero_grad()
 
     for d, data in enumerate(data_loader_train):
 
@@ -100,12 +113,26 @@ for epoch in range(params['epochs']):
 
 
         images = images.to('cuda')
-        output = model(images)
-        loss, loss_items = compute_loss(output, converted_boxes.to('cuda'))
-        #print(loss.item())
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+
+        with torch.cuda.amp.autocast(amp):
+            output = model(images)  # forward
+            #print('IMAGES', imgs.size())
+            loss, loss_items = compute_loss(output, converted_boxes.to('cuda'))
+            #print(loss.item())
+
+        scaler.scale(loss).backward()
+
+        if ni - last_opt_step >= accumulate:
+            #print('ENTRO')
+            scaler.unscale_(optimizer)  # unscale gradients
+            torch.nn.utils.clip_grad_norm_(model.model.parameters(), max_norm=10.0)  # clip gradients
+            scaler.step(optimizer)  # optimizer.step
+            scaler.update()
+            optimizer.zero_grad()
+            #if ema:
+                #print('EMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+                #ema.update(model)
+            last_opt_step = ni
 
         temp_logs['train'].append(loss.item())
         #print(temp_logs)
