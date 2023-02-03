@@ -12,6 +12,7 @@ from torch.utils.data import DataLoader
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_final import DatasetsCreatorDoorsFinal
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5
+from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.autoanchor import check_anchors
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.autobatch import check_train_batch_size
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import check_amp, non_max_suppression
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.torch_utils import smart_optimizer, de_parallel
@@ -39,9 +40,11 @@ params = {
 train, validation, test, labels, _ = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name='house1', train_size=0.25, use_negatives=False)
 print(f'Train set size: {len(train)}', f'Validation set size: {len(validation)}', f'Test set size: {len(test)}')
 data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
-data_loader_validation = DataLoader(validation, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
+data_loader_validation = DataLoader(validation, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 data_loader_test = DataLoader(test, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 model = YOLOv5Model(model_name=YOLOv5, n_labels=2, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=EXP_1_HOUSE_1)
+
+#check_anchors(data_loader_train, model.model, model.hyp['anchor_t'], imgsz=800)
 
 # Model parameters
 nl = de_parallel(model.model).model[-1].nl
@@ -144,6 +147,7 @@ for epoch in range(params['epochs']):
     logs['train'].append(sum(temp_logs['train']) / len(temp_logs['train']))
 
     print(logs['train'])
+
 
 
 
