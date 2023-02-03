@@ -13,10 +13,10 @@ from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datase
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.autobatch import check_train_batch_size
-from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import check_amp
+from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import check_amp, non_max_suppression
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.torch_utils import smart_optimizer, de_parallel
 from doors_detection_long_term.doors_detector.utilities.plot import plot_losses
-from doors_detection_long_term.doors_detector.utilities.utils import collate_fn
+from doors_detection_long_term.doors_detector.utilities.utils import collate_fn, collate_fn_yolov5
 from dataset_configurator import *
 from doors_detection_long_term.doors_detector.utilities.utils import seed_everything
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.loss import ComputeLoss
@@ -38,8 +38,8 @@ params = {
 
 train, validation, test, labels, _ = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name='house1', train_size=0.25, use_negatives=False)
 print(f'Train set size: {len(train)}', f'Validation set size: {len(validation)}', f'Test set size: {len(test)}')
-data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_fn=collate_fn, shuffle=False, num_workers=4)
-data_loader_validation = DataLoader(validation, batch_size=params['batch_size'], collate_fn=collate_fn, drop_last=False, num_workers=4)
+data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
+data_loader_validation = DataLoader(validation, batch_size=1, collate_fn=collate_fn, drop_last=False, num_workers=4)
 data_loader_test = DataLoader(test, batch_size=params['batch_size'], collate_fn=collate_fn, drop_last=False, num_workers=4)
 model = YOLOv5Model(model_name=YOLOv5, n_labels=2, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=EXP_1_HOUSE_1)
 
@@ -78,6 +78,22 @@ logs = {'train': [], 'train_after_backpropagation': [], 'validation': [], 'test'
 
 #print('BTACH OPTIMAL', check_train_batch_size(model.model, 800, amp))
 
+# Eval
+for data in data_loader_validation:
+    images, targets = data
+    model.eval()
+    preds, train_out = model.model(images.to('cuda'))
+    print(preds.size(), train_out[0].size(), train_out[1].size(), train_out[2].size())
+    preds = non_max_suppression(preds,
+                                0.1,
+                                0.1,
+
+                                multi_label=True,
+                                agnostic=True,
+                                max_det=300)
+    print(preds[0].size())
+
+
 for epoch in range(params['epochs']):
     temp_logs = {'train': [], 'train_after_backpropagation': [], 'validation': [], 'test': []}
     model.train()
@@ -98,26 +114,12 @@ for epoch in range(params['epochs']):
                     x['momentum'] = np.interp(ni, xi, [model.hyp['warmup_momentum'], model.hyp['momentum']])
 
         images, targets = data
-        batch_size_width, batch_size_height = images.size()[2], images.size()[3]
-        converted_boxes = []
-        for i, target in enumerate(targets):
-            real_size_width, real_size_height = target['size'][0], target['size'][1]
-            scale_boxes = torch.tensor([[real_size_width / batch_size_width, real_size_height / batch_size_height, real_size_width / batch_size_width, real_size_height / batch_size_height]])
-            converted_boxes.append(torch.cat([
-                torch.tensor([[i] for _ in range(int(list(target['labels'].size())[0]))]),
-                torch.reshape(target['labels'], (target['labels'].size()[0], 1)),
-                target['boxes'] * scale_boxes
-                ], dim=1))
-            #print('PRINT?', target['size'], images.size()[2:], target['boxes'], target['boxes'] * scale_boxes)
-        converted_boxes = torch.cat(converted_boxes, dim=0)
-
-
         images = images.to('cuda')
 
         with torch.cuda.amp.autocast(amp):
             output = model(images)  # forward
             #print('IMAGES', imgs.size())
-            loss, loss_items = compute_loss(output, converted_boxes.to('cuda'))
+            loss, loss_items = compute_loss(output, targets.to('cuda'))
             #print(loss.item())
 
         scaler.scale(loss).backward()

@@ -53,3 +53,20 @@ def collate_fn(batch_data):
     batch_data[0] = tensor
 
     return tuple(batch_data[:2])
+
+def collate_fn_yolov5(batch):
+    images, targets = collate_fn(batch)
+
+    batch_size_width, batch_size_height = images.size()[2], images.size()[3]
+    converted_boxes = []
+    for i, target in enumerate(targets):
+        real_size_width, real_size_height = target['size'][0], target['size'][1]
+        scale_boxes = torch.tensor([[real_size_width / batch_size_width, real_size_height / batch_size_height, real_size_width / batch_size_width, real_size_height / batch_size_height]])
+        converted_boxes.append(torch.cat([
+            torch.tensor([[i] for _ in range(int(list(target['labels'].size())[0]))]),
+            torch.reshape(target['labels'], (target['labels'].size()[0], 1)),
+            target['boxes'] * scale_boxes
+        ], dim=1))
+        #print('PRINT?', target['size'], images.size()[2:], target['boxes'], target['boxes'] * scale_boxes)
+    converted_boxes = torch.cat(converted_boxes, dim=0)
+    return images, converted_boxes
