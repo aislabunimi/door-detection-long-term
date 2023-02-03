@@ -17,11 +17,10 @@ data_loader_test = DataLoader(test, batch_size=6, collate_fn=collate_fn, drop_la
 COLORS = np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
 
 for d, data in enumerate(data_loader_train):
-    images, targets = data
+    images, targets, converted_boxes = data
 
     for count, image in enumerate(images):
         plt.close()
-        print(image.size())
         pil_image = image * torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
         pil_image = pil_image + torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
         plt.figure(figsize=(16, 10))
@@ -30,9 +29,8 @@ for d, data in enumerate(data_loader_train):
 
         ax = plt.gca()
 
-        for img, label, x, y, width, height in targets:
+        for img, label, x, y, width, height in converted_boxes:
             img, label, x, y, width, height = img.item(), label.item(), x.item(), y.item(), width.item(), height.item()
-            print(img, label, x, y, width, height)
             if img == count:
                 img_width, img_height = image.size()[1], image.size()[2]
                 #real_width, real_height = targets[count]['size'][0], targets[count]['size'][1]

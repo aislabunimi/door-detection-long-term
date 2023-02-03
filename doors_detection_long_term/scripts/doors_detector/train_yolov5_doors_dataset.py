@@ -39,8 +39,8 @@ params = {
 train, validation, test, labels, _ = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name='house1', train_size=0.25, use_negatives=False)
 print(f'Train set size: {len(train)}', f'Validation set size: {len(validation)}', f'Test set size: {len(test)}')
 data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
-data_loader_validation = DataLoader(validation, batch_size=1, collate_fn=collate_fn, drop_last=False, num_workers=4)
-data_loader_test = DataLoader(test, batch_size=params['batch_size'], collate_fn=collate_fn, drop_last=False, num_workers=4)
+data_loader_validation = DataLoader(validation, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
+data_loader_test = DataLoader(test, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 model = YOLOv5Model(model_name=YOLOv5, n_labels=2, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=EXP_1_HOUSE_1)
 
 # Model parameters
@@ -80,7 +80,7 @@ logs = {'train': [], 'train_after_backpropagation': [], 'validation': [], 'test'
 
 # Eval
 for data in data_loader_validation:
-    images, targets = data
+    images, targets, converted_boxes = data
     model.eval()
     preds, train_out = model.model(images.to('cuda'))
     print(preds.size(), train_out[0].size(), train_out[1].size(), train_out[2].size())
@@ -113,13 +113,13 @@ for epoch in range(params['epochs']):
                 if 'momentum' in x:
                     x['momentum'] = np.interp(ni, xi, [model.hyp['warmup_momentum'], model.hyp['momentum']])
 
-        images, targets = data
+        images, targets, converted_boxes = data
         images = images.to('cuda')
 
         with torch.cuda.amp.autocast(amp):
             output = model(images)  # forward
             #print('IMAGES', imgs.size())
-            loss, loss_items = compute_loss(output, targets.to('cuda'))
+            loss, loss_items = compute_loss(output, converted_boxes.to('cuda'))
             #print(loss.item())
 
         scaler.scale(loss).backward()

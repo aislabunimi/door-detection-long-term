@@ -67,6 +67,5 @@ def collate_fn_yolov5(batch):
             torch.reshape(target['labels'], (target['labels'].size()[0], 1)),
             target['boxes'] * scale_boxes
         ], dim=1))
-        #print('PRINT?', target['size'], images.size()[2:], target['boxes'], target['boxes'] * scale_boxes)
     converted_boxes = torch.cat(converted_boxes, dim=0)
-    return images, converted_boxes
+    return images, targets, converted_boxes
