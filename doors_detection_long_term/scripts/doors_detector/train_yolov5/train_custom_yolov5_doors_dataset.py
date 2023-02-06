@@ -233,7 +233,7 @@ if __name__ == '__main__':
             # Change the model description on each epoch step
             if epoch == epochs_general_detector[epoch_count] - 1 and epoch_count < len(epochs_general_detector) -1:
                 epoch_count += 1
-                model.set_description(globals()[f'EXP_1_{house}_2_LAYERS_BACKBONE_{epochs_general_detector[epoch_count]}_EPOCHS'.upper()])
+                model.set_description(globals()[f'EXP_1_{house}_{epochs_general_detector[epoch_count]}_EPOCHS'.upper()])
 
 
     # Qualify the general detectors trained before
