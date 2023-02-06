@@ -1,3 +1,4 @@
+import os.path
 import random
 import time
 
@@ -18,11 +19,12 @@ from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general i
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.torch_utils import smart_optimizer, de_parallel
 from doors_detection_long_term.doors_detector.utilities.plot import plot_losses
 from doors_detection_long_term.doors_detector.utilities.utils import collate_fn, collate_fn_yolov5
-from dataset_configurator import *
+from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 from doors_detection_long_term.doors_detector.utilities.utils import seed_everything
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.loss import ComputeLoss
 import torchvision.transforms as T
 
+from doors_detection_long_term.scripts.doors_detector.dataset_configurator import get_final_doors_dataset_epoch_analysis
 
 device = 'cuda'
 
@@ -33,8 +35,8 @@ fine_tune_quantity = [25, 50, 75]
 
 # Params
 params = {
-    'batch_size': 1,
-    'epochs': 40
+    'batch_size': 4,
+    'epochs': 20
 }
 
 train, validation, test, labels, _ = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name='house1', train_size=0.25, use_negatives=False)
@@ -67,9 +69,6 @@ last_opt_step = -1
 amp = check_amp(model.model)
 scaler = torch.cuda.amp.GradScaler(enabled=amp)
 
-# EMA exponential moving average
-#ema = ModelEMA(model)
-
 # Optimizer
 optimizer = smart_optimizer(model.model, 'SGD', model.hyp['lr0'], model.hyp['momentum'], model.hyp['weight_decay'])
 
@@ -78,24 +77,6 @@ lf = lambda x: (1 - x / params['epochs']) * (1.0 - model.hyp['lrf']) + model.hyp
 scheduler = lr_scheduler.LambdaLR(optimizer, lr_lambda=lf)  # plot_lr_scheduler(optimizer, scheduler, epochs)
 
 logs = {'train': [], 'train_after_backpropagation': [], 'validation': [], 'test': []}
-
-#print('BTACH OPTIMAL', check_train_batch_size(model.model, 800, amp))
-
-# Eval
-for data in data_loader_validation:
-    images, targets, converted_boxes = data
-    model.eval()
-    preds, train_out = model.model(images.to('cuda'))
-    print(preds.size(), train_out[0].size(), train_out[1].size(), train_out[2].size())
-    preds = non_max_suppression(preds,
-                                0.1,
-                                0.1,
-
-                                multi_label=True,
-                                agnostic=True,
-                                max_det=300)
-    print(preds[0].size())
-
 
 for epoch in range(params['epochs']):
     temp_logs = {'train': [], 'train_after_backpropagation': [], 'validation': [], 'test': []}
@@ -121,32 +102,27 @@ for epoch in range(params['epochs']):
 
         with torch.cuda.amp.autocast(amp):
             output = model(images)  # forward
-            #print('IMAGES', imgs.size())
             loss, loss_items = compute_loss(output, converted_boxes.to('cuda'))
-            #print(loss.item())
 
         scaler.scale(loss).backward()
 
         if ni - last_opt_step >= accumulate:
-            #print('ENTRO')
             scaler.unscale_(optimizer)  # unscale gradients
             torch.nn.utils.clip_grad_norm_(model.model.parameters(), max_norm=10.0)  # clip gradients
             scaler.step(optimizer)  # optimizer.step
             scaler.update()
             optimizer.zero_grad()
-            #if ema:
-                #print('EMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-                #ema.update(model)
             last_opt_step = ni
 
         temp_logs['train'].append(loss.item())
-        #print(temp_logs)
         if d % 10 == 0:
             print(f'EPOCHS {epoch}, [{d}:{len(data_loader_train)}]')
 
     logs['train'].append(sum(temp_logs['train']) / len(temp_logs['train']))
 
     print(logs['train'])
+    torch.save(model.model.state_dict(), os.path.join(os.path.dirname(__file__),
+                                                      '../../../doors_detector/models/trained_yolo_variable_size.pth'))
 
 
 
