@@ -109,6 +109,7 @@ if __name__ == '__main__':
             accumulate_loss = []
 
             model.train()
+            optimizer.zero_grad()
             for d, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'{house} - Epoch {epoch} - Train model'):
                 ni = d + nb * epoch
 
@@ -155,8 +156,6 @@ if __name__ == '__main__':
 
             # Train loss after backpropagation
             with torch.no_grad():
-                model.eval()
-
                 accumulate_loss = []
                 for i, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'{house} - Epoch {epoch} - Test model with training data'):
                     images, targets, converted_boxes = data
@@ -172,9 +171,6 @@ if __name__ == '__main__':
 
             # Validation
             with torch.no_grad():
-                model.eval()
-                compute_loss.eval()
-
                 accumulate_loss = []
                 for i, data in tqdm(enumerate(data_loader_validation), total=len(data_loader_validation), desc=f'{house} - Epoch {epoch} - Test model with validation data'):
                     images, targets, converted_boxes = data
@@ -185,27 +181,9 @@ if __name__ == '__main__':
                     accumulate_loss.append(loss.item())
 
             logs['validation'].append({'loss': sum(accumulate_loss, 0) / len(accumulate_loss)})
-            # Train loss after backpropagation
-            with torch.no_grad():
-                model.eval()
-
-                accumulate_loss = []
-                for i, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'{house} - Epoch {epoch} - Test model with training data'):
-                    images, targets, converted_boxes = data
-
-                    images = images.to('cuda')
-                    output = model(images)
-                    loss, loss_items = compute_loss(output, converted_boxes.to('cuda'))
-                    accumulate_loss.append(loss.item())
-
-            logs['train_after_backpropagation'].append({'loss': sum(accumulate_loss, 0) / len(accumulate_loss)})
-
-            #print(f'----> EPOCH SUMMARY TRAIN AFTER BACKPROP [{epoch}] -> [{i}/{len(data_loader_train)}]: ' + ', '.join([f'{k}: {v}' for k, v in logs['train_after_backpropagation'][epoch].items()]))
 
             # Test
             with torch.no_grad():
-                model.eval()
-
                 accumulate_loss = []
                 for i, data in tqdm(enumerate(data_loader_test), total=len(data_loader_test), desc=f'{house} - Epoch {epoch} - Test model with test data'):
                     images, targets, converted_boxes = data
