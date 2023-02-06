@@ -61,6 +61,37 @@ class ModelEvaluator:
                     )
             img_count_temp += 1
 
+    def add_predictions_yolo(self, targets, predictions, imgs_size):
+        img_count_temp = self._img_count
+
+        for target in targets:
+            for label, [x, y, w, h] in zip(target['labels'].tolist(), target['boxes'].tolist()):
+                self._gt_bboxes.append(BoundingBox(
+                    image_name=str(self._img_count),
+                    class_id=str(label),
+                    coordinates=(x - w / 2, y - h / 2, w, h),
+                    bb_type=BBType.GROUND_TRUTH,
+                    format=BBFormat.XYWH,
+                ))
+            self._img_count += 1
+
+        for boxes in predictions:
+            for x1, y1, x2, y2, score, label in boxes:
+                label, score, = int(label.item()), score.item(),
+                x1, y1, x2, y2 = x1.item() / imgs_size[0], y1.item() / imgs_size[1], x2.item() / imgs_size[0], y2.item() / imgs_size[1]
+                if label >= 0:
+                    self._predicted_bboxes.append(
+                        BoundingBox(
+                            image_name=str(img_count_temp),
+                            class_id=str(label),
+                            coordinates=(x1, y1, x2 - x1, y2 - y1),
+                            bb_type=BBType.DETECTED,
+                            format=BBFormat.XYWH,
+                            confidence=score
+                        )
+                    )
+            img_count_temp += 1
+
     @abstractmethod
     def get_metrics(self) -> Dict:
         pass
