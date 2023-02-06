@@ -156,7 +156,6 @@ if __name__ == '__main__':
             # Train loss after backpropagation
             with torch.no_grad():
                 model.eval()
-                compute_loss.eval()
 
                 accumulate_loss = []
                 for i, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'{house} - Epoch {epoch} - Test model with training data'):
@@ -189,7 +188,6 @@ if __name__ == '__main__':
             # Train loss after backpropagation
             with torch.no_grad():
                 model.eval()
-                compute_loss.eval()
 
                 accumulate_loss = []
                 for i, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'{house} - Epoch {epoch} - Test model with training data'):
@@ -207,7 +205,6 @@ if __name__ == '__main__':
             # Test
             with torch.no_grad():
                 model.eval()
-                compute_loss.eval()
 
                 accumulate_loss = []
                 for i, data in tqdm(enumerate(data_loader_test), total=len(data_loader_test), desc=f'{house} - Epoch {epoch} - Test model with test data'):
