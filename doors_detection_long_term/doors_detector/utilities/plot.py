@@ -29,4 +29,7 @@ def plot_losses(logs: Dict[str, List[Dict[str, float]]], save_to_file: bool = Fa
             plt.plot([i for i in range(len(validation_logs))], [log_epoch[loss] for log_epoch in validation_logs], label='Validation loss')
 
         plt.legend()
-        plt.show()
+        if not save_to_file:
+            plt.show()
+        else:
+            plt.savefig('a.svg')

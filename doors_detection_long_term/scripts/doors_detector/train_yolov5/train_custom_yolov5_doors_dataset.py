@@ -212,15 +212,14 @@ if __name__ == '__main__':
 
 
     # Qualify the general detectors trained before
-"""
     for house, epochs_general, quantity in [(h, e, q) for h in houses for e in epochs_general_detector for q in fine_tune_quantity]:
         epoch_count = 0
         print(f'{house}, general detectors trained for {epochs_general} epochs, fine tune train set: {quantity}')
         train, validation, test, labels, _ = get_final_doors_dataset_epoch_analysis(experiment=2, folder_name=house.replace('_', ''), train_size=quantity / 100, use_negatives=False)
         print(f'Train set size: {len(train)}', f'Validation set size: {len(validation)}', f'Test set size: {len(test)}')
-        data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_fn=collate_fn, shuffle=False, num_workers=4)
-        data_loader_validation = DataLoader(validation, batch_size=params['batch_size'], collate_fn=collate_fn, drop_last=False, num_workers=4)
-        data_loader_test = DataLoader(test, batch_size=params['batch_size'], collate_fn=collate_fn, drop_last=False, num_workers=4)
+        data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
+        data_loader_validation = DataLoader(validation, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
+        data_loader_test = DataLoader(test, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 
         model, criterion, lr_scheduler, optimizer, logs = prepare_model(globals()[f'EXP_1_{house}_2_LAYERS_BACKBONE_{epochs_general}_EPOCHS'.upper()], reload_model=True, restart_checkpoint=False)
         model.set_description(globals()[f'EXP_2_{house}_{quantity}_{epochs_general}_GENERAL_2_LAYERS_BACKBONE_{epochs_qualified_detectors[0]}_EPOCHS'.upper()])
@@ -420,5 +419,3 @@ if __name__ == '__main__':
             if epoch == epochs_qualified_detectors[epoch_count] - 1 and epoch_count < len(epochs_qualified_detectors) -1:
                 epoch_count += 1
                 model.set_description(globals()[f'EXP_2_{house}_{quantity}_{epochs_general}_GENERAL_2_LAYERS_BACKBONE_{epochs_qualified_detectors[epoch_count]}_EPOCHS'.upper()])
-
-"""
