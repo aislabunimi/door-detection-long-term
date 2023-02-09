@@ -225,7 +225,7 @@ if __name__ == '__main__':
         print_logs_every = 10
         last_opt_step = -1
         model.to('cuda')
-        model.set_description(globals()[f'EXP_2_{house}_EPOCHS_GD_{epochs_general}_QD_{epochs_general_detector[0]}_fine_tune_{fine_tune_quantity}'.upper()])
+        model.set_description(globals()[f'EXP_2_{house}_EPOCHS_GD_{epochs_general}_EPOCH_QD_{epochs_qualified_detectors[0]}_fine_tune_{quantity}'.upper()])
         print_logs_every = 10
 
         start_time = time.time()
@@ -237,7 +237,7 @@ if __name__ == '__main__':
 
             model.train()
             optimizer.zero_grad()
-            for d, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'{house} - Epoch {epoch} - Train model'):
+            for d, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'{house} - Epoch {epoch} - Fine tune with {quantity}% of examples'):
                 ni = d + nb * epoch
 
                 # warmup
@@ -331,4 +331,4 @@ if __name__ == '__main__':
             # Change the model description on each epoch step
             if epoch == epochs_qualified_detectors[epoch_count] - 1 and epoch_count < len(epochs_qualified_detectors) -1:
                 epoch_count += 1
-                model.set_description(globals()[f'EXP_2_{house}_EPOCHS_GD_{epochs_general}_QD_{epochs_general_detector[epoch_count]}_fine_tune_{fine_tune_quantity}'.upper()])
+                model.set_description(globals()[f'EXP_2_{house}_EPOCHS_GD_{epochs_general}_EPOCH_QD_{epochs_qualified_detectors[epoch_count]}_fine_tune_{quantity}'.upper()])
