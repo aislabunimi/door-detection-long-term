@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt, font_manager
 from matplotlib.pyplot import subplots
 from pandas import CategoricalDtype
 
-houses = pd.read_excel('./../results/epochs_and_backbone_analysis.xlsx')
+houses = pd.read_excel('./../../results/epochs_and_backbone_analysis.xlsx')
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs'] == 40) | (houses['epochs'] == 60)) & (houses['backbone'] == '2_layers')]

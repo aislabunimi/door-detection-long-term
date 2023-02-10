@@ -10,8 +10,8 @@ titles = ['No door', 'Closed door', 'Open door']
 for title, label in zip(titles, [-1, 0, 1]):
     fig, ax = plt.subplots(figsize=(8, 5))
     for label_x, epoch in zip(legend_labels, epochs_general_detector):
-        dataframes = [pd.read_excel(f'../results/gd_epochs_analysis_{epoch}.xlsx')] +\
-                     [pd.read_excel(f'../results/qd_{train_size}_epochs_analysis_{epoch}.xlsx') for train_size in fine_tune_quantity]
+        dataframes = [pd.read_excel(f'../../results/gd_epochs_analysis_{epoch}.xlsx')] +\
+                     [pd.read_excel(f'../../results/qd_{train_size}_epochs_analysis_{epoch}.xlsx') for train_size in fine_tune_quantity]
 
 
         means = []

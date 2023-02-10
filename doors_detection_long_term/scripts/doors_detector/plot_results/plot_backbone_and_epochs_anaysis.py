@@ -2,7 +2,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.pyplot import subplots
 
-results = pd.read_excel('./../results/epochsand_backbone_aggregation.xlsx', index_col=[0,1,2,3,4])
+results = pd.read_excel('./../../results/epochsand_backbone_aggregation.xlsx', index_col=[0,1,2,3,4])
 
 
 labels = ['$GD_{-e}$', '$QD^{25}_e$', '$QD^{50}_e$', '$QD^{75}_e$']
