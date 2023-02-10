@@ -31,7 +31,7 @@ def compute_results(model_name, data_loader_test, COLORS, description):
             preds, train_out = model.model(images)
             #print(preds.size(), train_out[0].size(), train_out[1].size(), train_out[2].size())
             preds = non_max_suppression(preds,
-                                        0.5,
+                                        0.75,
                                         0.45,
 
                                         multi_label=True,
