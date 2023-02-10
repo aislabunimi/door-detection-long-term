@@ -31,7 +31,7 @@ def compute_results(model_name, data_loader_test, COLORS, description):
             preds, train_out = model.model(images)
             #print(preds.size(), train_out[0].size(), train_out[1].size(), train_out[2].size())
             preds = non_max_suppression(preds,
-                                        0.25,
+                                        0.5,
                                         0.45,
 
                                         multi_label=True,
@@ -61,7 +61,7 @@ def save_file(results, file_name):
 
     dataframe = pd.DataFrame(d)
 
-    with pd.ExcelWriter('./../results/' + file_name) as writer:
+    with pd.ExcelWriter('./../../results/' + file_name) as writer:
         if not dataframe.index.name:
             dataframe.index.name = 'Index'
         dataframe.to_excel(writer, sheet_name='s')
