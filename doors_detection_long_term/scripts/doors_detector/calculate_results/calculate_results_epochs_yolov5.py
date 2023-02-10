@@ -25,19 +25,19 @@ def compute_results(model_name, data_loader_test, COLORS, description):
 
     evaluator = MyEvaluator()
 
-    for images, targets, converted_boxes in tqdm(data_loader_test, total=len(data_loader_test), desc=description):
-        images = images.to(device)
-        outputs = model(images)
-        preds, train_out = model.model(images)
-        #print(preds.size(), train_out[0].size(), train_out[1].size(), train_out[2].size())
-        preds = non_max_suppression(preds,
-                                    0.25,
-                                    0.45,
+    with torch.no_grad():
+        for images, targets, converted_boxes in tqdm(data_loader_test, total=len(data_loader_test), desc=description):
+            images = images.to(device)
+            preds, train_out = model.model(images)
+            #print(preds.size(), train_out[0].size(), train_out[1].size(), train_out[2].size())
+            preds = non_max_suppression(preds,
+                                        0.25,
+                                        0.45,
 
-                                    multi_label=True,
-                                    agnostic=True,
-                                    max_det=300)
-        evaluator.add_predictions_yolo(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
+                                        multi_label=True,
+                                        agnostic=True,
+                                        max_det=300)
+            evaluator.add_predictions_yolo(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
 
     metrics = evaluator.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=True, colors=COLORS)
     mAP = 0
