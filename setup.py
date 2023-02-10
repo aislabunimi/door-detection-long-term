@@ -73,7 +73,8 @@ setup(
         'pyyaml',
         'psutil',
         'tqdm',
-        'seaborn'
+        'seaborn',
+        'openpyxl'
 
     ],
     entry_points={
