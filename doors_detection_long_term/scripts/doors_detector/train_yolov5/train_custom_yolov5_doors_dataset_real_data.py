@@ -88,7 +88,7 @@ if __name__ == '__main__':
     seed_everything(params['seed'])
 
     # Train the general detector with gibson and deep_door_2
-    for name, (train, validation, _, _) in [('gibson', get_final_doors_dataset_all_envs()), ('deep_doors_2', get_deep_doors_2_relabelled_dataset_for_gd())]:
+    for name, (train, validation, labels, _) in [('gibson', get_final_doors_dataset_all_envs()), ('deep_doors_2', get_deep_doors_2_relabelled_dataset_for_gd())]:
         epoch_count = 0
         print(f'Train set size: {len(train)}', f'Validation set size: {len(validation)}')
         data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
@@ -108,7 +108,7 @@ if __name__ == '__main__':
 
             model.train()
             optimizer.zero_grad()
-            for d, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'Train GD with {name}'):
+            for d, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'Epoch {epoch} - Train GD with {name.upper()}'):
                 ni = d + nb * epoch
 
                 # warmup
@@ -155,7 +155,7 @@ if __name__ == '__main__':
             # Train loss after backpropagation
             with torch.no_grad():
                 accumulate_loss = []
-                for i, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'{house} - Epoch {epoch} - Test model with training data'):
+                for i, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'Epoch {epoch} - Test model with training data of {name.upper()} dataset'):
                     images, targets, converted_boxes = data
 
                     images = images.to('cuda')
@@ -170,7 +170,7 @@ if __name__ == '__main__':
             # Validation
             with torch.no_grad():
                 accumulate_loss = []
-                for i, data in tqdm(enumerate(data_loader_validation), total=len(data_loader_validation), desc=f'{house} - Epoch {epoch} - Test model with validation data'):
+                for i, data in tqdm(enumerate(data_loader_validation), total=len(data_loader_validation), desc=f'Epoch {epoch} - Test model with validation data of {name.upper()} dataset'):
                     images, targets, converted_boxes = data
 
                     images = images.to('cuda')
