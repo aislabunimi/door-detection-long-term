@@ -182,7 +182,7 @@ if __name__ == '__main__':
 
             print(f'----> EPOCH {epoch} SUMMARY: ' + ', '.join([f'{k}: {v[epoch]}' for k, v in logs.items()]))
 
-            plot_losses(logs)
+            #plot_losses(logs)
 
             model.save(epoch=epoch,
                    optimizer_state_dict=optimizer.state_dict(),
@@ -292,7 +292,7 @@ if __name__ == '__main__':
             logs['validation'].append({'loss': sum(accumulate_loss, 0) / len(accumulate_loss)})
             print(f'----> EPOCH {epoch} SUMMARY: ' + ', '.join([f'{k}: {v[epoch]}' for k, v in logs.items()]))
 
-            plot_losses(logs)
+            #plot_losses(logs)
 
             model.save(epoch=epoch,
                        optimizer_state_dict=optimizer.state_dict(),
