@@ -2,7 +2,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.pyplot import subplots
 
-results = pd.read_excel('./../results/general_detectors_with_real_data.xlsx', index_col=[1,2,3,4,5])
+results = pd.read_excel('./../../results/general_detectors_with_real_data.xlsx', index_col=[1,2,3,4,5])
 
 
 labels = ['40', '60', '80', '100']
