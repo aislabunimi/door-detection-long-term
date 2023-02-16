@@ -88,7 +88,7 @@ if __name__ == '__main__':
     seed_everything(params['seed'])
 
     # Train the general detector with gibson and deep_door_2
-    for name, (train, validation, labels, _) in [('gibson', get_final_doors_dataset_all_envs()), ('deep_doors_2', get_deep_doors_2_relabelled_dataset_for_gd())]:
+    for name, (train, validation, labels, _) in [ ('deep_doors_2', get_deep_doors_2_relabelled_dataset_for_gd())]:
         epoch_count = 0
         print(f'Train set size: {len(train)}', f'Validation set size: {len(validation)}')
         data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
@@ -125,6 +125,7 @@ if __name__ == '__main__':
                 images = images.to('cuda')
 
                 with torch.cuda.amp.autocast(amp):
+                    print(images.size())
                     output = model(images)  # forward
                     loss, loss_items = compute_loss(output, converted_boxes.to('cuda'))
                     #print(loss_items)
@@ -292,7 +293,7 @@ if __name__ == '__main__':
             logs['validation'].append({'loss': sum(accumulate_loss, 0) / len(accumulate_loss)})
             print(f'----> EPOCH {epoch} SUMMARY: ' + ', '.join([f'{k}: {v[epoch]}' for k, v in logs.items()]))
 
-            #plot_losses(logs)
+                    #plot_losses(logs)
 
             model.save(epoch=epoch,
                        optimizer_state_dict=optimizer.state_dict(),

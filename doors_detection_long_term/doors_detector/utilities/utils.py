@@ -58,14 +58,43 @@ def collate_fn_yolov5(batch):
     images, targets = collate_fn(batch)
 
     batch_size_width, batch_size_height = images.size()[2], images.size()[3]
+    final_size = [i for i in images.size()[:2]]
+
+    translate_w, translate_h = 0., 0.
+    # If the images have different width and height, make them squared adding padding
+    modify = False
+    if batch_size_width > batch_size_height:
+        final_size += [batch_size_width, batch_size_width]
+        batch_size_height = batch_size_width
+        modify = True
+    else:
+        final_size  += [batch_size_height, batch_size_height]
+        batch_size_width = batch_size_height
+        modify = True
+
+    final_size = tuple(final_size)
+
+    if modify:
+        tensor = torch.zeros(size=final_size, dtype=images.dtype, device=images.device)
+
+        translate_w = (tensor.size()[3] - images.size()[3]) / tensor.size()[3] / 2
+        translate_h =  (tensor.size()[2] - images.size()[2]) / tensor.size()[2] / 2
+
+        for img, pad_img in zip(images, tensor):
+            pad_img[: img.size()[0], int((final_size[2] - img.size()[1]) / 2.) : int(img.shape[1] + (final_size[2] - img.size()[1]) / 2.), int((final_size[3] - img.size()[2]) / 2.) : int(img.shape[2] + (final_size[3] - img.size()[2]) / 2.)].copy_(img)
+        images = tensor
+
+
     converted_boxes = []
     for i, target in enumerate(targets):
-        real_size_width, real_size_height = target['size'][0], target['size'][1]
-        scale_boxes = torch.tensor([[real_size_width / batch_size_width, real_size_height / batch_size_height, real_size_width / batch_size_width, real_size_height / batch_size_height]])
+        real_size_width, real_size_height = target['size'][1], target['size'][0]
+        scale_boxes = torch.tensor([[real_size_width / batch_size_width, real_size_height / batch_size_height,
+                                     real_size_width / batch_size_width, real_size_height / batch_size_height]])
+
         converted_boxes.append(torch.cat([
             torch.tensor([[i] for _ in range(int(list(target['labels'].size())[0]))]),
             torch.reshape(target['labels'], (target['labels'].size()[0], 1)),
-            target['boxes'] * scale_boxes
+            target['boxes'] * scale_boxes + torch.tensor([[translate_w, translate_h, 0., 0.]])
         ], dim=1))
     converted_boxes = torch.cat(converted_boxes, dim=0)
     return images, targets, converted_boxes
