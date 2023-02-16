@@ -65,13 +65,15 @@ def collate_fn_yolov5(batch):
     modify = False
     if batch_size_width > batch_size_height:
         final_size += [batch_size_width, batch_size_width]
-        batch_size_height = batch_size_width
         modify = True
     else:
-        final_size  += [batch_size_height, batch_size_height]
-        batch_size_width = batch_size_height
+        final_size += [batch_size_height, batch_size_height]
         modify = True
 
+    if final_size[2] % 32 != 0 or final_size[3] % 32 != 0:
+        final_size[2] = final_size[3] = final_size[2] + 32 - final_size[2] % 32
+
+    batch_size_width, batch_size_height = final_size[2], final_size[3]
     final_size = tuple(final_size)
 
     if modify:
@@ -81,7 +83,7 @@ def collate_fn_yolov5(batch):
         translate_h =  (tensor.size()[2] - images.size()[2]) / tensor.size()[2] / 2
 
         for img, pad_img in zip(images, tensor):
-            pad_img[: img.size()[0], int((final_size[2] - img.size()[1]) / 2.) : int(img.shape[1] + (final_size[2] - img.size()[1]) / 2.), int((final_size[3] - img.size()[2]) / 2.) : int(img.shape[2] + (final_size[3] - img.size()[2]) / 2.)].copy_(img)
+            pad_img[: img.size()[0], int((final_size[2] - img.size()[1]) / 2.) : img.shape[1] + int((final_size[2] - img.size()[1]) / 2.), int((final_size[3] - img.size()[2]) / 2.) : img.shape[2] + int((final_size[3] - img.size()[2]) / 2.)].copy_(img)
         images = tensor
 
 

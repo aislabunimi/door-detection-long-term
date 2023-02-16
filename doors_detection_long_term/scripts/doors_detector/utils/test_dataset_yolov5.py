@@ -8,9 +8,9 @@ from doors_detection_long_term.scripts.doors_detector.dataset_configurator impor
 import torchvision.transforms as T
 
 
-train, validation, test, labels, _ = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name='house1', train_size=0.25, use_negatives=False)
+#train, validation, test, labels, _ = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name='house1', train_size=0.25, use_negatives=False)
 
-#train, test, labels, _ = get_deep_doors_2_relabelled_dataset_for_gd()
+train, test, labels, _ = get_deep_doors_2_relabelled_dataset_for_gd()
 #print(f'Train set size: {len(train)}', f'Validation set size: {len(validation)}', f'Test set size: {len(test)}')
 data_loader_train = DataLoader(train, batch_size=6, collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
 #data_loader_validation = DataLoader(validation, batch_size=6, collate_fn=collate_fn, drop_last=False, num_workers=4)
