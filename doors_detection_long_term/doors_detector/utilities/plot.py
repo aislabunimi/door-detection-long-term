@@ -21,8 +21,11 @@ def plot_losses(logs: Dict[str, List[Dict[str, float]]], save_to_file: bool = Fa
         else:
             plt.plot([i for i in range(len(train_logs))], [log_epoch[loss] for log_epoch in train_logs], label='Train loss')
 
-        # Print test logs
-        plt.plot([i for i in range(len(test_logs))], [log_epoch[loss] for log_epoch in test_logs], label='Test loss')
+        try:
+            # Print test logs
+            plt.plot([i for i in range(len(test_logs))], [log_epoch[loss] for log_epoch in test_logs], label='Test loss')
+        except:
+            pass
 
         # Plot validation loss if exists
         if validation_logs is not None:
