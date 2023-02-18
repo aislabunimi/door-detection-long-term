@@ -222,7 +222,7 @@ if __name__ == '__main__':
 
             model.train()
             optimizer.zero_grad()
-            for d, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'{house} - Epoch {epoch} - Fine tune with {quantity}% of examples'):
+            for d, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'{house} - Epoch {epoch} - Starting GD trained with {gd_dataset} - Fine tune with {quantity}% of examples of {house}'):
                 ni = d + nb * epoch
 
                 # warmup
