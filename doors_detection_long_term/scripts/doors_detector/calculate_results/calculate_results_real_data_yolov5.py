@@ -12,6 +12,7 @@ from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 houses = ['floor1', 'floor4', 'chemistry_floor0']
+datasets = ['gibson', 'deep_doors_2']
 epochs_general_detector = [60]
 epochs_qualified_detector = [40]
 fine_tune_quantity = [25, 50, 75]
@@ -45,14 +46,14 @@ def compute_results(model_name, data_loader_test, description):
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
         mAP += values['AP']
         print(f'\tLabel {label} -> AP = {values["AP"]}, Total positives = {values["total_positives"]}, TP = {values["TP"]}, FP = {values["FP"]}')
-        print(f'\t\tPositives = {values["TP"] / values["total_positives"] * 100:.2f}%, False positives = {values["FP"] / (values["TP"] + values["FP"]) * 100:.2f}%')
-    print(f'\tmAP = {mAP / len(metrics["per_bbox"].keys())}')
+        #print(f'\t\tPositives = {values["TP"] / values["total_positives"] * 100:.2f}%, False positives = {values["FP"] / (values["TP"] + values["FP"]) * 100:.2f}%')
+    #print(f'\tmAP = {mAP / len(metrics["per_bbox"].keys())}')
 
     return metrics
 
 
 def save_file(results, file_name):
-
+    print(results)
     results = np.array(results).T
     columns = ['house', 'exp', 'general_dataset', 'epochs_gd', 'epochs_qd', 'label',  'AP', 'total_positives', 'TP', 'FP']
     d = {}
@@ -67,8 +68,8 @@ def save_file(results, file_name):
         dataframe.to_excel(writer, sheet_name='s')
 
 
-model_names_general_detectors = [(globals()[f'EXP_GENERAL_DETECTOR_{dataset}_{epochs}_EPOCHS'.upper()], dataset, epochs) for dataset in ['gibson', 'deep_doors_2', 'gibson_deep_doors_2'] for epochs in epochs_general_detector]
-model_names_qualified_detectors = [(globals()[f'EXP_2_{house}_{dataset}_EPOCHS_GD_{epochs_general}_EPOCH_QD_{epochs_qualified}_FINE_TUNE_{quantity}'.upper()], house, dataset, quantity, epochs_general, epochs_qualified) for house in houses for dataset in ['gibson', 'deep_doors_2', 'gibson_deep_doors_2'] for quantity in fine_tune_quantity for epochs_general in epochs_general_detector for epochs_qualified in epochs_qualified_detector]
+model_names_general_detectors = [(globals()[f'EXP_GENERAL_DETECTOR_{dataset}_{epochs}_EPOCHS'.upper()], dataset, epochs) for dataset in datasets for epochs in epochs_general_detector]
+model_names_qualified_detectors = [(globals()[f'EXP_2_{house}_{dataset}_EPOCHS_GD_{epochs_general}_EPOCHS_QD_{epochs_qualified}_FINE_TUNE_{quantity}'.upper()], house, dataset, quantity, epochs_general, epochs_qualified) for house in houses for dataset in datasets for quantity in fine_tune_quantity for epochs_general in epochs_general_detector for epochs_qualified in epochs_qualified_detector]
 
 results = []
 # General detectors
@@ -84,13 +85,13 @@ for model_name, dataset, epochs, in model_names_general_detectors:
         for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
             results += [[house, 'GD', dataset, epochs, epochs, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
-for model_name, house, quantity, epochs_general, epochs_qualified in model_names_qualified_detectors:
-    _, _, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name=house.replace('_', ''), train_size=0.25, use_negatives=False)
+for model_name, house, dataset, quantity, epochs_general, epochs_qualified in model_names_qualified_detectors:
+    _, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25)
     data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 
-    metrics = compute_results(model_name, data_loader_test, f'{house} - Epochs GD: {epochs_general} - Epochs qualified {epochs_qualified} - {quantity}%')
+    metrics = compute_results(model_name, data_loader_test, f'{house} - GD trained on {dataset} - Epochs GD: {epochs_general} - Epochs qualified {epochs_qualified} - {quantity}%')
 
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
-        results += [[house.replace('_', ''), 'QD_' + str(quantity), epochs_general, epochs_qualified, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
+        results += [[house, f'QD_{quantity}', dataset, epochs_general, epochs_qualified, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
 save_file(results, 'yolo_v5_results_real_data.xlsx')
