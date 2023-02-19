@@ -88,7 +88,7 @@ if __name__ == '__main__':
     seed_everything(params['seed'])
 
     # Train the general detector with gibson and deep_door_2
-    for name, (train, validation, labels, _) in [ ('deep_doors_2', get_deep_doors_2_relabelled_dataset_for_gd())]:
+    for name, (train, validation, labels, _) in [('gibson', get_final_doors_dataset_all_envs()), ('deep_doors_2', get_deep_doors_2_relabelled_dataset_for_gd()), ('gibson_deep_doors_2', get_gibson_and_deep_door_2_dataset(half=False))]:
         epoch_count = 0
         print(f'Train set size: {len(train)}', f'Validation set size: {len(validation)}')
         data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
@@ -198,7 +198,7 @@ if __name__ == '__main__':
 
 
     # Qualify the general detectors trained before
-    for house, gd_dataset, epochs_general, quantity in [(h, eg, e, q) for h in houses for eg in ['gibson', 'deep_doors_2'] for e in epochs_general_detector for q in fine_tune_quantity]:
+    for house, gd_dataset, epochs_general, quantity in [(h, eg, e, q) for h in houses for eg in ['gibson', 'deep_doors_2', 'gibson_deep_doors_2'] for e in epochs_general_detector for q in fine_tune_quantity]:
         epoch_count = 0
         print(f'{house}, general detectors trained with {gd_dataset} for {epochs_general} epochs, fine tune train set: {quantity}')
         train, test, labels, _ = get_final_doors_dataset_real_data(folder_name=house, train_size=quantity / 100)
