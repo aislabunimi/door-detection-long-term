@@ -31,7 +31,7 @@ fine_tune_quantity = [25, 50, 75]
 # Params
 params = {
     #'epochs': 40,
-    'batch_size': 4,
+    'batch_size': 1,
     'seed': 0
 }
 def prepare_model(description, reload_model, restart_checkpoint, epochs):
