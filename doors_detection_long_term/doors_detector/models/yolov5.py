@@ -15,6 +15,7 @@ from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general i
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.torch_utils import de_parallel
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import trained_models_path
 
+
 TEST: DESCRIPTION = 0
 EXP_1_HOUSE_1_40_EPOCHS: DESCRIPTION = 1
 EXP_2_HOUSE_1_EPOCHS_GD_40_EPOCH_QD_20_FINE_TUNE_25: DESCRIPTION = 2
