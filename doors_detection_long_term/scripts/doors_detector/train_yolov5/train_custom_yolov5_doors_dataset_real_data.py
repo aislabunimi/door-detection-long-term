@@ -203,8 +203,8 @@ if __name__ == '__main__':
         print(f'{house}, general detectors trained with {gd_dataset} for {epochs_general} epochs, fine tune train set: {quantity}')
         train, test, labels, _ = get_final_doors_dataset_real_data(folder_name=house, train_size=quantity / 100)
         print(f'Train set size: {len(train)}', f'Test set size: {len(test)}')
-        data_loader_train = DataLoader(train, batch_size=3, collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
-        data_loader_test = DataLoader(test, batch_size=3, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
+        data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
+        data_loader_test = DataLoader(test, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 
         model, compute_loss, optimizer, scheduler, scaler, start_epoch, nl, nw, nb, amp, nbs, accumulate, lf, logs = prepare_model(globals()[f'EXP_GENERAL_DETECTOR_{gd_dataset}_{epochs_general}_EPOCHS'.upper()], reload_model=True, restart_checkpoint=False, epochs=epochs_general_detector[-1])
         print_logs_every = 10
