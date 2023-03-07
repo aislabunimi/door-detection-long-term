@@ -22,14 +22,16 @@ class DatasetsCreatorRealData:
         return DOOR_LABELS
 
     def create_datasets(self, folder_name: str, train_size: float, random_state: int = 42):
+        assert train_size == 0.15 or train_size == 0.25 or train_size == 0.5 or train_size == 0.75
 
         self._dataframe = self._dataframe[(self._dataframe.label == 1) & (self._dataframe.folder_name == folder_name)]
         shuffled_dataframe = shuffle(self._dataframe, random_state=random_state)
 
         [fold_1, fold_2, fold_3, fold_4] = np.array_split(shuffled_dataframe.index.to_numpy(), 4)
 
-        if train_size == 0.25:
-            train_dataframe = shuffled_dataframe.loc[fold_1.tolist()]
+        if train_size <= 0.25:
+            fold_1 = fold_1.tolist()
+            train_dataframe = shuffled_dataframe.loc[fold_1[:int((train_size / 0.25) * len(fold_1))]]
         elif train_size == 0.50:
             train_dataframe = shuffled_dataframe.loc[fold_1.tolist() + fold_2.tolist()]
         elif train_size == 0.75:
