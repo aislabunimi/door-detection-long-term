@@ -59,7 +59,7 @@ class DatasetsCreatorDoorsFinalEpochAnalysis:
         :param train_size: the size of the training set in experiment 2. For the first experiment this parameter is not considered, all samples of folders k-1 are considered.
         """
         if isinstance(train_size, float):
-            assert 0.0 < train_size < 1.0
+            assert train_size == 0.15 or train_size == 0.25 or train_size == 0.5 or train_size == 0.75
 
         shuffled_dataframe = shuffle(self._dataframe, random_state=random_state)
 
@@ -79,8 +79,10 @@ class DatasetsCreatorDoorsFinalEpochAnalysis:
             qualified_dataframe = shuffled_dataframe[(shuffled_dataframe.folder_name == self._folder_name) & (shuffled_dataframe.label == 1)]
             [fold_1, fold_2, fold_3, _] = np.array_split(qualified_dataframe.index.to_numpy(), 4)
 
-            if train_size == 0.25:
-                train_dataframe = qualified_dataframe.loc[fold_1.tolist()]
+            if train_size <= 0.25:
+                fold_1 = fold_1.tolist()
+                train_dataframe = qualified_dataframe.loc[fold_1[:int((train_size / 0.25) * len(fold_1))]]
+
             elif train_size == 0.50:
                 train_dataframe = qualified_dataframe.loc[fold_1.tolist() + fold_2.tolist()]
             elif train_size == 0.75:
