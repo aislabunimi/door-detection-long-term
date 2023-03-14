@@ -100,3 +100,19 @@ def collate_fn_yolov5(batch):
         ], dim=1))
     converted_boxes = torch.cat(converted_boxes, dim=0)
     return images, targets, converted_boxes
+
+def collate_fn_faster_rcnn(batch):
+    images, targets, converted_boxes = collate_fn_yolov5(batch)
+    print(images, targets, converted_boxes)
+    batch_size_width, batch_size_height = images.size()[2], images.size()[3]
+    new_targets = []
+    for i, image in enumerate(images):
+        t = {}
+        current_boxes = converted_boxes[converted_boxes[:, 0].to(torch.int) == i]
+        t['labels'] = current_boxes[:, 1].to(torch.int)
+        t['boxes'] = torch.cat((current_boxes[:, 2:4] - (current_boxes[:, 4:] / 2), current_boxes[:, 2:4] + (current_boxes[:, 4:] / 2)), 1) * torch.tensor([[batch_size_width, batch_size_height, batch_size_width, batch_size_width]])
+        t['area'] = torch.prod(t['boxes'][:, 2:] - t['boxes'][:, :2], 1)
+        t['iscrowd'] = torch.zeros(t['area'].size()[0]).to(torch.int)
+        new_targets.append(t)
+
+    return images, targets, new_targets
