@@ -49,8 +49,8 @@ def prepare_model(description, reload_model, restart_checkpoint):
 
     params = [(n, p) for n, p in model.named_parameters() if p.requires_grad]
 
-    optimizer = torch.optim.SGD([p for n, p in params], lr=0.005,
-                                momentum=0.9, weight_decay=0.0005)
+    optimizer = torch.optim.SGD([p for n, p in params], lr=0.001,
+                                momentum=0.9, nesterov=True)
 
     if restart_checkpoint:
         optimizer.load_state_dict(optimizer_state_dict)
@@ -113,7 +113,7 @@ if __name__ == '__main__':
 
                 accumulate_loss.append(loss_value)
 
-            scheduler.step()
+            #scheduler.step()
             logs['time'].append(time.time() - start_time)
             epoch_total = {}
             for d in temp_logs['train']:
@@ -243,7 +243,7 @@ if __name__ == '__main__':
 
                 accumulate_loss.append(loss_value)
 
-            scheduler.step()
+            #scheduler.step()
             logs['time'].append(time.time() - start_time)
             epoch_total = {}
             for d in temp_logs['train']:
