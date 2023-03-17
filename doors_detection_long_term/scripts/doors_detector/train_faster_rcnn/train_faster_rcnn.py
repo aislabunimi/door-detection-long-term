@@ -110,10 +110,10 @@ if __name__ == '__main__':
                 optimizer.zero_grad()
                 losses.backward()
                 optimizer.step()
-                scheduler.step()
 
                 accumulate_loss.append(loss_value)
 
+            scheduler.step()
             logs['time'].append(time.time() - start_time)
             epoch_total = {}
             for d in temp_logs['train']:
@@ -240,10 +240,10 @@ if __name__ == '__main__':
                 optimizer.zero_grad()
                 losses.backward()
                 optimizer.step()
-                scheduler.step()
 
                 accumulate_loss.append(loss_value)
 
+            scheduler.step()
             logs['time'].append(time.time() - start_time)
             epoch_total = {}
             for d in temp_logs['train']:
