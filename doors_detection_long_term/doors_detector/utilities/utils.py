@@ -103,7 +103,6 @@ def collate_fn_yolov5(batch):
 
 def collate_fn_faster_rcnn(batch):
     images, targets, converted_boxes = collate_fn_yolov5(batch)
-    print(images, targets, converted_boxes)
     batch_size_width, batch_size_height = images.size()[2], images.size()[3]
     new_targets = []
     for i, image in enumerate(images):

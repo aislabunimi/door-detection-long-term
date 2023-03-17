@@ -370,9 +370,9 @@ class FasterRCNN(GenericModel):
                 path = os.path.join(trained_models_path, path)
             self.model.load_state_dict(torch.load(os.path.join(path, 'model.pth'), map_location=torch.device('cpu')))
 
-    def forward(self, x):
+    def forward(self, x, y):
 
-        x = self.model(x)
+        x = self.model(x, y)
         return x
 
     def eval(self):

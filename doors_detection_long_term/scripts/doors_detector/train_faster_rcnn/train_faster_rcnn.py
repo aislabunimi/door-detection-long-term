@@ -95,39 +95,26 @@ if __name__ == '__main__':
             model.train()
             optimizer.zero_grad()
             for d, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'{house} - Epoch {epoch} - Train model'):
-                ni = d + nb * epoch
+                images, targets, new_targets = data
+                images = list(image.to(device) for image in images)
+                new_targets = [{k: v.to(device).to(torch.int64) for k, v in t.items()} for t in new_targets]
 
-                # warmup
-                if ni <= nw:
-                    xi = [0, nw]  # x interp
-                    accumulate = max(1, np.interp(ni, xi, [1, nbs / params['batch_size']]).round())
-                    for j, x in enumerate(optimizer.param_groups):
-                        # bias lr falls from 0.1 to lr0, all other lrs rise from 0.0 to lr0
-                        x['lr'] = np.interp(ni, xi, [model.hyp['warmup_bias_lr'] if j == 0 else 0.0, x['initial_lr'] * lf(epoch)])
-                        if 'momentum' in x:
-                            x['momentum'] = np.interp(ni, xi, [model.hyp['warmup_momentum'], model.hyp['momentum']])
 
-                images, targets, converted_boxes = data
-                images = images.to('cuda')
+                with torch.cuda.amp.autocast(enabled=False):
+                    loss_dict = model(images, new_targets)
+                    losses = sum(loss for loss in loss_dict.values())
+                    #print('losses', loss_dict)
 
-                with torch.cuda.amp.autocast(amp):
-                    output = model(images)  # forward
-                    loss, loss_items = compute_loss(output, converted_boxes.to('cuda'))
-                    #print(loss_items)
+                loss_value = losses.item()
+                #print('loss_value', loss_value)
 
-                scaler.scale(loss).backward()
+                optimizer.zero_grad()
+                losses.backward()
+                optimizer.step()
+                scheduler.step()
 
-                if ni - last_opt_step >= accumulate:
-                    scaler.unscale_(optimizer)  # unscale gradients
-                    torch.nn.utils.clip_grad_norm_(model.model.parameters(), max_norm=10.0)  # clip gradients
-                    scaler.step(optimizer)  # optimizer.step
-                    scaler.update()
-                    optimizer.zero_grad()
-                    last_opt_step = ni
+                accumulate_loss.append(loss_value)
 
-                accumulate_loss.append(loss.item())
-
-            scheduler.step()
             logs['time'].append(time.time() - start_time)
             epoch_total = {}
             for d in temp_logs['train']:
@@ -142,12 +129,18 @@ if __name__ == '__main__':
             with torch.no_grad():
                 accumulate_loss = []
                 for i, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'{house} - Epoch {epoch} - Test model with training data'):
-                    images, targets, converted_boxes = data
+                    images, targets, new_targets = data
+                    images = list(image.to(device) for image in images)
+                    new_targets = [{k: v.to(device).to(torch.int64) for k, v in t.items()} for t in new_targets]
 
-                    images = images.to('cuda')
-                    output = model(images)
-                    loss, loss_items = compute_loss(output, converted_boxes.to('cuda'))
-                    accumulate_loss.append(loss.item())
+
+                    with torch.cuda.amp.autocast(enabled=False):
+                        loss_dict = model(images, new_targets)
+                        losses = sum(loss for loss in loss_dict.values())
+                        #print('losses', loss_dict)
+
+                    loss_value = losses.item()
+                    accumulate_loss.append(loss_value)
 
             logs['train_after_backpropagation'].append({'loss': sum(accumulate_loss, 0) / len(accumulate_loss)})
 
@@ -157,12 +150,18 @@ if __name__ == '__main__':
             with torch.no_grad():
                 accumulate_loss = []
                 for i, data in tqdm(enumerate(data_loader_validation), total=len(data_loader_validation), desc=f'{house} - Epoch {epoch} - Test model with validation data'):
-                    images, targets, converted_boxes = data
+                    images, targets, new_targets = data
+                    images = list(image.to(device) for image in images)
+                    new_targets = [{k: v.to(device).to(torch.int64) for k, v in t.items()} for t in new_targets]
 
-                    images = images.to('cuda')
-                    output = model(images)
-                    loss, loss_items = compute_loss(output, converted_boxes.to('cuda'))
-                    accumulate_loss.append(loss.item())
+
+                    with torch.cuda.amp.autocast(enabled=False):
+                        loss_dict = model(images, new_targets)
+                        losses = sum(loss for loss in loss_dict.values())
+                        #print('losses', loss_dict)
+
+                    loss_value = losses.item()
+                    accumulate_loss.append(loss_value)
 
             logs['validation'].append({'loss': sum(accumulate_loss, 0) / len(accumulate_loss)})
 
@@ -170,12 +169,19 @@ if __name__ == '__main__':
             with torch.no_grad():
                 accumulate_loss = []
                 for i, data in tqdm(enumerate(data_loader_test), total=len(data_loader_test), desc=f'{house} - Epoch {epoch} - Test model with test data'):
-                    images, targets, converted_boxes = data
+                    images, targets, new_targets = data
+                images = list(image.to(device) for image in images)
+                new_targets = [{k: v.to(device).to(torch.int64) for k, v in t.items()} for t in new_targets]
 
-                    images = images.to('cuda')
-                    output = model(images)
-                    loss, loss_items = compute_loss(output, converted_boxes.to('cuda'))
-                    accumulate_loss.append(loss.item())
+
+                with torch.cuda.amp.autocast(enabled=False):
+                    loss_dict = model(images, new_targets)
+                    losses = sum(loss for loss in loss_dict.values())
+                    print('losses', loss_dict)
+                    losses_reduced = sum(loss for loss in loss_dict.values())
+
+                    loss_value = losses_reduced.item()
+                    accumulate_loss.append(loss_value)
 
             logs['test'].append({'loss': sum(accumulate_loss, 0) / len(accumulate_loss)})
             print(f'----> EPOCH {epoch} SUMMARY: ' + ', '.join([f'{k}: {v[epoch]}' for k, v in logs.items()]))
