@@ -110,10 +110,11 @@ if __name__ == '__main__':
                 optimizer.zero_grad()
                 losses.backward()
                 optimizer.step()
-                scheduler.step()
+
 
                 accumulate_loss.append(loss_value)
 
+            scheduler.step()
             logs['time'].append(time.time() - start_time)
             epoch_total = {}
             for d in temp_logs['train']:
@@ -160,7 +161,7 @@ if __name__ == '__main__':
                     accumulate_loss.append(loss_value)
 
             logs['validation'].append({'loss': sum(accumulate_loss, 0) / len(accumulate_loss)})
-
+            logs['test'].append({'loss': 0.})
             print(f'----> EPOCH {epoch} SUMMARY: ' + ', '.join([f'{k}: {v[epoch]}' for k, v in logs.items()]))
 
             plot_losses(logs)
@@ -217,10 +218,9 @@ if __name__ == '__main__':
                 optimizer.zero_grad()
                 losses.backward()
                 optimizer.step()
-                scheduler.step()
-
                 accumulate_loss.append(loss_value)
 
+            scheduler.step()
             logs['time'].append(time.time() - start_time)
             epoch_total = {}
             for d in temp_logs['train']:
