@@ -196,7 +196,7 @@ if __name__ == '__main__':
 
         for epoch in range(epochs_qualified_detectors[-1]):
 
-            temp_logs = {'train': [], 'train_after_backpropagation': [], 'validation': []}
+            temp_logs = {'train': [], 'train_after_backpropagation': [], 'test': []}
             accumulate_loss = []
 
             model.train()
@@ -263,7 +263,8 @@ if __name__ == '__main__':
                     loss_value = losses.item()
                     accumulate_loss.append(loss_value)
 
-            logs['validation'].append({'loss': sum(accumulate_loss, 0) / len(accumulate_loss)})
+            logs['test'].append({'loss': sum(accumulate_loss, 0) / len(accumulate_loss)})
+            logs['validation'].append({'loss': 0})
             print(f'----> EPOCH {epoch} SUMMARY: ' + ', '.join([f'{k}: {v[epoch]}' for k, v in logs.items()]))
 
                     #plot_losses(logs)
