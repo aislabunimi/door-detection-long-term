@@ -59,7 +59,7 @@ def save_file(results, file_name):
 
 
 model_names_general_detectors = [(globals()[f'EXP_1_{house}_2_layers_BACKBONE_{epochs}_EPOCHS'.upper()], house, epochs) for house in houses for epochs in epochs_general_detector]
-model_names_qualified_detectors = [(globals()[f'EXP_2_{house}_{quantity}_{epochs_general}_GENERAL_2_layers_BACKBONE_{epochs_qualified}_EPOCHS'.upper()], house, quantity, epochs_general, epochs_qualified) for house in houses for quantity in fine_tune_quantity for epochs_general in epochs_general_detector for epochs_qualified in epochs_qualified_detector]
+model_names_qualified_detectors = [(globals()[f'EXP_2_{house}_{quantity}_{epochs_general}_GENERAL_2_layers_BACKBONE_{epochs_qualified}_EPOCHS'.upper()], house, quantity, epochs_general, epochs_qualified) for house in houses for quantity in fine_tune_quantity for epochs_general in epochs_general_detector for epochs_qualified in epochs_qualified_detector if not (quantity == 15 and epochs_general == 40)]
 
 results = []
 # General detectors
