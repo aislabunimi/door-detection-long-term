@@ -63,7 +63,7 @@ def save_file(results, complete_results, file_name_1, file_name_2):
             dataframe.index.name = 'Index'
         dataframe.to_excel(writer, sheet_name='s')
 
-    complete_results = np.array(results).T
+    complete_results = np.array(complete_results).T
     columns = ['house', 'detector', 'dataset', 'epochs_gd', 'epochs_qd', 'label',  'total_positives', 'TP', 'FP', 'TPm', 'FPm', 'FPiou']
     d = {}
     for i, column in enumerate(columns):
