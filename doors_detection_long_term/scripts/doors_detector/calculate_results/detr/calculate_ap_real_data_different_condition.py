@@ -54,7 +54,7 @@ def save_file(results, file_name):
 
     dataframe = pd.DataFrame(d)
 
-    with pd.ExcelWriter('./../results/' + file_name) as writer:
+    with pd.ExcelWriter('./../../../results/' + file_name) as writer:
         if not dataframe.index.name:
             dataframe.index.name = 'Index'
         dataframe.to_excel(writer, sheet_name='s')
@@ -74,7 +74,7 @@ for house, dataset, epochs_gd in [(h, d, e) for h in houses for d in datasets fo
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
         results += [[house.replace('_', ''), 'GD', dataset, epochs_gd, epochs_gd, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
-for house, dataset, epochs_gd, epochs_qd, fine_tune in [(h, d, e, eq) for h in houses for d in datasets for e in epochs_general_detector for eq in epochs_qualified_detector for ft in  fine_tune_quantity]:
+for house, dataset, epochs_gd, epochs_qd, fine_tune in [(h, d, e, eq, ft) for h in houses for d in datasets for e in [60] for eq in epochs_qualified_detector for ft in  fine_tune_quantity]:
     _, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house + '_evening', train_size=0.25)
     data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn, drop_last=False, num_workers=4)
 
@@ -85,4 +85,4 @@ for house, dataset, epochs_gd, epochs_qd, fine_tune in [(h, d, e, eq) for h in h
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
         results += [[house.replace('_', ''), 'QD_' + str(fine_tune_quantity), dataset, epochs_gd, epochs_qd, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
-save_file(results, 'detr_ap_real_data_different_condition.xlsx')
+save_file(results, 'detr_ap_real_data_different_conditions.xlsx')
