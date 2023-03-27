@@ -33,10 +33,10 @@ def compute_results(model_name, data_loader_test, COLORS):
         images = images.to(device)
         outputs = model(images)
         evaluator.add_predictions(targets=targets, predictions=outputs)
-        print(targets, outputs)
         evaluator_complete_metric.add_predictions(targets=targets, predictions=outputs)
 
-    metrics = evaluator.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=True, colors=COLORS)
+    metrics = evaluator.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False, colors=COLORS)
+    complete_metrics = evaluator_complete_metric.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False, colors=COLORS)
     mAP = 0
     print('Results per bounding box:')
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
@@ -45,10 +45,10 @@ def compute_results(model_name, data_loader_test, COLORS):
         print(f'\t\tPositives = {values["TP"] / values["total_positives"] * 100:.2f}%, False positives = {values["FP"] / (values["TP"] + values["FP"]) * 100:.2f}%')
     print(f'\tmAP = {mAP / len(metrics["per_bbox"].keys())}')
 
-    return metrics
+    return metrics, complete_metrics
 
 
-def save_file(results, file_name):
+def save_file(results, complete_results, file_name_1, file_name_2):
 
     results = np.array(results).T
     columns = ['house', 'detector', 'dataset', 'epochs_gd', 'epochs_qd', 'label',  'AP', 'total_positives', 'TP', 'FP']
@@ -58,12 +58,28 @@ def save_file(results, file_name):
 
     dataframe = pd.DataFrame(d)
 
-    with pd.ExcelWriter('./../../../results/' + file_name) as writer:
+    with pd.ExcelWriter('./../../../results/' + file_name_1) as writer:
         if not dataframe.index.name:
             dataframe.index.name = 'Index'
         dataframe.to_excel(writer, sheet_name='s')
 
+    complete_results = np.array(results).T
+    columns = ['house', 'detector', 'dataset', 'epochs_gd', 'epochs_qd', 'label',  'total_positives', 'TP', 'FP', 'TPm', 'FPm', 'FPiou']
+    d = {}
+    for i, column in enumerate(columns):
+        d[column] = complete_results[i]
+
+    dataframe = pd.DataFrame(d)
+
+    with pd.ExcelWriter('./../../../results/' + file_name_2) as writer:
+        if not dataframe.index.name:
+            dataframe.index.name = 'Index'
+        dataframe.to_excel(writer, sheet_name='s')
+
+
 results = []
+results_complete = []
+
 
 # General detectors
 for house, dataset, epochs_gd in [(h, d, e) for h in houses for d in datasets for e in epochs_general_detector]:
@@ -73,10 +89,14 @@ for house, dataset, epochs_gd in [(h, d, e) for h in houses for d in datasets fo
 
     model_name = globals()[f'EXP_GENERAL_DETECTOR_2_layers_BACKBONE_{dataset}_{epochs_gd}_EPOCHS'.upper()]
 
-    metrics = compute_results(model_name, data_loader_test, COLORS)
+    metrics, complete_metrics = compute_results(model_name, data_loader_test, COLORS)
 
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
         results += [[house.replace('_', ''), 'GD', dataset, epochs_gd, epochs_gd, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
+
+    for label, values in sorted(complete_metrics.items(), key=lambda v: v[0]):
+        results += [[house.replace('_', ''), 'GD', dataset, epochs_gd, epochs_gd, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
+
 
 for house, dataset, epochs_gd, epochs_qd, fine_tune in [(h, d, e, eq, ft) for h in houses for d in datasets for e in [60] for eq in epochs_qualified_detector for ft in  fine_tune_quantity]:
     _, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house + '_evening', train_size=0.25)
@@ -84,9 +104,12 @@ for house, dataset, epochs_gd, epochs_qd, fine_tune in [(h, d, e, eq, ft) for h 
 
     model_name = globals()[f'EXP_2_{house}_{dataset}_{epochs_gd}_FINE_TUNE_{fine_tune}_EPOCHS_{epochs_qd}'.upper()]
 
-    metrics = compute_results(model_name, data_loader_test, COLORS)
+    metrics, complete_metrics = compute_results(model_name, data_loader_test, COLORS)
 
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
         results += [[house.replace('_', ''), 'QD_' + str(fine_tune_quantity), dataset, epochs_gd, epochs_qd, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
-save_file(results, 'detr_ap_real_data_different_conditions.xlsx')
+    for label, values in sorted(complete_metrics.items(), key=lambda v: v[0]):
+        results += [[house.replace('_', ''), 'QD_' + str(fine_tune_quantity), dataset, epochs_gd, epochs_qd, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
+
+save_file(results, results_complete, 'detr_ap_real_data_different_conditions.xlsx', 'detr_complete_metrics_real_data_different_conditions.xlsx')
