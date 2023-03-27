@@ -107,9 +107,9 @@ for house, dataset, epochs_gd, epochs_qd, fine_tune in [(h, d, e, eq, ft) for h 
     metrics, complete_metrics = compute_results(model_name, data_loader_test, COLORS)
 
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
-        results += [[house.replace('_', ''), 'QD_' + str(fine_tune_quantity), dataset, epochs_gd, epochs_qd, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
+        results += [[house.replace('_', ''), 'QD_' + str(fine_tune), dataset, epochs_gd, epochs_qd, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
     for label, values in sorted(complete_metrics.items(), key=lambda v: v[0]):
-        results_complete += [[house.replace('_', ''), 'QD_' + str(fine_tune_quantity), dataset, epochs_gd, epochs_qd, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
+        results_complete += [[house.replace('_', ''), 'QD_' + str(fine_tune), dataset, epochs_gd, epochs_qd, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
 save_file(results, results_complete, 'detr_ap_real_data_different_conditions.xlsx', 'detr_complete_metrics_real_data_different_conditions.xlsx')
