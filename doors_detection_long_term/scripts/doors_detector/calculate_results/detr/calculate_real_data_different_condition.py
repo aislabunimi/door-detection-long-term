@@ -3,6 +3,7 @@ import pandas as pd
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
+from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
 from doors_detection_long_term.doors_detector.models.detr_door_detector import *
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
@@ -26,11 +27,14 @@ def compute_results(model_name, data_loader_test, COLORS):
     model.to(device)
 
     evaluator = MyEvaluator()
+    evaluator_complete_metric =  MyEvaluatorCompleteMetric()
 
     for images, targets in tqdm(data_loader_test, total=len(data_loader_test), desc='Evaluate model'):
         images = images.to(device)
         outputs = model(images)
         evaluator.add_predictions(targets=targets, predictions=outputs)
+        print(targets, outputs)
+        evaluator_complete_metric.add_predictions(targets=targets, predictions=outputs)
 
     metrics = evaluator.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=True, colors=COLORS)
     mAP = 0
