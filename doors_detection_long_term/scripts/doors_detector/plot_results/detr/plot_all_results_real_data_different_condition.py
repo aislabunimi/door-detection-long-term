@@ -42,8 +42,8 @@ for dataset in ['deep_doors_2', 'gibson', 'gibson_deep_doors_2']:
     ax.set_ylim([0, 110])
 
     ax.tick_params(axis='y', labelsize=16)
-    ax.set_xticks([i+0.3 for i in range(4)])
-    ax.set_xticklabels([f'$e_{i}$' for i in range(3)] + ['$\overline{e}$'], fontsize=17)
+    ax.set_xticks([i+0.3 for i in range(3)])
+    ax.set_xticklabels([f'$e_{i}$' for i in range(2)] + ['$\overline{e}$'], fontsize=17)
     ax.set_ylabel('AP', fontsize=17)
     ax.set_xlabel('Environment', fontsize=17)
 
@@ -67,8 +67,8 @@ for dataset in ['deep_doors_2', 'gibson', 'gibson_deep_doors_2']:
     ax.set_title(f'AP results over all houses - open doors - {dataset}', fontsize=18)
     ax.set_ylim([0, 110])
     ax.tick_params(axis='y', labelsize=16)
-    ax.set_xticks([i+0.3 for i in range(4)])
-    ax.set_xticklabels([f'$e_{i}$' for i in range(3)] + ['$\overline{e}$'], fontsize=17)
+    ax.set_xticks([i+0.3 for i in range(3)])
+    ax.set_xticklabels([f'$e_{i}$' for i in range(2)] + ['$\overline{e}$'], fontsize=17)
     ax.set_ylabel('AP', fontsize=17)
     ax.set_xlabel('Environment', fontsize=17)
 
