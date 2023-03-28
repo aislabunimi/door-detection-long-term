@@ -21,13 +21,19 @@ datasets = ['GIBSON', 'DEEP_DOORS_2', 'GIBSON_DEEP_DOORS_2']
 device = 'cuda'
 
 
-def compute_results(model_name, data_loader_test, COLORS):
+def compute_results(model_name, data_loader_train, data_loader_test, COLORS):
     model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=model_name)
     model.eval()
     model.to(device)
 
     evaluator = MyEvaluator()
     evaluator_complete_metric =  MyEvaluatorCompleteMetric()
+
+    for images, targets in tqdm(data_loader_train, total=len(data_loader_train), desc='Evaluate model'):
+        images = images.to(device)
+        outputs = model(images)
+        evaluator.add_predictions(targets=targets, predictions=outputs)
+        evaluator_complete_metric.add_predictions(targets=targets, predictions=outputs)
 
     for images, targets in tqdm(data_loader_test, total=len(data_loader_test), desc='Evaluate model'):
         images = images.to(device)
@@ -84,12 +90,14 @@ results_complete = []
 # General detectors
 for house, dataset, epochs_gd in [(h, d, e) for h in houses for d in datasets for e in epochs_general_detector]:
 
-    _, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house + '_evening', train_size=0.25)
+    train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house + '_evening', train_size=0.75)
+    data_loader_train = DataLoader(train, batch_size=1, collate_fn=collate_fn, drop_last=False, num_workers=4)
     data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn, drop_last=False, num_workers=4)
+
 
     model_name = globals()[f'EXP_GENERAL_DETECTOR_2_layers_BACKBONE_{dataset}_{epochs_gd}_EPOCHS'.upper()]
 
-    metrics, complete_metrics = compute_results(model_name, data_loader_test, COLORS)
+    metrics, complete_metrics = compute_results(model_name, data_loader_train, data_loader_test, COLORS)
 
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
         results += [[house.replace('_', ''), 'GD', dataset, epochs_gd, epochs_gd, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
@@ -99,12 +107,12 @@ for house, dataset, epochs_gd in [(h, d, e) for h in houses for d in datasets fo
 
 
 for house, dataset, epochs_gd, epochs_qd, fine_tune in [(h, d, e, eq, ft) for h in houses for d in datasets for e in [60] for eq in epochs_qualified_detector for ft in  fine_tune_quantity]:
-    _, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house + '_evening', train_size=0.25)
+    train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house + '_evening', train_size=0.25)
+    data_loader_train = DataLoader(train, batch_size=1, collate_fn=collate_fn, drop_last=False, num_workers=4)
     data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn, drop_last=False, num_workers=4)
-
     model_name = globals()[f'EXP_2_{house}_{dataset}_{epochs_gd}_FINE_TUNE_{fine_tune}_EPOCHS_{epochs_qd}'.upper()]
 
-    metrics, complete_metrics = compute_results(model_name, data_loader_test, COLORS)
+    metrics, complete_metrics = compute_results(model_name, data_loader_train, data_loader_test, COLORS)
 
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
         results += [[house.replace('_', ''), 'QD_' + str(fine_tune), dataset, epochs_gd, epochs_qd, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
