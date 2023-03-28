@@ -33,7 +33,7 @@ def compute_results(model_name, data_loader_test, COLORS):
         evaluator.add_predictions(targets=targets, predictions=outputs)
         evaluator_complete_metric.add_predictions(targets=targets, predictions=outputs)
 
-    metrics = evaluator.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=True, colors=COLORS)
+    metrics = evaluator.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False, colors=COLORS)
     complete_metrics = evaluator_complete_metric.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False, colors=COLORS)
     mAP = 0
     print('Results per bounding box:')
