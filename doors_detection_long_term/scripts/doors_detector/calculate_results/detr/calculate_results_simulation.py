@@ -87,18 +87,24 @@ for model_name, house, epochs in model_names_general_detectors:
     _, _, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name=house.replace('_', ''), train_size=0.25, use_negatives=False)
     data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn, drop_last=False, num_workers=4)
 
-    metrics = compute_results(model_name, data_loader_test, COLORS)
+    metrics, complete_metrics = compute_results(model_name, data_loader_test, COLORS)
 
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
         results += [[house.replace('_', ''), 'GD', epochs, epochs, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
+
+    for label, values in sorted(complete_metrics.items(), key=lambda v: v[0]):
+        results_complete += [[house.replace('_', ''), 'GD', epochs, epochs, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
 for model_name, house, quantity, epochs_general, epochs_qualified in model_names_qualified_detectors:
     _, _, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name=house.replace('_', ''), train_size=0.25, use_negatives=False)
     data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn, drop_last=False, num_workers=4)
 
-    metrics = compute_results(model_name, data_loader_test, COLORS)
+    metrics, complete_metrics = compute_results(model_name, data_loader_test, COLORS)
 
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
         results += [[house.replace('_', ''), 'QD_' + str(quantity), epochs_general, epochs_qualified, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
+
+    for label, values in sorted(complete_metrics.items(), key=lambda v: v[0]):
+        results_complete += [[house.replace('_', ''), 'QD_' + str(quantity), epochs_general, epochs_qualified, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
 save_file(results, results_complete, 'detr_ap_simulation.xlsx', 'detr_complete_metric_simulation.xlsx')
