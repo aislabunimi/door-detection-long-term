@@ -108,7 +108,7 @@ for house, house_1, dataset, epochs_gd in [(h, h1, d, e) for h in houses for h1 
 
 
 for house, house_1, dataset, epochs_gd, epochs_qd, fine_tune in [(h, h1, d, e, eq, ft) for h in houses for h1 in houses_1 for d in datasets for e in [60] for eq in epochs_qualified_detector for ft in  fine_tune_quantity]:
-    train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house_1, train_size=0.25)
+    train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house_1, train_size=0.75)
     data_loader_train = DataLoader(train, batch_size=1, collate_fn=collate_fn, drop_last=False, num_workers=4)
     data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn, drop_last=False, num_workers=4)
     model_name = globals()[f'EXP_2_{house}_{dataset}_{epochs_gd}_FINE_TUNE_{fine_tune}_EPOCHS_{epochs_qd}'.upper()]
