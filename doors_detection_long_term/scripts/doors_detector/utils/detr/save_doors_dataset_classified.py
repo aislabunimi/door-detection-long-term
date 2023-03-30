@@ -2,6 +2,7 @@ import random
 
 import numpy as np
 import torch
+import os
 from matplotlib import pyplot as plt
 import torchvision.transforms as T
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_final import DatasetsCreatorDoorsFinal
@@ -16,22 +17,28 @@ params = {
     'seed': 0
 }
 
+path = '/media/antonazzi/hdd/classifications/trained_on_gd_day_tested_on_floor_1_night'
 
 if __name__ == '__main__':
 
     # Fix seeds
     seed_everything(params['seed'])
 
+    # Create_folder
+    if not os.path.exists(path):
+        os.mkdir(path)
+
     #train, test, labels, COLORS = get_deep_doors_2_labelled_sets()
     #train, test, labels, COLORS = get_final_doors_dataset(2, 'house1', train_size=0.25, use_negatives=False)
-    train, validation, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name='house1', train_size=0.75, use_negatives=True)
+    #train, validation, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name='house1', train_size=0.75, use_negatives=True)
+    train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name='floor1_evening', train_size=0.25)
 
     print(f'Train set size: {len(train)}', f'Test set size: {len(test)}')
 
-    model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_2_HOUSE_1_25)
+    model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_GENERAL_DETECTOR_2_LAYERS_BACKBONE_GIBSON_60_EPOCHS)
     model.eval()
 
-    for i in range(10, 50):
+    for i in range(len(test)):
         img, target, door_sample = test[i]
         img = img.unsqueeze(0)
         outputs = model(img)
@@ -49,7 +56,7 @@ if __name__ == '__main__':
         for image_data in processed_data:
             # keep only predictions with 0.7+ confidence
 
-            keep = image_data['scores'] > 0.8
+            keep = image_data['scores'] > 0.7
 
             # Show image with bboxes
 
@@ -69,5 +76,4 @@ if __name__ == '__main__':
                 ax.text(xmin, ymin, text, fontsize=15,
                         bbox=dict(facecolor='yellow', alpha=0.5))
 
-            plt.axis('off')
-            plt.show()
+            plt.savefig(os.path.join(path, f'image_{i}.png'))
