@@ -29,21 +29,23 @@ transform = T.Compose([
     T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
 load_path = '/home/antonazzi/Downloads/images_floor4'
-save_path = '/home/antonazzi/Downloads/floor_4_fine_tune_25'
+save_path = '/home/antonazzi/Downloads/floor_4_fine_tune_75'
 
 images_names = os.listdir(load_path)
 images_names.sort()
 #print(images_names)
-for i, file_name in tqdm(enumerate(images_names[2000:]), total=len(images_names)):
-    image = cv2.imread(os.path.join(load_path, file_name))
+images = [cv2.imread(os.path.join(load_path, file_name)) for file_name in images_names]
+model.to('cuda')
+for i, image in tqdm(enumerate(images), total=len(images_names)):
+    #image = cv2.imread(os.path.join(load_path, file_name))
 
-    new_img = transform(Image.fromarray(image[..., [2, 1, 0]])).unsqueeze(0)
+    new_img = transform(Image.fromarray(image[..., [2, 1, 0]])).unsqueeze(0).to('cuda')
 
     outputs = model(new_img)
+
     post_processor = PostProcess()
     img_size = list(new_img.size()[2:])
-
-    processed_data = post_processor(outputs=outputs, target_sizes=torch.tensor([img_size]))
+    processed_data = post_processor(outputs=outputs, target_sizes=torch.tensor([img_size]).to('cuda'))
 
     for image_data in processed_data:
         # keep only predictions with 0.7+ confidence
@@ -54,8 +56,8 @@ for i, file_name in tqdm(enumerate(images_names[2000:]), total=len(images_names)
         for label, score, (xmin, ymin, xmax, ymax) in zip(image_data['labels'][keep], image_data['scores'][keep], image_data['boxes'][keep]):
             label = label.item()
             colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-
+            #print(xmin, ymin, xmax, ymax)
             save_image = cv2.rectangle(save_image, (int(xmin), int(ymin)), (int(xmax), int(ymax)), colors[label])
             #ax.text(xmin, ymin, text, fontsize=15,
             #bbox=dict(facecolor='yellow', alpha=0.5))
-        cv2.imwrite(os.path.join(save_path, f'image_{i}.jpg'), save_image)
+        cv2.imwrite(os.path.join(save_path, 'image_{0:05d}.png'.format(i)), save_image)
