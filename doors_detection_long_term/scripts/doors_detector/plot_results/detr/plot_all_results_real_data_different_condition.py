@@ -90,10 +90,12 @@ for dataset in ['deep_doors_2', 'gibson', 'gibson_deep_doors_2']:
 
     increments = pd.DataFrame()
     # Calculate increment
-    for i, exp in enumerate(experiments[1:]):
-        i += 1
-        closed_doors_increment = (closed_doors.iloc[:, i + 1] - closed_doors.iloc[:, i]) / closed_doors.iloc[:, i] * 100
-        open_doors_increment = (open_doors.iloc[:, i + 1] - open_doors.iloc[:, i]) / open_doors.iloc[:, i] * 100
-        print(f'{exp}')
+
+    keys = pd.MultiIndex.from_arrays([['AP' for _ in range(len(experiments))], experiments])
+    for i in range(len(keys) -1):
+        closed_doors_increment = (closed_doors.loc[:, keys[i + 1]] - closed_doors.loc[:, keys[i]]) / closed_doors.loc[:, keys[i]] * 100
+        open_doors_increment = (open_doors.loc[:, keys[i + 1]] - open_doors.loc[:, keys[i]]) / open_doors.loc[:, keys[i]] * 100
+        print(f'{keys[i + 1]}')
         print(f'\t- closed doors: mean = {closed_doors_increment.mean()}, std = {closed_doors_increment.std()}')
         print(f'\t- open doors: mean = {open_doors_increment.mean()}, std = {open_doors_increment.std()}')
+
