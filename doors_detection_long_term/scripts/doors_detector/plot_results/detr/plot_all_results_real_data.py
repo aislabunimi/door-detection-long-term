@@ -17,7 +17,7 @@ houses_list_dtype = CategoricalDtype(
     ordered=True
 )
 
-for dataset in ['deep_doors_2', 'gibson', 'gibson_deep_doors_2']:
+for dataset, dataset_name in [('deep_doors_2', 'Deep Doors 2'), ('gibson', 'Our dataset'), ('gibson_deep_doors_2', 'Our dataset + Deep Doors 2')]:
     dataset = dataset.upper()
     closed_doors = houses[(houses.label == 0) & (houses.dataset == dataset)][['house', 'detector', 'AP']]
     closed_doors = closed_doors.pivot_table(values=['AP'], index=closed_doors['house'], columns='detector', aggfunc='first').reset_index()
@@ -38,7 +38,7 @@ for dataset in ['deep_doors_2', 'gibson', 'gibson_deep_doors_2']:
     ax.bar(X + 0.4, closed_doors[('AP', experiments[2])].tolist() + [closed_doors[('AP', experiments[2])].mean()], yerr=np.array([[0, 0] for _ in range(3)] + [[closed_doors[('AP', experiments[2])].std(), closed_doors[('AP', experiments[2])].std()]]).T, width=0.2, label=labels[2])
     ax.bar(X + 0.6, closed_doors[('AP', experiments[3])].tolist() + [closed_doors[('AP', experiments[3])].mean()], yerr=np.array([[0, 0] for _ in range(3)] + [[closed_doors[('AP', experiments[3])].std(), closed_doors[('AP', experiments[3])].std()]]).T, width=0.2, label=labels[3])
 
-    ax.set_title(f'AP results over all houses - closed doors - {dataset}', fontsize=18)
+    ax.set_title(f'{dataset_name} - Closed doors', fontsize=18)
     ax.set_ylim([0, 110])
 
     ax.tick_params(axis='y', labelsize=16)
@@ -64,7 +64,7 @@ for dataset in ['deep_doors_2', 'gibson', 'gibson_deep_doors_2']:
     ax.bar(X + 0.4, open_doors[('AP', experiments[2])].tolist() + [open_doors[('AP', experiments[2])].mean()], yerr=np.array([[0, 0] for _ in range(3)] + [[open_doors[('AP', experiments[2])].std(), open_doors[('AP', experiments[2])].std()]]).T, width=0.2, label=labels[2])
     ax.bar(X + 0.6, open_doors[('AP', experiments[3])].tolist() + [open_doors[('AP', experiments[3])].mean()], yerr=np.array([[0, 0] for _ in range(3)] + [[open_doors[('AP', experiments[3])].std(), open_doors[('AP', experiments[3])].std()]]).T, width=0.2, label=labels[3])
 
-    ax.set_title(f'AP results over all houses - open doors - {dataset}', fontsize=18)
+    ax.set_title(f'{dataset_name} - Open doors', fontsize=18)
     ax.set_ylim([0, 110])
     ax.tick_params(axis='y', labelsize=16)
     ax.set_xticks([i+0.3 for i in range(4)])
