@@ -5,3 +5,5 @@ checkpoint.pth
 model.pth
 *.pt
 build/
+*.trt
+*.onnx
