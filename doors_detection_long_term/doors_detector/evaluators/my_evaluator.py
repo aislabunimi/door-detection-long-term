@@ -80,7 +80,7 @@ class MyEvaluator(ModelEvaluator):
                 'TP': 0,
                 'FP': 0,
             }
-            for box in predicted_bboxes}
+            for box in predicted_bboxes + gt_bboxes}
 
         # Add ground truth bboxes to each image
         for box in gt_bboxes:

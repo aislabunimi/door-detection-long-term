@@ -58,19 +58,28 @@ setup(
     tests_require=test_deps,
     # Add here the package dependencies
     install_requires=[
+        'PyQt5',
         'numpy',
         'opencv-python',
         'generic-dataset',
         'torch',
         'torchvision',
         'scikit-learn',
-        'src @ git+http://github.com/rafaelpadilla/review_object_detection_metrics.git#egg=src',
-        'gibson'
+        'detr @ git+http://github.com/micheleantonazzi/detr.git',
+        'src @ git+http://github.com/micheleantonazzi/review_object_detection_metrics.git#egg=src',
+        "pytest",
+        "pytest-cov",
+        'ipython',
+        'pyyaml',
+        'psutil',
+        'tqdm',
+        'seaborn',
+        'openpyxl'
+
     ],
     entry_points={
         'console_scripts': [
         ],
     },
-    test_deps=test_deps,
     extras_require=extras,
 )
