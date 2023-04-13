@@ -3,6 +3,7 @@ import pandas as pd
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
+from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
@@ -14,7 +15,7 @@ from doors_detection_long_term.scripts.doors_detector.dataset_configurator impor
 houses = ['house_1', 'house_2', 'house_7', 'house_9', 'house_10', 'house_13', 'house_15', 'house_20', 'house_21', 'house_22']
 epochs_general_detector = [40, 60]
 epochs_qualified_detector = [20, 40]
-fine_tune_quantity = [25, 50, 75]
+fine_tune_quantity = [15, 25, 50, 75]
 device = 'cuda'
 
 
@@ -24,6 +25,7 @@ def compute_results(model_name, data_loader_test, COLORS, description):
     model.to(device)
 
     evaluator = MyEvaluator()
+    evaluator_complete_metric = MyEvaluatorCompleteMetric()
 
     with torch.no_grad():
         for images, targets, converted_boxes in tqdm(data_loader_test, total=len(data_loader_test), desc=description):
@@ -38,8 +40,10 @@ def compute_results(model_name, data_loader_test, COLORS, description):
                                         agnostic=True,
                                         max_det=300)
             evaluator.add_predictions_yolo(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
+            evaluator_complete_metric.add_predictions_yolo(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
 
     metrics = evaluator.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=True, colors=COLORS)
+    complete_metrics = evaluator_complete_metric.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False, colors=COLORS)
     mAP = 0
     print('Results per bounding box:')
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
@@ -48,10 +52,10 @@ def compute_results(model_name, data_loader_test, COLORS, description):
         print(f'\t\tPositives = {values["TP"] / values["total_positives"] * 100:.2f}%, False positives = {values["FP"] / (values["TP"] + values["FP"]) * 100:.2f}%')
     print(f'\tmAP = {mAP / len(metrics["per_bbox"].keys())}')
 
-    return metrics
+    return metrics, complete_metrics
 
 
-def save_file(results, file_name):
+def save_file(results, complete_results, file_name_1, file_name_2):
 
     results = np.array(results).T
     columns = ['house', 'detector', 'epochs_gd', 'epochs', 'label',  'AP', 'total_positives', 'TP', 'FP']
@@ -61,7 +65,20 @@ def save_file(results, file_name):
 
     dataframe = pd.DataFrame(d)
 
-    with pd.ExcelWriter('./../../results/' + file_name) as writer:
+    with pd.ExcelWriter('./../../results/' + file_name_1) as writer:
+        if not dataframe.index.name:
+            dataframe.index.name = 'Index'
+        dataframe.to_excel(writer, sheet_name='s')
+
+    complete_results = np.array(complete_results).T
+    columns = ['house', 'detector', 'epochs_gd', 'epochs_qd', 'label',  'total_positives', 'TP', 'FP', 'TPm', 'FPm', 'FPiou']
+    d = {}
+    for i, column in enumerate(columns):
+        d[column] = complete_results[i]
+
+    dataframe = pd.DataFrame(d)
+
+    with pd.ExcelWriter('./../../../results/' + file_name_2) as writer:
         if not dataframe.index.name:
             dataframe.index.name = 'Index'
         dataframe.to_excel(writer, sheet_name='s')
@@ -71,24 +88,31 @@ model_names_general_detectors = [(globals()[f'EXP_1_{house}_{epochs}_EPOCHS'.upp
 model_names_qualified_detectors = [(globals()[f'EXP_2_{house}_EPOCHS_GD_{epochs_general}_EPOCH_QD_{epochs_qualified}_FINE_TUNE_{quantity}'.upper()], house, quantity, epochs_general, epochs_qualified) for house in houses for quantity in fine_tune_quantity for epochs_general in epochs_general_detector for epochs_qualified in epochs_qualified_detector]
 
 results = []
+results_complete = []
+
 # General detectors
 for model_name, house, epochs in model_names_general_detectors:
-    print(model_name)
     _, _, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name=house.replace('_', ''), train_size=0.25, use_negatives=False)
     data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 
-    metrics = compute_results(model_name, data_loader_test, COLORS, f'{house} - Epochs GD: {epochs}')
+    metrics, complete_metrics = compute_results(model_name, data_loader_test, COLORS, f'{house} - Epochs GD: {epochs}')
 
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
         results += [[house.replace('_', ''), 'GD', epochs, epochs, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
+
+    for label, values in sorted(complete_metrics.items(), key=lambda v: v[0]):
+        results_complete += [[house.replace('_', ''), 'GD', epochs, epochs, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
 for model_name, house, quantity, epochs_general, epochs_qualified in model_names_qualified_detectors:
     _, _, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name=house.replace('_', ''), train_size=0.25, use_negatives=False)
     data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 
-    metrics = compute_results(model_name, data_loader_test, COLORS, f'{house} - Epochs GD: {epochs_general} - Epochs qualified {epochs_qualified} - {quantity}%')
+    metrics, complete_metrics = compute_results(model_name, data_loader_test, COLORS, f'{house} - Epochs GD: {epochs_general} - Epochs qualified {epochs_qualified} - {quantity}%')
 
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
         results += [[house.replace('_', ''), 'QD_' + str(quantity), epochs_general, epochs_qualified, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
-save_file(results, 'yolo_v5_epochs_analysis.xlsx')
+    for label, values in sorted(complete_metrics.items(), key=lambda v: v[0]):
+        results_complete += [[house.replace('_', ''), 'QD_' + str(quantity), epochs_general, epochs_qualified, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
+
+save_file(results, results_complete, 'detr_ap_simulation.xlsx', 'detr_complete_metric_simulation.xlsx')
