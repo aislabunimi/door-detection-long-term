@@ -25,7 +25,7 @@ def compute_results(model_name, data_loader_test, COLORS):
     model.to(device)
 
     evaluator = MyEvaluator()
-    evaluator_complete_metric =  MyEvaluatorCompleteMetric()
+    evaluator_complete_metric = MyEvaluatorCompleteMetric()
 
     for images, targets in tqdm(data_loader_test, total=len(data_loader_test), desc='Evaluate model'):
         images = images.to(device)

@@ -9,8 +9,8 @@ houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60))]
 
-labels = ['$GD_{-e}$', '$QD^{25}_e$', '$QD^{50}_e$', '$QD^{75}_e$']
-experiments = ['GD', 'QD_25', 'QD_50', 'QD_75']
+labels = ['$GD_{-e}$', '$QD^{15}_e$', '$QD^{25}_e$', '$QD^{50}_e$', '$QD^{75}_e$']
+experiments = ['GD', 'QD_15', 'QD_25', 'QD_50', 'QD_75']
 
 houses_list_dtype = CategoricalDtype(
     ['house10', 'house2', 'house7', 'house9', 'house1', 'house13', 'house15', 'house20', 'house21', 'house22'],
@@ -30,10 +30,12 @@ fig, ax = subplots(figsize=(10, 5))
 
 X = np.arange(11)
 print([closed_doors[('AP', experiments[0])].mean() - closed_doors[('AP', experiments[0])].std(), closed_doors[('AP', experiments[0])].mean() + closed_doors[('AP', experiments[0])].std()])
-ax.bar(X, closed_doors[('AP', experiments[0])].tolist() + [closed_doors[('AP', experiments[0])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[closed_doors[('AP', experiments[0])].std(), closed_doors[('AP', experiments[0])].std()]]).T,width=0.2, label=labels[0])
-ax.bar(X + 0.2, closed_doors[('AP', experiments[1])].tolist() + [closed_doors[('AP', experiments[1])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[closed_doors[('AP', experiments[1])].std(), closed_doors[('AP', experiments[1])].std()]]).T,  width=0.2, label=labels[1])
-ax.bar(X + 0.4, closed_doors[('AP', experiments[2])].tolist() + [closed_doors[('AP', experiments[2])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[closed_doors[('AP', experiments[2])].std(), closed_doors[('AP', experiments[2])].std()]]).T, width=0.2, label=labels[2])
-ax.bar(X + 0.6, closed_doors[('AP', experiments[3])].tolist() + [closed_doors[('AP', experiments[3])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[closed_doors[('AP', experiments[3])].std(), closed_doors[('AP', experiments[3])].std()]]).T, width=0.2, label=labels[3])
+ax.bar(X, closed_doors[('AP', experiments[0])].tolist() + [closed_doors[('AP', experiments[0])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[closed_doors[('AP', experiments[0])].std(), closed_doors[('AP', experiments[0])].std()]]).T,width=0.15, label=labels[0])
+ax.bar(X + 0.15, closed_doors[('AP', experiments[1])].tolist() + [closed_doors[('AP', experiments[1])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[closed_doors[('AP', experiments[1])].std(), closed_doors[('AP', experiments[1])].std()]]).T,  width=0.15, label=labels[1])
+ax.bar(X + 0.30, closed_doors[('AP', experiments[2])].tolist() + [closed_doors[('AP', experiments[2])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[closed_doors[('AP', experiments[2])].std(), closed_doors[('AP', experiments[2])].std()]]).T, width=0.15, label=labels[2])
+ax.bar(X + 0.45, closed_doors[('AP', experiments[3])].tolist() + [closed_doors[('AP', experiments[3])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[closed_doors[('AP', experiments[3])].std(), closed_doors[('AP', experiments[3])].std()]]).T, width=0.15, label=labels[3])
+ax.bar(X + 0.60, closed_doors[('AP', experiments[4])].tolist() + [closed_doors[('AP', experiments[4])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[closed_doors[('AP', experiments[4])].std(), closed_doors[('AP', experiments[4])].std()]]).T, width=0.15, label=labels[4])
+
 ax.set_title('Closed doors', fontsize=18)
 ax.set_ylim([0, 110])
 
@@ -43,7 +45,7 @@ ax.set_xticklabels([f'$e_{i}$' for i in range(10)] + ['$\overline{e}$'], fontsiz
 ax.set_ylabel('AP', fontsize=17)
 ax.set_xlabel('Environment', fontsize=17)
 
-ax.legend(prop={"size": 16}, loc='upper center', ncol=4)
+ax.legend(prop={"size": 16}, loc='upper center', ncol=5)
 
 fig.tight_layout()
 plt.show()
@@ -55,10 +57,12 @@ fig, ax = subplots(figsize=(10, 5))
 #print(closed_doors[('AP', '1')].tolist())
 
 X = np.arange(11)
-ax.bar(X, open_doors[('AP', experiments[0])].tolist() + [open_doors[('AP', experiments[0])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[open_doors[('AP', experiments[0])].std(), open_doors[('AP', experiments[0])].std()]]).T, width=0.2, label=labels[0])
-ax.bar(X + 0.2, open_doors[('AP', experiments[1])].tolist() + [open_doors[('AP', experiments[1])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[open_doors[('AP', experiments[1])].std(), open_doors[('AP', experiments[1])].std()]]).T,  width=0.2, label=labels[1])
-ax.bar(X + 0.4, open_doors[('AP', experiments[2])].tolist() + [open_doors[('AP', experiments[2])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[open_doors[('AP', experiments[2])].std(), open_doors[('AP', experiments[2])].std()]]).T, width=0.2, label=labels[2])
-ax.bar(X + 0.6, open_doors[('AP', experiments[3])].tolist() + [open_doors[('AP', experiments[3])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[open_doors[('AP', experiments[3])].std(), open_doors[('AP', experiments[3])].std()]]).T, width=0.2, label=labels[3])
+ax.bar(X, open_doors[('AP', experiments[0])].tolist() + [open_doors[('AP', experiments[0])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[open_doors[('AP', experiments[0])].std(), open_doors[('AP', experiments[0])].std()]]).T, width=0.15, label=labels[0])
+ax.bar(X + 0.15, open_doors[('AP', experiments[1])].tolist() + [open_doors[('AP', experiments[1])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[open_doors[('AP', experiments[1])].std(), open_doors[('AP', experiments[1])].std()]]).T,  width=0.15, label=labels[1])
+ax.bar(X + 0.30, open_doors[('AP', experiments[2])].tolist() + [open_doors[('AP', experiments[2])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[open_doors[('AP', experiments[2])].std(), open_doors[('AP', experiments[2])].std()]]).T, width=0.15, label=labels[2])
+ax.bar(X + 0.45, open_doors[('AP', experiments[3])].tolist() + [open_doors[('AP', experiments[3])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[open_doors[('AP', experiments[3])].std(), open_doors[('AP', experiments[3])].std()]]).T, width=0.15, label=labels[3])
+ax.bar(X + 0.60, open_doors[('AP', experiments[4])].tolist() + [open_doors[('AP', experiments[4])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[open_doors[('AP', experiments[4])].std(), open_doors[('AP', experiments[4])].std()]]).T, width=0.15, label=labels[3])
+
 
 ax.set_title('Open doors', fontsize=18)
 ax.set_ylim([0, 110])
@@ -68,7 +72,7 @@ ax.set_xticklabels([f'$e_{i}$' for i in range(10)] + ['$\overline{e}$'], fontsiz
 ax.set_ylabel('AP', fontsize=17)
 ax.set_xlabel('Environment', fontsize=17)
 
-ax.legend(prop={"size": 16}, loc='upper center', ncol=4)
+ax.legend(prop={"size": 16}, loc='upper center', ncol=5)
 
 fig.tight_layout()
 plt.show()
