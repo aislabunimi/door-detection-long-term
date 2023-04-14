@@ -26,9 +26,9 @@ for dataset in datasets:
         print(f'\t{house}')
         for detector in experiments:
             line = a.loc[(house, detector, dataset)]
-            print(f'\t\t{detector}: Total = {line["total_positives"]}, TP = {line["TP"]} ({round(line["TP"] / line["total_positives"]*100)}%),'
-                  f' FP = {line["FP"]} ({round(line["FP"] / line["total_positives"]*100)}%), '
-                  f'FPiou = {line["FPiou"]} ({round(line["FPiou"] / line["total_positives"]*100)}%)')
+            print(f'\t\t{detector}: Total = {line["total_positives"]}, TP = {line["TP"]} ({round(line["TP"] / line["total_positives"]*100, 1)}%),'
+                  f' FP = {line["FP"]} ({round(line["FP"] / line["total_positives"]*100, 1)}%), '
+                  f'FPiou = {line["FPiou"]} ({round(line["FPiou"] / line["total_positives"]*100, 1)}%)')
 
 
 
