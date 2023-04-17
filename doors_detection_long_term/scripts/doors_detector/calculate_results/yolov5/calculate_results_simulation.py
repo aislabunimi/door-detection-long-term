@@ -115,4 +115,4 @@ for model_name, house, quantity, epochs_general, epochs_qualified in model_names
     for label, values in sorted(complete_metrics.items(), key=lambda v: v[0]):
         results_complete += [[house.replace('_', ''), 'QD_' + str(quantity), epochs_general, epochs_qualified, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
-save_file(results, results_complete, 'detr_ap_simulation.xlsx', 'detr_complete_metric_simulation.xlsx')
+save_file(results, results_complete, 'yolov5_ap_simulation.xlsx', 'yolov5_complete_metric_simulation.xlsx')
