@@ -20,7 +20,7 @@ fine_tune_quantity = [15, 25, 50, 75]
 device = 'cuda'
 
 
-def compute_results(model_name, data_loader_test, description):
+def compute_results(model_name, data_loader_train, data_loader_test, description):
     model = YOLOv5Model(model_name=YOLOv5, n_labels=2, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=model_name)
     model.eval()
     model.to(device)
@@ -30,6 +30,20 @@ def compute_results(model_name, data_loader_test, description):
 
 
     with torch.no_grad():
+        for images, targets, converted_boxes in tqdm(data_loader_train, total=len(data_loader_test), desc=description):
+            images = images.to(device)
+            preds, train_out = model.model(images)
+            #print(preds.size(), train_out[0].size(), train_out[1].size(), train_out[2].size())
+            preds = non_max_suppression(preds,
+                                        0.75,
+                                        0.45,
+
+                                        multi_label=True,
+                                        agnostic=True,
+                                        max_det=300)
+            evaluator.add_predictions_yolo(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
+            evaluator_complete_metric.add_predictions_yolo(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
+
         for images, targets, converted_boxes in tqdm(data_loader_test, total=len(data_loader_test), desc=description):
             images = images.to(device)
             preds, train_out = model.model(images)
@@ -98,10 +112,11 @@ for model_name, dataset, epochs, in model_names_general_detectors:
     print(model_name)
 
     for house in houses:
-        _, test, _, _ = get_final_doors_dataset_real_data(folder_name=f'{house}_evening', train_size=0.25)
+        train, test, _, _ = get_final_doors_dataset_real_data(folder_name=f'{house}_evening', train_size=0.25)
+        data_loader_train = DataLoader(train, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
         data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 
-        metrics, complete_metrics = compute_results(model_name, data_loader_test, f'Test on {house}, GD trained on {dataset} - Epochs GD: {epochs}')
+        metrics, complete_metrics = compute_results(model_name, data_loader_train, data_loader_test, f'Test on {house}, GD trained on {dataset} - Epochs GD: {epochs}')
 
         for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
             results += [[house, 'GD', dataset, epochs, epochs, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
@@ -110,10 +125,11 @@ for model_name, dataset, epochs, in model_names_general_detectors:
             results_complete += [[house.replace('_', ''), 'GD', dataset, epochs, epochs, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
 for model_name, house, dataset, quantity, epochs_general, epochs_qualified in model_names_qualified_detectors:
-    _, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=f'{house}_evening', train_size=0.25)
+    train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=f'{house}_evening', train_size=0.25)
+    data_loader_train = DataLoader(train, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
     data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 
-    metrics, complete_metrics = compute_results(model_name, data_loader_test, f'{house} - GD trained on {dataset} - Epochs GD: {epochs_general} - Epochs qualified {epochs_qualified} - {quantity}%')
+    metrics, complete_metrics = compute_results(model_name, data_loader_train, data_loader_test, f'{house} - GD trained on {dataset} - Epochs GD: {epochs_general} - Epochs qualified {epochs_qualified} - {quantity}%')
 
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
         results += [[house, f'QD_{quantity}', dataset, epochs_general, epochs_qualified, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
