@@ -5,7 +5,6 @@ from tqdm import tqdm
 
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.models.yolov5 import *
-from doors_detection_long_term.doors_detector.models.detr_door_detector import *
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
 from doors_detection_long_term.doors_detector.utilities.utils import seed_everything
@@ -14,7 +13,7 @@ import os
 import torchvision.transforms as T
 
 
-model = YOLOv5Model(model_name=YOLOv5, n_labels=2, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_GENERAL_DETECTOR_GIBSON_60_EPOCHS)
+model = YOLOv5Model(model_name=YOLOv5, n_labels=2, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_2_FLOOR4_GIBSON_EPOCHS_GD_60_EPOCHS_QD_40_FINE_TUNE_75)
 
 model.to('cpu')
 model.eval()
@@ -31,7 +30,8 @@ model.to('cuda')
 transform = T.Compose([
     #T.RandomResize([std_size], max_size=max_size),
     T.ToTensor(),
-    T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    T.Pad([0, 40]) # Check according image size
 ])
 
 
@@ -54,7 +54,7 @@ with torch.no_grad():
 
         for i, (image, boxes) in enumerate(zip(images, preds)):
             # keep only predictions with 0.7+ confidence
-
+            save_image =image.copy()
             for x1, y1, x2, y2, conf, label in boxes:
                 label, x1, y1, x2, y2 = label.item(), x1.item(), y1.item(), x2.item(), y2.item()
                 x1 = int(min(img_size[0], max(.0, x1)))
