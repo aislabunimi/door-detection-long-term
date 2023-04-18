@@ -58,7 +58,7 @@ def compute_results(model_name, data_loader_test, COLORS, description):
 def save_file(results, complete_results, file_name_1, file_name_2):
 
     results = np.array(results).T
-    columns = ['house', 'detector', 'epochs_gd', 'epochs', 'label',  'AP', 'total_positives', 'TP', 'FP']
+    columns = ['house', 'detector', 'epochs_gd', 'epochs_qd', 'label',  'AP', 'total_positives', 'TP', 'FP']
     d = {}
     for i, column in enumerate(columns):
         d[column] = results[i]
