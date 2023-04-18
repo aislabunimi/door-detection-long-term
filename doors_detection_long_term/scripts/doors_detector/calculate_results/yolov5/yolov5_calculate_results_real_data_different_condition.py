@@ -30,7 +30,7 @@ def compute_results(model_name, data_loader_train, data_loader_test, description
 
 
     with torch.no_grad():
-        for images, targets, converted_boxes in tqdm(data_loader_train, total=len(data_loader_test), desc=description):
+        for images, targets, converted_boxes in tqdm(data_loader_train, total=len(data_loader_train), desc=description):
             images = images.to(device)
             preds, train_out = model.model(images)
             #print(preds.size(), train_out[0].size(), train_out[1].size(), train_out[2].size())
