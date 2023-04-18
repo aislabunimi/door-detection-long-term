@@ -13,7 +13,7 @@ params = {
     'seed': 0
 }
 
-path = '/media/antonazzi/hdd/classifications/trained_on_gd_day_tested_on_floor_1_night'
+path = '/media/antonazzi/hdd/classifications/test_detr_opencv'
 
 if __name__ == '__main__':
 
@@ -27,11 +27,11 @@ if __name__ == '__main__':
     #train, test, labels, COLORS = get_deep_doors_2_labelled_sets()
     #train, test, labels, COLORS = get_final_doors_dataset(2, 'house1', train_size=0.25, use_negatives=False)
     #train, validation, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name='house1', train_size=0.75, use_negatives=True)
-    train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name='floor1_evening', train_size=0.25)
+    train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name='floor1', train_size=0.25)
 
     print(f'Train set size: {len(train)}', f'Test set size: {len(test)}')
 
-    model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_GENERAL_DETECTOR_2_LAYERS_BACKBONE_GIBSON_60_EPOCHS)
+    model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_2_FLOOR1_GIBSON_60_FINE_TUNE_25_EPOCHS_40)
     model.eval()
 
     for i in range(len(test)):
@@ -55,7 +55,7 @@ if __name__ == '__main__':
             keep = image_data['scores'] > 0.7
 
             # Show image with bboxes
-            save_image =img.copy()
+            save_image =door_sample.get_bgr_image().copy()
             for label, score, (xmin, ymin, xmax, ymax) in zip(image_data['labels'][keep], image_data['scores'][keep], image_data['boxes'][keep]):
                 label = label.item()
                 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
