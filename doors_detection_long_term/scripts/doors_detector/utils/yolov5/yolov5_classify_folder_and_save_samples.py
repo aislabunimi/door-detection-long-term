@@ -21,6 +21,8 @@ model.model.eval()
 
 load_path = '/home/antonazzi/Downloads/images_floor4'
 save_path = '/home/antonazzi/Downloads/floor_4_fine_tune_75'
+if not os.path.exists(save_path):
+    os.mkdir(save_path)
 
 images_names = os.listdir(load_path)
 images_names.sort()
