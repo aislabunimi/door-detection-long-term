@@ -112,7 +112,7 @@ for model_name, dataset, epochs, in model_names_general_detectors:
     print(model_name)
 
     for house in houses:
-        train, test, _, _ = get_final_doors_dataset_real_data(folder_name=f'{house}_evening', train_size=0.25)
+        train, test, _, _ = get_final_doors_dataset_real_data(folder_name=f'{house}_evening', train_size=0.75)
         data_loader_train = DataLoader(train, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
         data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 
@@ -125,7 +125,7 @@ for model_name, dataset, epochs, in model_names_general_detectors:
             results_complete += [[house.replace('_', ''), 'GD', dataset, epochs, epochs, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
 for model_name, house, dataset, quantity, epochs_general, epochs_qualified in model_names_qualified_detectors:
-    train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=f'{house}_evening', train_size=0.25)
+    train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=f'{house}_evening', train_size=0.75)
     data_loader_train = DataLoader(train, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
     data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 
