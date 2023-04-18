@@ -61,7 +61,7 @@ def compute_results(model_name, data_loader_test, description):
 def save_file(results, complete_results, file_name_1, file_name_2):
 
     results = np.array(results).T
-    columns = ['house', 'detector', 'epochs_gd', 'epochs_qd', 'label',  'AP', 'total_positives', 'TP', 'FP']
+    columns = ['house', 'detector', 'dataset', 'epochs_gd', 'epochs_qd', 'label',  'AP', 'total_positives', 'TP', 'FP']
     d = {}
     for i, column in enumerate(columns):
         d[column] = results[i]
@@ -74,7 +74,7 @@ def save_file(results, complete_results, file_name_1, file_name_2):
         dataframe.to_excel(writer, sheet_name='s')
 
     complete_results = np.array(complete_results).T
-    columns = ['house', 'detector', 'epochs_gd', 'epochs_qd', 'label',  'total_positives', 'TP', 'FP', 'TPm', 'FPm', 'FPiou']
+    columns = ['house', 'detector', 'dataset', 'epochs_gd', 'epochs_qd', 'label',  'total_positives', 'TP', 'FP', 'TPm', 'FPm', 'FPiou']
     d = {}
     for i, column in enumerate(columns):
         d[column] = complete_results[i]
@@ -107,7 +107,7 @@ for model_name, dataset, epochs, in model_names_general_detectors:
             results += [[house, 'GD', dataset, epochs, epochs, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
         for label, values in sorted(complete_metrics.items(), key=lambda v: v[0]):
-            results_complete += [[house.replace('_', ''), 'GD', epochs, epochs, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
+            results_complete += [[house.replace('_', ''), 'GD', dataset, epochs, epochs, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
 for model_name, house, dataset, quantity, epochs_general, epochs_qualified in model_names_qualified_detectors:
     _, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25)
@@ -118,6 +118,6 @@ for model_name, house, dataset, quantity, epochs_general, epochs_qualified in mo
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
         results += [[house, f'QD_{quantity}', dataset, epochs_general, epochs_qualified, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
     for label, values in sorted(complete_metrics.items(), key=lambda v: v[0]):
-        results_complete += [[house.replace('_', ''), 'QD_' + str(quantity), epochs_general, epochs_qualified, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
+        results_complete += [[house.replace('_', ''), 'QD_' + str(quantity), dataset, epochs_general, epochs_qualified, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
 save_file(results, results_complete, 'yolov5_ap_real_data.xlsx', 'yolov5_complete_metric_real_data.xlsx')
