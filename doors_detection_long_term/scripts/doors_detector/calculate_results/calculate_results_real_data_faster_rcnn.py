@@ -3,24 +3,24 @@ import pandas as pd
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from doors_detection_long_term.doors_detector.models.yolov5 import *
+from doors_detection_long_term.doors_detector.models.faster_rcnn import *
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
-from doors_detection_long_term.doors_detector.models.model_names import YOLOv5
+from doors_detection_long_term.doors_detector.models.model_names import FASTER_RCNN
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
-from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_yolov5
+from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_faster_rcnn
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 houses = ['floor1', 'floor4', 'chemistry_floor0']
 datasets = ['gibson', 'deep_doors_2', 'gibson_deep_doors_2']
 epochs_general_detector = [60]
 epochs_qualified_detector = [40]
-fine_tune_quantity = [25, 50, 75]
+fine_tune_quantity = [15, 25, 50, 75]
 device = 'cuda'
 
 
 def compute_results(model_name, data_loader_test, description):
-    model = YOLOv5Model(model_name=YOLOv5, n_labels=2, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=model_name)
+    model = FasterRCNN(model_name=FASTER_RCNN, n_labels=2, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=model_name)
     model.eval()
     model.to(device)
 
@@ -78,7 +78,7 @@ for model_name, dataset, epochs, in model_names_general_detectors:
 
     for house in houses:
         _, test, _, _ = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25)
-        data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
+        data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_faster_rcnn, drop_last=False, num_workers=4)
 
         metrics = compute_results(model_name, data_loader_test, f'Test on {house}, GD trained on {dataset} - Epochs GD: {epochs}')
 
@@ -87,11 +87,11 @@ for model_name, dataset, epochs, in model_names_general_detectors:
 
 for model_name, house, dataset, quantity, epochs_general, epochs_qualified in model_names_qualified_detectors:
     _, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25)
-    data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
+    data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_faster_rcnn, drop_last=False, num_workers=4)
 
     metrics = compute_results(model_name, data_loader_test, f'{house} - GD trained on {dataset} - Epochs GD: {epochs_general} - Epochs qualified {epochs_qualified} - {quantity}%')
 
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
         results += [[house, f'QD_{quantity}', dataset, epochs_general, epochs_qualified, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
-save_file(results, 'yolo_v5_results_real_data.xlsx')
+save_file(results, 'faster_rcnn_results_real_data.xlsx')
