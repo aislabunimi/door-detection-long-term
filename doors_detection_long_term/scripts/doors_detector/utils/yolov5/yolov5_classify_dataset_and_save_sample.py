@@ -13,9 +13,8 @@ from doors_detection_long_term.scripts.doors_detector.dataset_configurator impor
 import os
 import torchvision.transforms as T
 
-train, test, labels, _ = get_final_doors_dataset_real_data(folder_name='floor4', train_size=0.25,)
+train, test, labels, _ = get_final_doors_dataset_real_data(folder_name='floor4', train_size=0.25)
 print(f'Train set size: {len(train)}', f'Test set size: {len(test)}')
-data_loader_train = DataLoader(train, batch_size=3, collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
 #data_loader_validation = DataLoader(validation, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 
@@ -28,16 +27,20 @@ model.model.eval()
 
 save_path = '/home/antonazzi/Downloads/test_yolo'
 
-model.to('cuda')
+if not os.path.exists(save_path):
+    os.mkdir(save_path)
 
+model.to('cuda')
+padding_height = 40
+padding_width = 0
 transform = T.Compose([
-    T.Pad([0, 40]) # Check according image size
+    T.Pad([padding_width, padding_height]) # Check according image size
 ])
 
 with torch.no_grad():
     for i in range(len(test)):
         img, target, door_sample = test[i]
-        img = transform(img).unsqueeze(0)
+        img = transform(img).unsqueeze(0).to('cuda')
 
         preds, train_out = model.model(img)
         #print(preds.size(), train_out[0].size(), train_out[1].size(), train_out[2].size())
@@ -49,10 +52,11 @@ with torch.no_grad():
                                     agnostic=True,
                                     max_det=300)
         img_size = list(img.size()[2:])
-
-        for i, (image, boxes) in enumerate(zip(img, preds)):
+        print(preds)
+        for count, (image, boxes) in enumerate(zip(img, preds)):
             # keep only predictions with 0.7+ confidence
-            save_image =image.copy()
+            save_image =door_sample.get_bgr_image().copy()
+            save_image =  cv2.copyMakeBorder(save_image, padding_height, padding_height, padding_width, padding_width, cv2.BORDER_CONSTANT, value=[0, 0, 0])
             for x1, y1, x2, y2, conf, label in boxes:
                 label, x1, y1, x2, y2 = label.item(), x1.item(), y1.item(), x2.item(), y2.item()
                 x1 = int(min(img_size[0], max(.0, x1)))
@@ -63,4 +67,5 @@ with torch.no_grad():
                 save_image = cv2.rectangle(save_image, (x1, y1), (x2, y2), colors[label])
                 #ax.text(xmin, ymin, text, fontsize=15,
                 #bbox=dict(facecolor='yellow', alpha=0.5))
+                print(save_image)
             cv2.imwrite(os.path.join(save_path, 'image_{0:05d}.png'.format(i)), save_image)
