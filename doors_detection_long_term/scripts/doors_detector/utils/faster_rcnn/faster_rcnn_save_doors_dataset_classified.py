@@ -14,10 +14,11 @@ save_path = '/home/michele/Downloads/test_faster_rcnn'
 if not os.path.exists(save_path):
     os.mkdir(save_path)
 #train, test, _, _ = get_final_doors_dataset_all_envs()
-train, test, labels, _ = get_final_doors_dataset_real_data(folder_name='floor4', train_size=0.25)
+#train, test, labels, _ = get_final_doors_dataset_real_data(folder_name='floor4', train_size=0.25)
+train, validation, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=2, train_size=0.25, folder_name='house1')
 data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_faster_rcnn, drop_last=False, num_workers=4)
 
-model = FasterRCNN(model_name=FASTER_RCNN, n_labels=2, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_2_FLOOR4_GIBSON_EPOCHS_GD_60_EPOCHS_QD_40_FINE_TUNE_75)
+model = FasterRCNN(model_name=FASTER_RCNN, n_labels=2, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_2_HOUSE_1_EPOCHS_GD_60_EPOCH_QD_40_FINE_TUNE_75)
 
 model.eval()
 model.to('cuda')
