@@ -67,5 +67,4 @@ with torch.no_grad():
                 save_image = cv2.rectangle(save_image, (x1, y1), (x2, y2), colors[label])
                 #ax.text(xmin, ymin, text, fontsize=15,
                 #bbox=dict(facecolor='yellow', alpha=0.5))
-                print(save_image)
             cv2.imwrite(os.path.join(save_path, 'image_{0:05d}.png'.format(i)), save_image)
