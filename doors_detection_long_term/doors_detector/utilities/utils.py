@@ -108,7 +108,7 @@ def collate_fn_faster_rcnn(batch):
     for i, image in enumerate(images):
         t = {}
         current_boxes = converted_boxes[converted_boxes[:, 0].to(torch.int) == i]
-        t['labels'] = current_boxes[:, 1].to(torch.int)
+        t['labels'] = current_boxes[:, 1].to(torch.int) + 1
         t['boxes'] = torch.cat((current_boxes[:, 2:4] - (current_boxes[:, 4:] / 2), current_boxes[:, 2:4] + (current_boxes[:, 4:] / 2)), 1) * torch.tensor([[batch_size_width, batch_size_height, batch_size_width, batch_size_width]])
         t['area'] = torch.prod(t['boxes'][:, 2:] - t['boxes'][:, :2], 1)
         t['iscrowd'] = torch.zeros(t['area'].size()[0]).to(torch.int)
