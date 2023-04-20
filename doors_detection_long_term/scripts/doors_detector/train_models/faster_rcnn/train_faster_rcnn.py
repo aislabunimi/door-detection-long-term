@@ -33,7 +33,7 @@ params = {
     'seed': 0
 }
 def prepare_model(description, reload_model, restart_checkpoint):
-    model = FasterRCNN(model_name=FASTER_RCNN, n_labels=len(labels.keys()), pretrained=reload_model, dataset_name=FINAL_DOORS_DATASET, description=description)
+    model = FasterRCNN(model_name=FASTER_RCNN, n_labels=len(labels.keys()) + 1, pretrained=reload_model, dataset_name=FINAL_DOORS_DATASET, description=description)
 
     logs = {'train': [], 'train_after_backpropagation': [], 'validation': [], 'test': [], 'time': []}
     optimizer_state_dict = {}
