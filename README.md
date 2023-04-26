@@ -6,9 +6,9 @@ To use this package and install all the dependencies, clone this repository and 
 ```pip install -e .```
 
 Datasets links:
-* The relabelled version of *DeepDoors2* dataset [link](https://drive.google.com/file/d/1wSmFUHF9aSJkomwFdOmepMevBvkRpf3D/view?usp=sharing)
-* The collected dataset in simulation [link](https://drive.google.com/file/d/1BqjBpobjKTomFjDkzhWjmCryAXOEluO2/view?usp=sharing)
-* The collected dataset in the real world [link](https://drive.google.com/file/d/1CVPtAUwd3i950y71KqFK3c2LQMOa-EkH/view?usp=sharing)
+* The relabelled version of *DeepDoors2* dataset [link](https://unimi2013-my.sharepoint.com/:u:/g/personal/michele_antonazzi_unimi_it/EX1sP643dctKswmWsVBiCLoBtyOdkSsxi5fpZJy3mnoaBg?e=8YHUOn)
+* The collected dataset in simulation [link](https://unimi2013-my.sharepoint.com/:u:/g/personal/michele_antonazzi_unimi_it/EVYqJ4lErGNIhzUpqK7HDjQBoz2vQ-17acmi3NCpmE2xRw?e=sBRjqr)
+* The collected dataset in the real world [link](https://unimi2013-my.sharepoint.com/:u:/g/personal/michele_antonazzi_unimi_it/EXLStATEcj9Hhd06k4AcU0EBTB7J3pUUG_At9Ar60NpI3g?e=IWRRth)
 
 ## Simulation Environment
 
