@@ -383,3 +383,16 @@ class FasterRCNN(GenericModel):
 
     def to(self, device):
         self.model.to(device)
+
+
+def apply_nms(orig_prediction, iou_thresh=0.1):
+
+    # torchvision returns the indices of the bboxes to keep
+    keep = torchvision.ops.nms(orig_prediction['boxes'], orig_prediction['scores'], iou_thresh)
+
+    final_prediction = orig_prediction
+    final_prediction['boxes'] = final_prediction['boxes'][keep]
+    final_prediction['scores'] = final_prediction['scores'][keep]
+    final_prediction['labels'] = final_prediction['labels'][keep]
+
+    return final_prediction
