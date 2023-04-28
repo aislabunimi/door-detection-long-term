@@ -37,8 +37,6 @@ with torch.no_grad():
             output = apply_nms(output, confidence_threshold=0.75)
             save_image =door_sample.get_bgr_image().copy()
             for [x1, y1, x2, y2], label, conf in zip(output['boxes'], output['labels'], output['scores']):
-                if conf.item() < 0.75:
-                    continue
                 label, x1, y1, x2, y2 = label.item(), x1.item(), y1.item(), x2.item(), y2.item()
                 label -= 1
                 x1 = int(min(img_size[1], max(.0, x1)))

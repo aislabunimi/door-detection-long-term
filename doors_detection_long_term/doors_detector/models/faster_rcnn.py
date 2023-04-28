@@ -392,7 +392,7 @@ def apply_nms(orig_prediction, iou_thresh=0.1, confidence_threshold=0.75):
     orig_prediction['scores'] = orig_prediction['scores'][keep]
     orig_prediction['labels'] = orig_prediction['labels'][keep]
 
-    keep = torchvision.ops.nms(orig_prediction['boxes'][keep], orig_prediction['scores'][keep], iou_thresh)
+    keep = torchvision.ops.nms(orig_prediction['boxes'], orig_prediction['scores'], iou_thresh)
 
     final_prediction = orig_prediction
     final_prediction['boxes'] = final_prediction['boxes'][keep]
