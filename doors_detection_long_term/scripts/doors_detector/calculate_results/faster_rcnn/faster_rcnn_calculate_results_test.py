@@ -25,7 +25,9 @@ def compute_results(model_name, data_loader_test, description):
             images = images.to(device)
             preds = model.model(images)
             #print(preds.size(), train_out[0].size(), train_out[1].size(), train_out[2].size())
-            preds = apply_nms(preds)
+            preds = [apply_nms(pred) for pred in preds]
+            for pred in preds:
+                pred['labels'] = pred['labels'] - 1
             evaluator.add_predictions_faster_rcnn(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
             evaluator_complete_metric.add_predictions_faster_rcnn(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
 

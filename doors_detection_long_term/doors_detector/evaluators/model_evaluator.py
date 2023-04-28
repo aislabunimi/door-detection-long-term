@@ -94,7 +94,7 @@ class ModelEvaluator:
 
     def add_predictions_faster_rcnn(self, targets, predictions, imgs_size):
         img_count_temp = self._img_count
-
+        #print(targets, predictions)
         for target in targets:
             for label, [x, y, w, h] in zip(target['labels'].tolist(), target['boxes'].tolist()):
                 self._gt_bboxes.append(BoundingBox(
@@ -106,18 +106,21 @@ class ModelEvaluator:
                 ))
             self._img_count += 1
 
-        for [x1, y1, x2, y2], label, score in zip(predictions['boxes'].tolist(), predictions['labels'].tolist(), predictions['scores'].tolist()):
-            if label >= 0:
-                self._predicted_bboxes.append(
-                    BoundingBox(
-                        image_name=str(img_count_temp),
-                        class_id=str(label),
-                        coordinates=(x1, y1, x2 - x1, y2 - y1),
-                        bb_type=BBType.DETECTED,
-                        format=BBFormat.XYWH,
-                        confidence=score
+        for prediction in predictions:
+            for [x1, y1, x2, y2], label, score in zip(prediction['boxes'].tolist(), prediction['labels'].tolist(), prediction['scores'].tolist()):
+                x1, y1, x2, y2 = x1 / imgs_size[0], y1 / imgs_size[1], x2 / imgs_size[0], y2 / imgs_size[1]
+
+                if label >= 0:
+                    self._predicted_bboxes.append(
+                        BoundingBox(
+                            image_name=str(img_count_temp),
+                            class_id=str(label),
+                            coordinates=(x1, y1, x2 - x1, y2 - y1),
+                            bb_type=BBType.DETECTED,
+                            format=BBFormat.XYWH,
+                            confidence=score
+                        )
                     )
-                )
             img_count_temp += 1
 
     @abstractmethod
