@@ -32,7 +32,6 @@ def compute_results(model_name, data_loader_test, description):
         for images, targets, converted_boxes in tqdm(data_loader_test, total=len(data_loader_test), desc=description):
             images = images.to(device)
             preds = model.model(images)
-            #print(preds.size(), train_out[0].size(), train_out[1].size(), train_out[2].size())
             preds = [apply_nms(pred) for pred in preds]
             for pred in preds:
                 pred['labels'] = pred['labels'] - 1
