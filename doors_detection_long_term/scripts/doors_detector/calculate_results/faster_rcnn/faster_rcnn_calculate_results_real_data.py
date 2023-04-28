@@ -4,24 +4,23 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
-from doors_detection_long_term.doors_detector.models.yolov5 import *
+from doors_detection_long_term.doors_detector.models.faster_rcnn import *
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
-from doors_detection_long_term.doors_detector.models.model_names import YOLOv5
-from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
-from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_yolov5
+from doors_detection_long_term.doors_detector.models.model_names import FASTER_RCNN
+from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_faster_rcnn
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 houses = ['floor1', 'floor4', 'chemistry_floor0']
 datasets = ['gibson', 'deep_doors_2', 'gibson_deep_doors_2']
-epochs_general_detector = [60]
-epochs_qualified_detector = [40]
+epochs_general_detector = [40, 60]
+epochs_qualified_detector = [20, 40]
 fine_tune_quantity = [15, 25, 50, 75]
 device = 'cuda'
 
 
 def compute_results(model_name, data_loader_test, description):
-    model = YOLOv5Model(model_name=YOLOv5, n_labels=2, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=model_name)
+    model = FasterRCNN(model_name=FASTER_RCNN, n_labels=3, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=model_name)
     model.eval()
     model.to(device)
 
@@ -32,17 +31,11 @@ def compute_results(model_name, data_loader_test, description):
     with torch.no_grad():
         for images, targets, converted_boxes in tqdm(data_loader_test, total=len(data_loader_test), desc=description):
             images = images.to(device)
-            preds, train_out = model.model(images)
+            preds = model.model(images)
             #print(preds.size(), train_out[0].size(), train_out[1].size(), train_out[2].size())
-            preds = non_max_suppression(preds,
-                                        0.75,
-                                        0.45,
-
-                                        multi_label=True,
-                                        agnostic=True,
-                                        max_det=300)
-            evaluator.add_predictions_yolo(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
-            evaluator_complete_metric.add_predictions_yolo(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
+            preds = apply_nms(preds)
+            evaluator.add_predictions_faster_rcnn(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
+            evaluator_complete_metric.add_predictions_faster_rcnn(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
 
     metrics = evaluator.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False)
     complete_metrics = evaluator_complete_metric.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False)
@@ -99,7 +92,7 @@ for model_name, dataset, epochs, in model_names_general_detectors:
 
     for house in houses:
         _, test, _, _ = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25)
-        data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
+        data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_faster_rcnn, drop_last=False, num_workers=4)
 
         metrics, complete_metrics = compute_results(model_name, data_loader_test, f'Test on {house}, GD trained on {dataset} - Epochs GD: {epochs}')
 
