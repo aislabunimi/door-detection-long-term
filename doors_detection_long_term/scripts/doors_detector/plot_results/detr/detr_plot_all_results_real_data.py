@@ -78,7 +78,8 @@ for dataset, dataset_name in [('deep_doors_2', 'Deep Doors 2'), ('gibson', 'Our 
 
     fig.tight_layout()
     plt.show()
-
+    closed_doors = closed_doors.drop([('house',)], axis=1)
+    open_doors = open_doors.drop([('house',)], axis=1)
     closed_std = closed_doors.std()
     closed_mean = closed_doors.mean()
     open_std = open_doors.std()
