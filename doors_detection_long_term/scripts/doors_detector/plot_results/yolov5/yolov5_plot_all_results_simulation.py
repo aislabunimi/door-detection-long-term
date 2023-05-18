@@ -76,7 +76,8 @@ ax.legend(prop={"size": 16}, loc='upper center', ncol=5)
 
 fig.tight_layout()
 plt.show()
-
+closed_doors = closed_doors.drop([('house',)], axis=1)
+open_doors = open_doors.drop([('house',)], axis=1)
 closed_std = closed_doors.std()
 closed_mean = closed_doors.mean()
 open_std = open_doors.std()
