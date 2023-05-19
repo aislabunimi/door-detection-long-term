@@ -43,9 +43,9 @@ ax.tick_params(axis='y', labelsize=16)
 ax.set_xticks([i+0.3 for i in range(11)])
 ax.set_xticklabels([f'$e_{i}$' for i in range(10)] + ['$\overline{e}$'], fontsize=17)
 ax.set_ylabel('AP', fontsize=17)
-ax.set_xlabel('Environment', fontsize=17)
+ax.set_xlabel(' ', fontsize=17)
 
-ax.legend(prop={"size": 16}, loc='upper center', ncol=5)
+ax.legend(prop={"size": 12}, loc='upper center', ncol=5)
 
 fig.tight_layout()
 plt.show()
@@ -61,7 +61,7 @@ ax.bar(X, open_doors[('AP', experiments[0])].tolist() + [open_doors[('AP', exper
 ax.bar(X + 0.15, open_doors[('AP', experiments[1])].tolist() + [open_doors[('AP', experiments[1])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[open_doors[('AP', experiments[1])].std(), open_doors[('AP', experiments[1])].std()]]).T,  width=0.15, label=labels[1])
 ax.bar(X + 0.30, open_doors[('AP', experiments[2])].tolist() + [open_doors[('AP', experiments[2])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[open_doors[('AP', experiments[2])].std(), open_doors[('AP', experiments[2])].std()]]).T, width=0.15, label=labels[2])
 ax.bar(X + 0.45, open_doors[('AP', experiments[3])].tolist() + [open_doors[('AP', experiments[3])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[open_doors[('AP', experiments[3])].std(), open_doors[('AP', experiments[3])].std()]]).T, width=0.15, label=labels[3])
-ax.bar(X + 0.60, open_doors[('AP', experiments[4])].tolist() + [open_doors[('AP', experiments[4])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[open_doors[('AP', experiments[4])].std(), open_doors[('AP', experiments[4])].std()]]).T, width=0.15, label=labels[3])
+ax.bar(X + 0.60, open_doors[('AP', experiments[4])].tolist() + [open_doors[('AP', experiments[4])].mean()], yerr=np.array([[0, 0] for _ in range(10)] + [[open_doors[('AP', experiments[4])].std(), open_doors[('AP', experiments[4])].std()]]).T, width=0.15, label=labels[4])
 
 
 ax.set_title('Open doors', fontsize=18)
@@ -72,7 +72,7 @@ ax.set_xticklabels([f'$e_{i}$' for i in range(10)] + ['$\overline{e}$'], fontsiz
 ax.set_ylabel('AP', fontsize=17)
 ax.set_xlabel('Environment', fontsize=17)
 
-ax.legend(prop={"size": 16}, loc='upper center', ncol=5)
+ax.legend(prop={"size": 12}, loc='upper center', ncol=5)
 
 fig.tight_layout()
 plt.show()
