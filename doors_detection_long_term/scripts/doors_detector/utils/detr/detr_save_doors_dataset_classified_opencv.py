@@ -13,7 +13,7 @@ params = {
     'seed': 0
 }
 
-path = '/media/antonazzi/hdd/classifications/test_detr_opencv'
+path = '/home/antonazzi/Downloads/detr_gd'
 
 if __name__ == '__main__':
 
@@ -26,12 +26,12 @@ if __name__ == '__main__':
 
     #train, test, labels, COLORS = get_deep_doors_2_labelled_sets()
     #train, test, labels, COLORS = get_final_doors_dataset(2, 'house1', train_size=0.25, use_negatives=False)
-    #train, validation, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name='house1', train_size=0.75, use_negatives=True)
-    train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name='floor1', train_size=0.25)
+    train, validation, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=2, folder_name='house21', train_size=0.75, use_negatives=False)
+    #train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name='floor1', train_size=0.25)
 
     print(f'Train set size: {len(train)}', f'Test set size: {len(test)}')
 
-    model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_2_FLOOR1_GIBSON_60_FINE_TUNE_25_EPOCHS_40)
+    model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_1_HOUSE_21_2_LAYERS_BACKBONE_60_EPOCHS)
     model.eval()
 
     for i in range(len(test)):
@@ -52,13 +52,13 @@ if __name__ == '__main__':
         for image_data in processed_data:
             # keep only predictions with 0.7+ confidence
 
-            keep = image_data['scores'] > 0.7
+            keep = image_data['scores'] > 0.75
 
             # Show image with bboxes
             save_image =door_sample.get_bgr_image().copy()
             for label, score, (xmin, ymin, xmax, ymax) in zip(image_data['labels'][keep], image_data['scores'][keep], image_data['boxes'][keep]):
                 label = label.item()
                 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-                save_image = cv2.rectangle(save_image, (int(xmin), int(ymin)), (int(xmax), int(ymax)), colors[label])
+                save_image = cv2.rectangle(save_image, (int(xmin), int(ymin)), (int(xmax), int(ymax)), colors[label], 2)
 
             cv2.imwrite(os.path.join(path, 'image_{0:05d}.png'.format(i)), save_image)

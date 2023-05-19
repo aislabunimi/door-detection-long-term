@@ -13,25 +13,26 @@ from doors_detection_long_term.scripts.doors_detector.dataset_configurator impor
 import os
 import torchvision.transforms as T
 
-train, test, labels, _ = get_final_doors_dataset_real_data(folder_name='floor4', train_size=0.25)
+#train, test, labels, _ = get_final_doors_dataset_real_data(folder_name='floor4', train_size=0.25)
+train, validation, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=1, train_size=0.25, folder_name='house2')
 print(f'Train set size: {len(train)}', f'Test set size: {len(test)}')
 #data_loader_validation = DataLoader(validation, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 
-model = YOLOv5Model(model_name=YOLOv5, n_labels=2, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_2_FLOOR4_GIBSON_EPOCHS_GD_60_EPOCHS_QD_40_FINE_TUNE_75)
+model = YOLOv5Model(model_name=YOLOv5, n_labels=2, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_1_HOUSE_2_60_EPOCHS)
 
 model.to('cpu')
 model.eval()
 
 model.model.eval()
 
-save_path = '/home/antonazzi/Downloads/test_yolo'
+save_path = '/home/antonazzi/Downloads/test_yolo_gd'
 
 if not os.path.exists(save_path):
     os.mkdir(save_path)
 
 model.to('cuda')
-padding_height = 40
+padding_height = 0
 padding_width = 0
 transform = T.Compose([
     T.Pad([padding_width, padding_height]) # Check according image size
@@ -45,7 +46,7 @@ with torch.no_grad():
         preds, train_out = model.model(img)
         #print(preds.size(), train_out[0].size(), train_out[1].size(), train_out[2].size())
         preds = non_max_suppression(preds,
-                                    0.25,
+                                    0.75,
                                     0.45,
 
                                     multi_label=True,
@@ -64,7 +65,7 @@ with torch.no_grad():
                 x2 = int(min(img_size[0], max(.0, x2)))
                 y2 = int(min(img_size[0], max(.0, y2)))
                 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-                save_image = cv2.rectangle(save_image, (x1, y1), (x2, y2), colors[label])
+                save_image = cv2.rectangle(save_image, (x1, y1), (x2, y2), colors[label], 2)
                 #ax.text(xmin, ymin, text, fontsize=15,
                 #bbox=dict(facecolor='yellow', alpha=0.5))
             cv2.imwrite(os.path.join(save_path, 'image_{0:05d}.png'.format(i)), save_image)
