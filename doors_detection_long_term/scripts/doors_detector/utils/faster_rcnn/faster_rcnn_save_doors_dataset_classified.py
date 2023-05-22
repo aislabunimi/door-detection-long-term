@@ -14,14 +14,14 @@ save_path = '/home/antonazzi/Downloads/test_faster_rcnn'
 if not os.path.exists(save_path):
     os.mkdir(save_path)
 #train, test, _, _ = get_final_doors_dataset_all_envs()
-train, test, labels, _ = get_final_doors_dataset_real_data(folder_name='floor1', train_size=0.25)
-#train, validation, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=2, train_size=0.25, folder_name='house1')
+#train, test, labels, _ = get_final_doors_dataset_real_data(folder_name='floor1', train_size=0.25)
+train, validation, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=1, train_size=0.25, folder_name='house20')
 data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_faster_rcnn, drop_last=False, num_workers=4)
 
-model = FasterRCNN(model_name=FASTER_RCNN, n_labels=3, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_2_FLOOR1_GIBSON_EPOCHS_GD_60_EPOCHS_QD_40_FINE_TUNE_25)
+model = FasterRCNN(model_name=FASTER_RCNN, n_labels=3, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_1_HOUSE_20_60_EPOCHS)
 model.eval()
 model.to('cuda')
-padding_height = 40
+padding_height = 0
 padding_width = 0
 transform = T.Compose([
     T.Pad([padding_width, padding_height]) # Check according image size
@@ -44,5 +44,5 @@ with torch.no_grad():
                 x2 = int(min(img_size[1], max(.0, x2)))
                 y2 = int(min(img_size[0], max(.0, y2)))
                 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-                save_image = cv2.rectangle(save_image, (x1, y1), (x2, y2), colors[label])
+                save_image = cv2.rectangle(save_image, (x1, y1), (x2, y2), colors[label], 2)
             cv2.imwrite(os.path.join(save_path, 'image_{0:05d}.png'.format(i)), save_image)
