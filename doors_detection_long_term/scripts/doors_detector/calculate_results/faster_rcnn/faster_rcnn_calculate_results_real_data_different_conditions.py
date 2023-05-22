@@ -32,7 +32,7 @@ def compute_results(model_name, data_loader_test, description):
         for images, targets, converted_boxes in tqdm(data_loader_test, total=len(data_loader_test), desc=description):
             images = images.to(device)
             preds = model.model(images)
-            preds = [apply_nms(pred) for pred in preds]
+            preds = [apply_nms(pred, iou_thresh=0.45) for pred in preds]
             for pred in preds:
                 pred['labels'] = pred['labels'] - 1
             evaluator.add_predictions_faster_rcnn(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
