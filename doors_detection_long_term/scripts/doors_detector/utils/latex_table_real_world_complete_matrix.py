@@ -34,9 +34,20 @@ for i, env in enumerate(environments):
     for c, (label, exp) in enumerate(zip(labels, experiments)):
         if c > 0:
             table += ' & '
-        table += label + ' & ' + str(int(dataframes[0].loc[[(env, 'GD')]]['total_positives'][0]))
-        for dataframe in dataframes:
-            table += ' & ' +str(int(dataframe.loc[[(env, exp)]]['TP'][0])) + ' & ' + str(int(dataframe.loc[[(env, exp)]]['FP'][0])) + ' & ' + str(int(dataframe.loc[[(env, exp)]]['FPiou'][0]))
+        total_positives = int(dataframes[0].loc[[(env, 'GD')]]['total_positives'][0])
+        table += label + ' & ' + str(total_positives)
+        TPs = [int(dataframe.loc[[(env, exp)]]['TP'][0]) for dataframe in dataframes]
+        m = TPs.index(max(TPs))
+
+        for d, dataframe in enumerate(dataframes):
+            TP = int(dataframe.loc[[(env, exp)]]['TP'][0])
+            FP = int(dataframe.loc[[(env, exp)]]['FP'][0])
+            FPiou = int(dataframe.loc[[(env, exp)]]['FPiou'][0])
+
+            TPstring = str(TP) + ' (' + str(int(TP / total_positives * 100)) + ')'
+            if d == m:
+                TPstring = '\\textbf{' + TPstring + '} '
+            table += ' & ' + TPstring + ' & ' + str(FP) + ' (' + str(int(FP / total_positives * 100)) + ') & ' + str(FPiou) + ' (' + str(int(FPiou / total_positives * 100)) + ')'
         table += '\\\\ \n'
     table += '\\hline \n'
 
