@@ -38,16 +38,18 @@ for i, env in enumerate(environments):
         table += label + ' & ' + str(total_positives)
         TPs = [dataframe.loc[[(env, exp)]]['TP'][0] for dataframe in dataframes]
         FPs = [dataframe.loc[[(env, exp)]]['FP'][0] for dataframe in dataframes]
-        FPious = [dataframe.loc[[(env, exp)]]['FPiou'][0] for dataframe in dataframes]
+        FPious = [int(dataframe.loc[[(env, exp)]]['FPiou'][0]) for dataframe in dataframes]
         m = TPs.index(max(TPs))
         m1 = 0
         for e, element in enumerate(FPs):
-            if element == min(FPs):
+            if int(element) == int(min(FPs)):
                 m1 = e
 
         m2 = 0
+        print(env, label)
         for e, element in enumerate(FPious):
-            if element == min(FPious):
+            print(int(element), int(min(FPious)), m2)
+            if int(element) == int(min(FPious)):
                 m2 = e
 
 
@@ -63,13 +65,13 @@ for i, env in enumerate(environments):
             if d == m1:
                 FPstring = '\\underline{' + FPstring + '} '
 
-            FPiouString = str(int(sum(FPious) / len(FPious))) + ' (' + str(int((sum(FPious) / len(FPious)) / total_positives * 100)) + ')'
+            FPiouString = str(FPiou) + ' (' + str(int(FPiou / total_positives * 100)) + ')'
             if d == m2:
                 FPiouString = '\\underline{' + FPiouString + '} '
             table += ' & ' + TPstring + ' & ' + FPstring + ' & ' + FPiouString
 
 
-        table += ' & ' + str(int(sum(TPs) / len(TPs))) + ' (' + str(int((sum(TPs) / len(TPs)) / total_positives * 100)) + ') & ' + str(int(sum(FPs) / len(FPs))) + ' (' + str(int((sum(FPs) / len(FPs)) / total_positives * 100)) + ') & ' + FPiouString
+        table += ' & ' + str(int(sum(TPs) / len(TPs))) + ' (' + str(int((sum(TPs) / len(TPs)) / total_positives * 100)) + ') & ' + str(int(sum(FPs) / len(FPs))) + ' (' + str(int((sum(FPs) / len(FPs)) / total_positives * 100)) + ') & ' + str(int(sum(FPious) / len(FPious))) + ' (' + str(int((sum(FPious) / len(FPious)) / total_positives * 100)) + ') '
         table += '\\\\ \n'
     table += '[2pt]\\hline \n'
 
