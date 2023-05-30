@@ -40,6 +40,15 @@ for i, env in enumerate(environments):
         FPs = [dataframe.loc[[(env, exp)]]['FP'][0] for dataframe in dataframes]
         FPious = [dataframe.loc[[(env, exp)]]['FPiou'][0] for dataframe in dataframes]
         m = TPs.index(max(TPs))
+        m1 = 0
+        for e, element in enumerate(FPs):
+            if element == min(FPs):
+                m1 = e
+
+        m2 = 0
+        for e, element in enumerate(FPious):
+            if element == min(FPious):
+                m2 = e
 
 
         for d, dataframe in enumerate(dataframes):
@@ -50,9 +59,18 @@ for i, env in enumerate(environments):
             TPstring = str(TP) + ' (' + str(int(TP / total_positives * 100)) + ')'
             if d == m:
                 TPstring = '\\textbf{' + TPstring + '} '
-            table += ' & ' + TPstring + ' & ' + str(FP) + ' (' + str(int(FP / total_positives * 100)) + ') & ' + str(FPiou) + ' (' + str(int(FPiou / total_positives * 100)) + ')'
-        table += ' & ' + str(int(sum(TPs) / len(TPs))) + ' (' + str(int((sum(TPs) / len(TPs)) / total_positives * 100)) + ') & ' + str(int(sum(FPs) / len(FPs))) + ' (' + str(int((sum(FPs) / len(FPs)) / total_positives * 100)) + ') & ' + str(int(sum(FPious) / len(FPious))) + ' (' + str(int((sum(FPious) / len(FPious)) / total_positives * 100)) + ')'
-        table += '\\\\ \n'
+            FPstring = str(FP) + ' (' + str(int(FP / total_positives * 100)) + ')'
+            if d == m1:
+                FPstring = '\\underline{' + FPstring + '} '
+
+            FPiouString = str(int(sum(FPious) / len(FPious))) + ' (' + str(int((sum(FPious) / len(FPious)) / total_positives * 100)) + ')'
+            if d == m2:
+                FPiouString = '\\underline{' + FPiouString + '} '
+            table += ' & ' + TPstring + ' & ' + FPstring + ' & ' + FPiouString
+
+
+        table += ' & ' + str(int(sum(TPs) / len(TPs))) + ' (' + str(int((sum(TPs) / len(TPs)) / total_positives * 100)) + ') & ' + str(int(sum(FPs) / len(FPs))) + ' (' + str(int((sum(FPs) / len(FPs)) / total_positives * 100)) + ') & ' + FPiouString
+        table += '\\\\[2pt] \n'
     table += '\\hline \n'
 
 print(table)
