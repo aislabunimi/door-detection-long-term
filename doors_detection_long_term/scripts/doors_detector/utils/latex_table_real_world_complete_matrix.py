@@ -36,8 +36,11 @@ for i, env in enumerate(environments):
             table += ' & '
         total_positives = int(dataframes[0].loc[[(env, 'GD')]]['total_positives'][0])
         table += label + ' & ' + str(total_positives)
-        TPs = [int(dataframe.loc[[(env, exp)]]['TP'][0]) for dataframe in dataframes]
+        TPs = [dataframe.loc[[(env, exp)]]['TP'][0] for dataframe in dataframes]
+        FPs = [dataframe.loc[[(env, exp)]]['FP'][0] for dataframe in dataframes]
+        FPious = [dataframe.loc[[(env, exp)]]['FPiou'][0] for dataframe in dataframes]
         m = TPs.index(max(TPs))
+
 
         for d, dataframe in enumerate(dataframes):
             TP = int(dataframe.loc[[(env, exp)]]['TP'][0])
@@ -48,6 +51,7 @@ for i, env in enumerate(environments):
             if d == m:
                 TPstring = '\\textbf{' + TPstring + '} '
             table += ' & ' + TPstring + ' & ' + str(FP) + ' (' + str(int(FP / total_positives * 100)) + ') & ' + str(FPiou) + ' (' + str(int(FPiou / total_positives * 100)) + ')'
+        table += ' & ' + str(int(sum(TPs) / len(TPs))) + ' (' + str(int((sum(TPs) / len(TPs)) / total_positives * 100)) + ') & ' + str(int(sum(FPs) / len(FPs))) + ' (' + str(int((sum(FPs) / len(FPs)) / total_positives * 100)) + ') & ' + str(int(sum(FPious) / len(FPious))) + ' (' + str(int((sum(FPious) / len(FPious)) / total_positives * 100)) + ')'
         table += '\\\\ \n'
     table += '\\hline \n'
 
