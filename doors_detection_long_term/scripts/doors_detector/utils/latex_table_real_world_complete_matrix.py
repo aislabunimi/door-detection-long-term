@@ -30,7 +30,7 @@ experiments = ['GD', 'QD_15', 'QD_25', 'QD_50', 'QD_75']
 
 table = ''
 for i, env in enumerate(environments):
-    table += '\multirow{5}{*}{$e_' + str(i) + '$} &'
+    table += '\multirow{5}{*}{$e_' + str((i+1)) + '$} &'
     for c, (label, exp) in enumerate(zip(labels, experiments)):
         if c > 0:
             table += ' & '
@@ -70,7 +70,7 @@ for i, env in enumerate(environments):
 
 
         table += ' & ' + str(int(sum(TPs) / len(TPs))) + ' (' + str(int((sum(TPs) / len(TPs)) / total_positives * 100)) + ') & ' + str(int(sum(FPs) / len(FPs))) + ' (' + str(int((sum(FPs) / len(FPs)) / total_positives * 100)) + ') & ' + FPiouString
-        table += '\\\\[2pt] \n'
-    table += '\\hline \n'
+        table += '\\\\ \n'
+    table += '[2pt]\\hline \n'
 
 print(table)
