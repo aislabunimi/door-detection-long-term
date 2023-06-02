@@ -74,7 +74,9 @@ setup(
         'psutil',
         'tqdm',
         'seaborn',
-        'openpyxl'
+        'openpyxl',
+        'PyCuda',
+        'tensorrt'
 
     ],
     entry_points={
