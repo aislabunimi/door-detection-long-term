@@ -1,18 +1,16 @@
+import pycuda.autoinit
+import numpy as np
 import onnx
 import tensorrt
 import torch
 import tensorrt as trt
 
-from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
-from doors_detection_long_term.doors_detector.models.model_names import YOLOv5
-from doors_detection_long_term.doors_detector.models.yolov5 import YOLOv5Model, \
-    EXP_2_FLOOR1_GIBSON_EPOCHS_GD_60_EPOCHS_QD_40_FINE_TUNE_15
+def model_to_tensorrt(model, input_tensor: torch.Tensor=torch.ones(1, 3, 320, 320), fp16: bool=False):
 
-
-def yolov5_to_tensorrt(model: YOLOv5Model, input_tensor: torch.Tensor=torch.ones(1, 3, 320, 320), fp16: bool=False):
+    model.eval()
 
     # Export to ONNX format
-    model_path = 'yolov5/model_onnx.onnx'
+    model_path = 'model_onnx.onnx'
 
     torch.onnx.export(model.model, input_tensor, model_path, input_names=['input'],
                       output_names=['output'], export_params=True)
@@ -56,23 +54,4 @@ def yolov5_to_tensorrt(model: YOLOv5Model, input_tensor: torch.Tensor=torch.ones
     context = engine.create_execution_context()
     print('Cuda engine created')
 
-    for binding in engine:
-        if engine.binding_is_input(binding):  # we expect only one input
-            input_shape = engine.get_binding_shape(binding)
-            print('input:', input_shape)
-
-        else:  # and one output
-            output_shape = engine.get_binding_shape(binding)
-            print('output:', output_shape)
-            # create page-locked memory buffers (i.e. won't be swapped to disk)
-
-
-
-
-
-
-
-
-if __name__ == '__main__':
-    yolov5model = YOLOv5Model(model_name=YOLOv5, n_labels=2, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_2_FLOOR1_GIBSON_EPOCHS_GD_60_EPOCHS_QD_40_FINE_TUNE_15)
-    yolov5_to_tensorrt(yolov5model)
+    return engine, context
