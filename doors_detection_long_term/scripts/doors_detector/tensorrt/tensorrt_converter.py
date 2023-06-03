@@ -12,7 +12,7 @@ def model_to_tensorrt(model, input_tensor: torch.Tensor=torch.ones(1, 3, 320, 32
     # Export to ONNX format
     model_path = 'model_onnx.onnx'
 
-    torch.onnx.export(model.model, input_tensor, model_path, input_names=['input'],
+    torch.onnx.export(model, input_tensor, model_path, input_names=['input'],
                       output_names=['output'], export_params=True)
     onnx_model = onnx.load(model_path)
     onnx.checker.check_model(onnx_model)
