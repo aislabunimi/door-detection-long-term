@@ -46,10 +46,6 @@ def compute_results(model_name, data_loader_test, description):
             host_output_pagelocked = cuda.pagelocked_empty(trt.volume(output_shape), dtype=np.float32)
             device_output_buffers.append(cuda.mem_alloc(host_output_pagelocked.nbytes))
 
-    _, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25)
-    data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
-
-
     evaluator = MyEvaluator()
     evaluator_complete_metric = MyEvaluatorCompleteMetric()
 
