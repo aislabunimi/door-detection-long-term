@@ -9,13 +9,24 @@ import doors_detection_long_term.doors_detector.utilities.transforms as T
 import pandas as pd
 from torch.utils.data import Dataset
 
-SET = Type[str]
+SET = str
 TRAIN_SET: SET = 'train_set'
 TEST_SET: SET = 'test_set'
 
-DATASET = Type[str]
+DATASET = str
 DEEP_DOORS_2_LABELLED: DATASET = 'deep_doors_2_labelled'
 FINAL_DOORS_DATASET: DATASET = 'final_doors_dataset'
+BOUNDING_BOX_DATASET: DATASET = 'bounding_box_dataset'
+
+
+class TorchDatasetBBoxes(Dataset):
+    def __init__(self):
+        self._images = []
+        self._bboxes = []
+        self._gt = []
+
+    def __len__(self):
+        return len(self._images)
 
 
 class TorchDataset(Dataset):

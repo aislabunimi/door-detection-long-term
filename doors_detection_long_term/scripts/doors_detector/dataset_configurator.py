@@ -8,6 +8,8 @@ from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datase
     DatasetsCreatorGibsonAndDeepDoors2
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.dataset_creator_real_data import \
     DatasetsCreatorRealData
+from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.dataset_creator_real_data_bbox_filter import \
+    DatasetsCreatorRealDataBboxFilter
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_final import DatasetsCreatorDoorsFinal
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_final_epoch_analysis import \
     DatasetsCreatorDoorsFinalEpochAnalysis
@@ -89,4 +91,11 @@ def get_final_doors_dataset_real_data(folder_name: str, train_size: float = 0.1)
     labels = dataset_creator.get_labels()
 
     return train, test, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
+
+def get_final_doors_dataset_real_data_bbox_filter(folder_name: str, train_size: float = 0.15, control_size: float = 0.15, fine_tune_size: float = 0.45, test_size: float = 0.25):
+    dataset_creator = DatasetsCreatorRealDataBboxFilter(dataset_path=real_final_doors_dataset_path)
+    train, control, fine_tune, test = dataset_creator.create_datasets(folder_name=folder_name, control_size=control_size, fine_tune_size=fine_tune_size, train_size=train_size, test_size=test_size )
+    labels = dataset_creator.get_labels()
+
+    return train, control, fine_tune, test, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
 
