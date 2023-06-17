@@ -92,6 +92,13 @@ def get_final_doors_dataset_real_data(folder_name: str, train_size: float = 0.1)
 
     return train, test, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
 
+def get_final_doors_dataset_bbox_filter(folder_name: str, train_size_student: float = .0):
+    dataset_creator = DatasetsCreatorDoorsFinalBBoxFilter(dataset_path=final_doors_dataset_path)
+    train_student, validation_student, unlabelled_bbox_filter, test = dataset_creator.create_datasets(folder_name=folder_name, train_size_student=train_size_student)
+    labels = dataset_creator.get_labels()
+
+    return train_student, validation_student, unlabelled_bbox_filter, test, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
+
 def get_final_doors_dataset_real_data_bbox_filter(folder_name: str, train_size: float = 0.15, control_size: float = 0.15, fine_tune_size: float = 0.45, test_size: float = 0.25):
     dataset_creator = DatasetsCreatorRealDataBboxFilter(dataset_path=real_final_doors_dataset_path)
     train, control, fine_tune, test = dataset_creator.create_datasets(folder_name=folder_name, control_size=control_size, fine_tune_size=fine_tune_size, train_size=train_size, test_size=test_size )
