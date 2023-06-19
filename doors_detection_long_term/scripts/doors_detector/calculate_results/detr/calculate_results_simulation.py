@@ -18,6 +18,7 @@ epochs_qualified_detector = [20, 40]
 fine_tune_quantity = [15, 25, 50, 75]
 device = 'cuda'
 
+iou_threshold = 0.65
 
 def compute_results(model_name, data_loader_test, COLORS):
     model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=model_name)
@@ -25,16 +26,16 @@ def compute_results(model_name, data_loader_test, COLORS):
     model.to(device)
 
     evaluator = MyEvaluator()
-    evaluator_complete_metric =  MyEvaluatorCompleteMetric()
+    evaluator_complete_metric = MyEvaluatorCompleteMetric()
 
     for images, targets in tqdm(data_loader_test, total=len(data_loader_test), desc='Evaluate model'):
         images = images.to(device)
         outputs = model(images)
-        evaluator.add_predictions(targets=targets, predictions=outputs)
-        evaluator_complete_metric.add_predictions(targets=targets, predictions=outputs)
+        evaluator.add_predictions(targets=targets, predictions=outputs, img_size=images.size()[2:])
+        evaluator_complete_metric.add_predictions(targets=targets, predictions=outputs, img_size=images.size()[2:])
 
-    metrics = evaluator.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False, colors=COLORS)
-    complete_metrics = evaluator_complete_metric.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False, colors=COLORS)
+    metrics = evaluator.get_metrics(iou_threshold=iou_threshold, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False, colors=COLORS)
+    complete_metrics = evaluator_complete_metric.get_metrics(iou_threshold=iou_threshold, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False, colors=COLORS)
     mAP = 0
     print('Results per bounding box:')
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
@@ -107,4 +108,4 @@ for model_name, house, quantity, epochs_general, epochs_qualified in model_names
     for label, values in sorted(complete_metrics.items(), key=lambda v: v[0]):
         results_complete += [[house.replace('_', ''), 'QD_' + str(quantity), epochs_general, epochs_qualified, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
-save_file(results, results_complete, 'detr_ap_simulation.xlsx', 'detr_complete_metric_simulation.xlsx')
+save_file(results, results_complete, f'detr_ap_simulation_{str(iou_threshold)}.xlsx', f'detr_complete_metric_simulation_{str(iou_threshold)}.xlsx')
