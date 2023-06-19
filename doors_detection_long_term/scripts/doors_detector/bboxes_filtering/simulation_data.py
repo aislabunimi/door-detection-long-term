@@ -2,16 +2,18 @@ import cv2
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET, TorchDatasetBBoxes
+from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCreatorBBoxes import DatasetsCreatorBBoxes, \
+    Type
+from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
 from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_yolov5
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
-num_boxes = 15
+num_bboxes = 15
 
-dataset_bboxes = TorchDatasetBBoxes(num_boxes=num_boxes)
+dataset_creator_bboxes = DatasetsCreatorBBoxes(num_bboxes=num_bboxes)
 
 houses = ['house_1', 'house_2', 'house_7', 'house_9', 'house_10', 'house_13', 'house_15', 'house_20', 'house_21', 'house_22']
 
@@ -35,11 +37,13 @@ with torch.no_grad():
 
                                     multi_label=True,
                                     agnostic=True,
-                                    max_det=num_boxes)
+                                    max_det=num_bboxes)
 
 
-        dataset_bboxes.add_example_from_yolo(images, targets, preds, images.size()[2:])
+        dataset_creator_bboxes.add_yolo_bboxes(images, targets, preds, Type.TRAINING)
 
 
+dataset_creator_bboxes.filter_bboxes(iou_threshold=0.5, filter_multiple_detection=False, consider_label=False)
+dataset_creator_bboxes.visualize_bboxes(show_filtered=True)
 
 

@@ -26,11 +26,7 @@ BOUNDING_BOX_DATASET: DATASET = 'bounding_box_dataset'
 
 class TorchDatasetBBoxes(Dataset):
     def __init__(self, num_boxes: int):
-        self._img_count = 0
-        self._images = []
-        self._gt_boxes = []
-        self._detected_bboxes = []
-        self._gt = []
+
         self._num_boxes = num_boxes
 
     def __len__(self):
