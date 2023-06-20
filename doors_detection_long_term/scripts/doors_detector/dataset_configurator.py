@@ -16,7 +16,7 @@ from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datase
 
 # The path in which the trained model are saved and loaded
 # If the string is empty, they are saved in a folder in this repository (/models/train_params/)
-trained_models_path = "/media/antonazzi/hdd/door_detection_long_term_data"
+trained_models_path = "/home/antonazzi/myfiles/trained_models"
 
 deep_doors_2_labelled_dataset_path = '/home/antonazzi/myfiles/deep_doors_2_labelled'
 final_doors_dataset_path = '/home/antonazzi/myfiles/final_doors_dataset/'
