@@ -55,6 +55,11 @@ class TorchDataset(Dataset):
         pass
 
     def __getitem__(self, idx):
+        """
+        The target bboxes are expressed as (center x, center_y, w, h) in relative values [0, 1]
+        :param idx:
+        :return:
+        """
         door_sample, folder_name, absolute_count = self.load_sample(idx)
 
         target = {}

@@ -24,6 +24,8 @@ def box_cxcywh_to_xyxy(x):
 def collate_fn(batch_data):
     # Batch data is a list of n tuple, where tuple[0] is the img while tuple[1] are targets (labels, bounding boxes ecc)
     # Batch data is transformed in a list where list[0] contains a list of the images and list[1] contains a list of targets
+    # The target bboxes are expressed as (center x, center_y, w, h) in relative values [0, 1]
+    # The pred bboxes are the same
     batch_data = list(zip(*batch_data))
 
     def _max_by_axis(the_list):

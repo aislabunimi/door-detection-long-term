@@ -27,6 +27,8 @@ class ModelEvaluator:
         return self._predicted_bboxes
 
     def add_predictions(self, targets, predictions, img_size):
+        # The target bboxes are expressed as (center x, center_y, w, h) in relative values [0, 1]
+        # The pred bboxes are the same
         img_count_temp = self._img_count
 
         for target in targets:
