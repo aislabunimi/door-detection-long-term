@@ -6,7 +6,7 @@ from pandas import CategoricalDtype
 
 # DETR
 
-houses = pd.read_excel('./../../results/detr_ap_simulation_0.65.xlsx')
+houses = pd.read_excel('./../../results/detr_ap_real_data_different_conditions_0.65.xlsx')
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60))]
@@ -15,7 +15,7 @@ labels = ['$GD_{-e}$', '$QD^{25}_e$', '$QD^{50}_e$', '$QD^{75}_e$']
 experiments = ['GD', 'QD_25', 'QD_50', 'QD_75']
 
 houses_list_dtype = CategoricalDtype(
-    ['house10', 'house2', 'house7', 'house9', 'house1', 'house13', 'house15', 'house20', 'house21', 'house22'],
+    ['floor1', 'floor4'],
     ordered=True)
 
 closed_doors = houses[houses.label == 0][['house', 'detector', 'AP']]
