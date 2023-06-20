@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt, font_manager
 from matplotlib.pyplot import subplots
 from pandas import CategoricalDtype
 
-houses = pd.read_excel('./../../../results/detr_ap_simulation_0.5.xlsx')
+houses = pd.read_excel('./../../../results/detr_ap_simulation_0.65.xlsx')
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60))]
@@ -72,7 +72,8 @@ ax.legend(prop={"size": 16}, loc='upper center', ncol=4)
 
 fig.tight_layout()
 plt.show()
-
+closed_doors = closed_doors.drop([('house',)], axis=1)
+open_doors = open_doors.drop([('house',)], axis=1)
 closed_std = closed_doors.std()
 closed_mean = closed_doors.mean()
 open_std = open_doors.std()
