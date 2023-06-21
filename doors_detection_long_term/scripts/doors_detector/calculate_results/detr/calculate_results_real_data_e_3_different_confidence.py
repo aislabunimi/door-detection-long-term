@@ -23,8 +23,8 @@ datasets = ['GIBSON']
 device = 'cuda'
 
 iou_threshold = 0.65
-confidence_thresholds = [i/100 for i in range(50, 60, 5)]
-
+confidence_thresholds = [i/100 for i in range(50, 100, 5)] + [0.97]
+print(confidence_thresholds)
 TPs = []
 FPs = []
 FPious = []
@@ -44,8 +44,8 @@ for confidence_threshold in confidence_thresholds:
             evaluator.add_predictions(targets=targets, predictions=outputs, img_size=images.size()[2:][::-1])
             evaluator_complete_metric.add_predictions(targets=targets, predictions=outputs, img_size=images.size()[2:][::-1])
 
-        metrics = evaluator.get_metrics(iou_threshold=iou_threshold, confidence_threshold=0.8, door_no_door_task=False, plot_curves=False, colors=COLORS)
-        complete_metrics = evaluator_complete_metric.get_metrics(iou_threshold=iou_threshold, confidence_threshold=0.8, door_no_door_task=False, plot_curves=False, colors=COLORS)
+        metrics = evaluator.get_metrics(iou_threshold=iou_threshold, confidence_threshold=confidence_threshold, door_no_door_task=False, plot_curves=False, colors=COLORS)
+        complete_metrics = evaluator_complete_metric.get_metrics(iou_threshold=iou_threshold, confidence_threshold=confidence_threshold, door_no_door_task=False, plot_curves=False, colors=COLORS)
         mAP = 0
         print('Results per bounding box:')
         for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
@@ -118,13 +118,22 @@ for confidence_threshold in confidence_thresholds:
         for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
             results += [[house.replace('_', ''), 'QD_' + str(fine_tune), dataset, epochs_gd, epochs_qd, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
+        TPs.append(0)
+        FPs.append(0)
+        FPious.append(0)
+        total = 0
         for label, values in sorted(complete_metrics.items(), key=lambda v: v[0]):
-            print(label)
+            TPs[-1] += values['TP']
+            FPs[-1] += values['FP']
+            FPious[-1] += values['FPiou']
+            total += values['total_positives']
             results_complete += [[house.replace('_', ''), 'QD_' + str(fine_tune), dataset, epochs_gd, epochs_qd, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
-
+        TPs[-1] /= total
+        FPs[-1] /= total
+        FPious[-1] /= total
 fig, ax = subplots(figsize=(10, 5))
-
-ax.plot(range(len(TPs)), TPs, 'g^')
+print(TPs)
+ax.plot(range(len(TPs)), TPs, 'g^-', range(len(FPs)), FPs, 'b^-', range(len(FPious)), FPious, 'r^-')
 fig.tight_layout()
 plt.show()
     #save_file(results, results_complete, f'detr_ap_real_data_{str(iou_threshold)}.xlsx', f'detr_complete_metrics_real_data_{str(iou_threshold)}.xlsx')
