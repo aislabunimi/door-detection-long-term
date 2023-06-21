@@ -23,7 +23,7 @@ datasets = ['GIBSON']
 device = 'cuda'
 
 iou_threshold = 0.65
-confidence_thresholds = [i/100 for i in range(50, 100, 5)] + [0.97]
+confidence_thresholds = [i/100 for i in range(50, 100, 5)]
 print(confidence_thresholds)
 TPs = []
 FPs = []
@@ -133,7 +133,12 @@ for confidence_threshold in confidence_thresholds:
         FPious[-1] /= total
 fig, ax = subplots(figsize=(10, 5))
 print(TPs)
-ax.plot(range(len(TPs)), TPs, 'g^-', range(len(FPs)), FPs, 'b^-', range(len(FPious)), FPious, 'r^-')
+ax.plot(range(len(TPs)), TPs, 'g^-', label='$TP_{\%}$')
+ax.plot(range(len(FPs)), FPs, 'b^-', label='$FP_{\%}$')
+ax.plot(range(len(FPious)), FPious, 'r^-', label='$BFD_{\%}$')
+ax.set_xticks([i for i in range(len(confidence_thresholds))])
+ax.set_xticklabels([str(c) for c in  confidence_thresholds])
+ax.legend(loc='upper right')
 fig.tight_layout()
 plt.show()
     #save_file(results, results_complete, f'detr_ap_real_data_{str(iou_threshold)}.xlsx', f'detr_complete_metrics_real_data_{str(iou_threshold)}.xlsx')
