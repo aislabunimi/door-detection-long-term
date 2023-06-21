@@ -36,8 +36,8 @@ def compute_results(model_name, data_loader_test, COLORS):
         evaluator.add_predictions(targets=targets, predictions=outputs, img_size=images.size()[2:][::-1])
         evaluator_complete_metric.add_predictions(targets=targets, predictions=outputs, img_size=images.size()[2:][::-1])
 
-    metrics = evaluator.get_metrics(iou_threshold=iou_threshold, confidence_threshold=0.8, door_no_door_task=False, plot_curves=False, colors=COLORS)
-    complete_metrics = evaluator_complete_metric.get_metrics(iou_threshold=iou_threshold, confidence_threshold=0.8, door_no_door_task=False, plot_curves=False, colors=COLORS)
+    metrics = evaluator.get_metrics(iou_threshold=iou_threshold, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False, colors=COLORS)
+    complete_metrics = evaluator_complete_metric.get_metrics(iou_threshold=iou_threshold, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False, colors=COLORS)
     mAP = 0
     print('Results per bounding box:')
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
