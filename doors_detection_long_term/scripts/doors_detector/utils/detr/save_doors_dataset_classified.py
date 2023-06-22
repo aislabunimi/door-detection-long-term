@@ -84,15 +84,25 @@ if __name__ == '__main__':
             image_size = image.size()[1:][::-1]
 
             for gt_box, label in zip(target['boxes'], target['labels']):
-                x1, y1, w, h = gt_box
+                x1, y1, w, h = gt_box.tolist()
 
-                target_image = cv2.rectangle(target_image, (int((x1 - w/2) * image_size[0]), int((y1 - h/2) * image_size[1])),
-                                             (int((x1 + w/2) * image_size[0]), int((y1 + h/2) * image_size[1])), COLORS[int(label)], 2)
-
+                box = BoundingBox(
+                    image_name=str(1),
+                    class_id=str(label),
+                    coordinates=(x1, y1, w, h),
+                    bb_type=BBType.GROUND_TRUTH,
+                    format=BBFormat.XYWH,
+                    confidence=1,
+                    type_coordinates=CoordinatesType.RELATIVE,
+                    img_size=image_size
+                )
+                x1, y1, w, h = box.get_absolute_bounding_box(BBFormat.XYWH)
+                target_image = cv2.rectangle(target_image, (int((x1)), int((y1))),
+                                               (int((x1 + w)), int((y1 + h))), COLORS[label], 2)
 
             #scores_image, pred_logits, pred_boxes
-            for box, score, label in zip(pred_boxes, scores_image, labels_images):
-                x1, y1, w, h = box
+            for box_coords, score, label in zip(pred_boxes, scores_image, labels_images):
+                x1, y1, w, h = box_coords
                 box = BoundingBox(
                     image_name=str(1),
                     class_id=str(label),
@@ -103,17 +113,14 @@ if __name__ == '__main__':
                     type_coordinates=CoordinatesType.RELATIVE,
                     img_size=image_size
                 )
-
+                x1, y1, w, h = box.get_absolute_bounding_box(BBFormat.XYWH)
+                print(x1, y1, w, h, box_coords, image_size)
                 if box.get_confidence() >= 0.8:
                     total += 1
-                    x1, y1, w, h = box.get_absolute_bounding_box(BBFormat.XYWH)
 
 
                     detected_image = cv2.rectangle(detected_image, (int((x1)), int((y1))),
                                                  (int((x1 + w)), int((y1 + h))), COLORS[int(label)], 2)
-                    x1, y1, w, h = box
-                    target_image = cv2.rectangle(detected_image, (int((x1 - w/2) * image_size[0]), int((y1 - h/2) * image_size[1])),
-                                                 (int((x1 + w/2) * image_size[0]), int((y1 + h/2) * image_size[1])), COLORS[int(label)], 2)
 
             show_image = cv2.hconcat([target_image, detected_image])
 

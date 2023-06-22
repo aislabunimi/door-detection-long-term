@@ -128,16 +128,19 @@ for confidence_threshold in confidence_thresholds:
             FPious[-1] += values['FPiou']
             total += values['total_positives']
             results_complete += [[house.replace('_', ''), 'QD_' + str(fine_tune), dataset, epochs_gd, epochs_qd, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
-        TPs[-1] /= total
-        FPs[-1] /= total
-        FPious[-1] /= total
+        TPs[-1] /= (total / 100)
+        FPs[-1] /= (total / 100)
+        FPious[-1] /= total / 100
+print(TPs, FPs, FPious)
 fig, ax = subplots(figsize=(10, 5))
 print(TPs)
 ax.plot(range(len(TPs)), TPs, 'g^-', label='$TP_{\%}$')
 ax.plot(range(len(FPs)), FPs, 'b^-', label='$FP_{\%}$')
 ax.plot(range(len(FPious)), FPious, 'r^-', label='$BFD_{\%}$')
 ax.set_xticks([i for i in range(len(confidence_thresholds))])
-ax.set_xticklabels([str(c) for c in  confidence_thresholds])
+ax.set_xticklabels([str(c) for c in  confidence_thresholds], fontsize=14)
+ax.set_xlabel('$\\rho_{c}$', fontsize=14)
+plt.yticks(fontsize=14)
 ax.legend(loc='upper right')
 fig.tight_layout()
 plt.show()
