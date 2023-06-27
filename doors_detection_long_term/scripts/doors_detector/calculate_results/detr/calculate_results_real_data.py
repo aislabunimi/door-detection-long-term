@@ -22,6 +22,7 @@ device = 'cuda'
 
 iou_threshold = 0.5
 seed_everything(seed=0)
+
 def compute_results(model_name, data_loader_test, COLORS):
     model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=model_name)
     model.eval()

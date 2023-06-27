@@ -11,7 +11,7 @@ from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.models.detr_door_detector import DetrDoorDetector
 from doors_detection_long_term.doors_detector.models.model_names import DETR_RESNET50
-from doors_detection_long_term.doors_detector.utilities.utils import collate_fn
+from doors_detection_long_term.doors_detector.utilities.utils import collate_fn, seed_everything
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import \
     get_final_doors_dataset_epoch_analysis, get_final_doors_dataset_real_data
 
@@ -21,8 +21,8 @@ epochs_qualified_detector = [40]
 fine_tune_quantity = [25]
 datasets = ['GIBSON']
 device = 'cuda'
-
-iou_threshold = 0.65
+seed_everything(seed=0)
+iou_threshold = 0.5
 confidence_thresholds = [i/100 for i in range(50, 100, 5)]
 print(confidence_thresholds)
 TPs = []
