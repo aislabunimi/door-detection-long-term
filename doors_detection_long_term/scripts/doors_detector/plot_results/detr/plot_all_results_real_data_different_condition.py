@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt, font_manager
 from matplotlib.pyplot import subplots
 from pandas import CategoricalDtype
 
-houses = pd.read_excel('./../../../results/detr_ap_real_data_different_conditions.xlsx')
+houses = pd.read_excel('./../../../results/detr_ap_real_data_different_conditions_0.5.xlsx')
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60))]
@@ -17,7 +17,8 @@ houses_list_dtype = CategoricalDtype(
     ordered=True
 )
 
-for dataset in ['deep_doors_2', 'gibson', 'gibson_deep_doors_2']:
+for dataset in [#'deep_doors_2',
+     'gibson', 'gibson_deep_doors_2']:
     dataset = dataset.upper()
     closed_doors = houses[(houses.label == 0) & (houses.dataset == dataset)][['house', 'detector', 'AP']]
     closed_doors = closed_doors.pivot_table(values=['AP'], index=closed_doors['house'], columns='detector', aggfunc='first').reset_index()

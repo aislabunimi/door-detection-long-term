@@ -5,8 +5,8 @@ from matplotlib.pyplot import subplots
 from pandas import CategoricalDtype
 
 # DETR
-
-houses = pd.read_excel('./../../results/detr_ap_real_data_0.65.xlsx')
+filename = 'detr_ap_real_data_0.5.xlsx'
+houses = pd.read_excel('./../../results/' + filename)
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 houses = houses.loc[(houses['dataset'] == 'GIBSON') & (houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60))]
@@ -42,7 +42,7 @@ for i in range(len(keys) -1):
     print(f'\t- open doors: mean = {open_doors_increment.mean()}, std = {open_doors_increment.std()}')
 
 
-houses = pd.read_excel('./../../results/detr_ap_real_data_0.65.xlsx')
+houses = pd.read_excel('./../../results/' + filename)
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 houses = houses.loc[(houses['dataset'] == 'DEEP_DOORS_2') & (houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60))]

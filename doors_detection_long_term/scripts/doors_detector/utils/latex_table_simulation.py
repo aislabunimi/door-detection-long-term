@@ -6,7 +6,7 @@ from pandas import CategoricalDtype
 
 # DETR
 
-houses = pd.read_excel('./../../results/detr_ap_simulation_0.65.xlsx')
+houses = pd.read_excel('./../../results/detr_ap_simulation_0.5.xlsx')
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60))]
