@@ -52,7 +52,7 @@ class MyEvaluatorCompleteMetric(ModelEvaluator):
 
             iou_max = float('-inf')
             match_index = -1
-
+            assert len(img['bboxes']) >= 0
             # Find the grater iou area with gt bboxes
             for gt_index, gt_box in enumerate(img['bboxes']):
                 iou = BoundingBox.iou(p_box, gt_box)
