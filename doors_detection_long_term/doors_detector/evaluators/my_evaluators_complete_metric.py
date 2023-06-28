@@ -62,7 +62,7 @@ class MyEvaluatorCompleteMetric(ModelEvaluator):
 
             result_by_labels[label]['total_detections'] += 1
             # Match completed
-            if iou_max > iou_threshold:
+            if iou_max >= iou_threshold:
                 gt_box = img['bboxes'][match_index]
                 # If the bbox has not already been matched
                 if img['mask'][match_index] == 0:
