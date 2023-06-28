@@ -101,11 +101,11 @@ for house, dataset, epochs_gd in [(h, d, e) for h in houses for d in datasets fo
 
     for (iou_threshold, confidence_threshold), metric in metrics.items():
         for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
-            results += [[house.replace('_', ''), 'GD', dataset, epochs_gd, epochs_gd, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
+            results += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'GD', dataset, epochs_gd, epochs_gd, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
     for (iou_threshold, confidence_threshold), complete_metric in complete_metrics.items():
         for label, values in sorted(complete_metric.items(), key=lambda v: v[0]):
-            results_complete += [[house.replace('_', ''), 'GD', dataset, epochs_gd, epochs_gd, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
+            results_complete += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'GD', dataset, epochs_gd, epochs_gd, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
 
 for house, dataset, epochs_gd, epochs_qd, fine_tune in [(h, d, e, eq, ft) for h in houses for d in datasets for e in [60] for eq in epochs_qualified_detector for ft in  fine_tune_quantity]:
@@ -118,10 +118,10 @@ for house, dataset, epochs_gd, epochs_qd, fine_tune in [(h, d, e, eq, ft) for h 
 
     for (iou_threshold, confidence_threshold), metric in metrics.items():
         for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
-            results += [[house.replace('_', ''), 'QD_' + str(fine_tune), dataset, epochs_gd, epochs_qd, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
+            results += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'QD_' + str(fine_tune), dataset, epochs_gd, epochs_qd, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
     for (iou_threshold, confidence_threshold), complete_metric in complete_metrics.items():
         for label, values in sorted(complete_metric.items(), key=lambda v: v[0]):
-            results_complete += [[house.replace('_', ''), 'QD_' + str(fine_tune), dataset, epochs_gd, epochs_qd, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
+            results_complete += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'QD_' + str(fine_tune), dataset, epochs_gd, epochs_qd, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
 save_file(results, results_complete, 'detr_ap_real_data_different_conditions.xlsx', 'detr_complete_metrics_real_data_different_conditions.xlsx')
