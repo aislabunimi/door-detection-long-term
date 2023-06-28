@@ -9,7 +9,7 @@ from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.models.detr_door_detector import DetrDoorDetector
 from doors_detection_long_term.doors_detector.models.model_names import DETR_RESNET50
-from doors_detection_long_term.doors_detector.utilities.utils import collate_fn
+from doors_detection_long_term.doors_detector.utilities.utils import collate_fn, seed_everything
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import get_final_doors_dataset_epoch_analysis
 
 houses = ['house_1', 'house_2', 'house_7', 'house_9', 'house_10', 'house_13', 'house_15', 'house_20', 'house_21', 'house_22']
@@ -17,6 +17,9 @@ epochs_general_detector = [40, 60]
 epochs_qualified_detector = [20, 40]
 fine_tune_quantity = [15, 25, 50, 75]
 device = 'cuda'
+
+iou_threshold = 0.5
+seed_everything(seed=0)
 
 
 def compute_results(model_name, data_loader_test, COLORS):
@@ -30,11 +33,11 @@ def compute_results(model_name, data_loader_test, COLORS):
     for images, targets in tqdm(data_loader_test, total=len(data_loader_test), desc='Evaluate model'):
         images = images.to(device)
         outputs = model(images)
-        evaluator.add_predictions(targets=targets, predictions=outputs)
-        evaluator_complete_metric.add_predictions(targets=targets, predictions=outputs)
+        evaluator.add_predictions(targets=targets, predictions=outputs, img_size=images.size()[2:][::-1])
+        evaluator_complete_metric.add_predictions(targets=targets, predictions=outputs, img_size=images.size()[2:][::-1])
 
-    metrics = evaluator.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False, colors=COLORS)
-    complete_metrics = evaluator_complete_metric.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False, colors=COLORS)
+    metrics = evaluator.get_metrics(iou_threshold=iou_threshold, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False, colors=COLORS)
+    complete_metrics = evaluator_complete_metric.get_metrics(iou_threshold=iou_threshold, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False, colors=COLORS)
     mAP = 0
     print('Results per bounding box:')
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):

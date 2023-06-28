@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import List, Dict
 
 from src.bounding_box import BoundingBox
-from src.utils.enumerators import BBType, BBFormat
+from src.utils.enumerators import BBType, BBFormat, CoordinatesType
 import torch.nn.functional as F
 
 class ModelEvaluator:
@@ -26,7 +26,7 @@ class ModelEvaluator:
         """
         return self._predicted_bboxes
 
-    def add_predictions(self, targets, predictions):
+    def add_predictions(self, targets, predictions, img_size):
         img_count_temp = self._img_count
 
         for target in targets:
@@ -34,9 +34,11 @@ class ModelEvaluator:
                 self._gt_bboxes.append(BoundingBox(
                     image_name=str(self._img_count),
                     class_id=str(label),
-                    coordinates=(x - w / 2, y - h / 2, w, h),
+                    coordinates=(x, y, w, h),
                     bb_type=BBType.GROUND_TRUTH,
                     format=BBFormat.XYWH,
+                    type_coordinates=CoordinatesType.RELATIVE,
+                    img_size=img_size
                 ))
             self._img_count += 1
 
@@ -45,18 +47,21 @@ class ModelEvaluator:
         scores_images, labels_images = prob[..., :-1].max(-1)
 
         for scores, labels, pred_boxes in zip(scores_images, labels_images, pred_boxes_images):
-            for score, label, [x, y, w, h] in zip(scores, labels, pred_boxes):
+            for score, label, box in zip(scores, labels, pred_boxes):
                 label = label.item()
                 score = score.item()
+                [x, y, w, h] = box.tolist()
                 if label >= 0:
                     self._predicted_bboxes.append(
                         BoundingBox(
                             image_name=str(img_count_temp),
                             class_id=str(label),
-                            coordinates=(x - w / 2, y - h / 2, w, h),
+                            coordinates=(x, y, w, h),
                             bb_type=BBType.DETECTED,
                             format=BBFormat.XYWH,
-                            confidence=score
+                            confidence=score,
+                            type_coordinates=CoordinatesType.RELATIVE,
+                            img_size=img_size
                         )
                     )
             img_count_temp += 1
