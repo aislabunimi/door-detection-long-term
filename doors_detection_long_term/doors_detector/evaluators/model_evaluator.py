@@ -98,7 +98,7 @@ class ModelEvaluator:
                     )
             img_count_temp += 1
 
-    def add_predictions_faster_rcnn(self, targets, predictions, imgs_size):
+    def add_predictions_faster_rcnn(self, targets, predictions, img_size):
         img_count_temp = self._img_count
         #print(targets, predictions)
         for target in targets:
@@ -106,15 +106,16 @@ class ModelEvaluator:
                 self._gt_bboxes.append(BoundingBox(
                     image_name=str(self._img_count),
                     class_id=str(label),
-                    coordinates=(x - w / 2, y - h / 2, w, h),
+                    coordinates=(x, y, w, h),
                     bb_type=BBType.GROUND_TRUTH,
                     format=BBFormat.XYWH,
+                    type_coordinates=CoordinatesType.RELATIVE,
+                    img_size=img_size
                 ))
             self._img_count += 1
 
         for prediction in predictions:
             for [x1, y1, x2, y2], label, score in zip(prediction['boxes'].tolist(), prediction['labels'].tolist(), prediction['scores'].tolist()):
-                x1, y1, x2, y2 = x1 / imgs_size[0], y1 / imgs_size[1], x2 / imgs_size[0], y2 / imgs_size[1]
 
                 if label >= 0:
                     self._predicted_bboxes.append(
