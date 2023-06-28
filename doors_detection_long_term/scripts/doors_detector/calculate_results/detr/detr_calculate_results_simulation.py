@@ -18,7 +18,6 @@ epochs_qualified_detector = [20, 40]
 fine_tune_quantity = [15, 25, 50, 75]
 device = 'cuda'
 
-iou_threshold = 0.5
 seed_everything(seed=0)
 
 
@@ -36,15 +35,12 @@ def compute_results(model_name, data_loader_test, COLORS):
         evaluator.add_predictions(targets=targets, predictions=outputs, img_size=images.size()[2:][::-1])
         evaluator_complete_metric.add_predictions(targets=targets, predictions=outputs, img_size=images.size()[2:][::-1])
 
-    metrics = evaluator.get_metrics(iou_threshold=iou_threshold, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False, colors=COLORS)
-    complete_metrics = evaluator_complete_metric.get_metrics(iou_threshold=iou_threshold, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False, colors=COLORS)
-    mAP = 0
-    print('Results per bounding box:')
-    for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
-        mAP += values['AP']
-        print(f'\tLabel {label} -> AP = {values["AP"]}, Total positives = {values["total_positives"]}, TP = {values["TP"]}, FP = {values["FP"]}')
-        print(f'\t\tPositives = {values["TP"] / values["total_positives"] * 100:.2f}%, False positives = {values["FP"] / (values["TP"] + values["FP"]) * 100:.2f}%')
-    print(f'\tmAP = {mAP / len(metrics["per_bbox"].keys())}')
+    complete_metrics = {}
+    metrics = {}
+    for iou_threshold in np.arange(0.5, 0.96, 0.05):
+        for confidence_threshold in np.arange(0.5, 0.96, 0.05):
+            metrics[(iou_threshold, confidence_threshold)] = evaluator.get_metrics(iou_threshold=iou_threshold, confidence_threshold=confidence_threshold, door_no_door_task=False, plot_curves=False, colors=COLORS)
+            complete_metrics[(iou_threshold, confidence_threshold)] = evaluator_complete_metric.get_metrics(iou_threshold=iou_threshold, confidence_threshold=confidence_threshold, door_no_door_task=False, plot_curves=False, colors=COLORS)
 
     return metrics, complete_metrics
 
@@ -52,7 +48,7 @@ def compute_results(model_name, data_loader_test, COLORS):
 def save_file(results, complete_results, file_name_1, file_name_2):
 
     results = np.array(results).T
-    columns = ['house', 'detector', 'epochs_gd', 'epochs_qd', 'label',  'AP', 'total_positives', 'TP', 'FP']
+    columns = ['iou_threshold', 'confidence_threshold', 'house', 'detector', 'epochs_gd', 'epochs_qd', 'label',  'AP', 'total_positives', 'TP', 'FP']
     d = {}
     for i, column in enumerate(columns):
         d[column] = results[i]
@@ -65,7 +61,7 @@ def save_file(results, complete_results, file_name_1, file_name_2):
         dataframe.to_excel(writer, sheet_name='s')
 
     complete_results = np.array(complete_results).T
-    columns = ['house', 'detector', 'epochs_gd', 'epochs_qd', 'label',  'total_positives', 'TP', 'FP', 'TPm', 'FPm', 'FPiou']
+    columns = ['iou_threshold', 'confidence_threshold', 'house', 'detector', 'epochs_gd', 'epochs_qd', 'label',  'total_positives', 'TP', 'FP', 'TPm', 'FPm', 'FPiou']
     d = {}
     for i, column in enumerate(columns):
         d[column] = complete_results[i]
@@ -92,11 +88,12 @@ for model_name, house, epochs in model_names_general_detectors:
 
     metrics, complete_metrics = compute_results(model_name, data_loader_test, COLORS)
 
-    for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
-        results += [[house.replace('_', ''), 'GD', epochs, epochs, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
-
-    for label, values in sorted(complete_metrics.items(), key=lambda v: v[0]):
-        results_complete += [[house.replace('_', ''), 'GD', epochs, epochs, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
+    for (iou_threshold, confidence_threshold), metric in metrics.items():
+        for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
+            results += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'GD', epochs, epochs, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
+    for (iou_threshold, confidence_threshold), complete_metric in metrics.items():
+        for label, values in sorted(complete_metric.items(), key=lambda v: v[0]):
+            results_complete += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'GD', epochs, epochs, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
 for model_name, house, quantity, epochs_general, epochs_qualified in model_names_qualified_detectors:
     _, _, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name=house.replace('_', ''), train_size=0.25, use_negatives=False)
@@ -104,10 +101,12 @@ for model_name, house, quantity, epochs_general, epochs_qualified in model_names
 
     metrics, complete_metrics = compute_results(model_name, data_loader_test, COLORS)
 
-    for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
-        results += [[house.replace('_', ''), 'QD_' + str(quantity), epochs_general, epochs_qualified, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
+    for (iou_threshold, confidence_threshold), metric in metrics.items():
+        for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
+            results += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'QD_' + str(quantity), epochs_general, epochs_qualified, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
-    for label, values in sorted(complete_metrics.items(), key=lambda v: v[0]):
-        results_complete += [[house.replace('_', ''), 'QD_' + str(quantity), epochs_general, epochs_qualified, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
+    for (iou_threshold, confidence_threshold), complete_metric in metrics.items():
+        for label, values in sorted(complete_metric.items(), key=lambda v: v[0]):
+            results_complete += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'QD_' + str(quantity), epochs_general, epochs_qualified, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
 save_file(results, results_complete, 'detr_ap_simulation.xlsx', 'detr_complete_metric_simulation.xlsx')
