@@ -2,7 +2,7 @@ import torch
 from torch.utils.data import DataLoader
 
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
-from doors_detection_long_term.doors_detector.models.BboxFilterNetwork import BboxFilterNetwork, TEST
+from doors_detection_long_term.doors_detector.models.bbox_filter_network import BboxFilterNetwork, TEST
 from doors_detection_long_term.doors_detector.models.model_names import BBOX_FILTER_NETWORK
 from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_yolov5
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import \
