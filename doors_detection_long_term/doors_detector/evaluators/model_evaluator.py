@@ -66,7 +66,7 @@ class ModelEvaluator:
                     )
             img_count_temp += 1
 
-    def add_predictions_yolo(self, targets, predictions, imgs_size):
+    def add_predictions_yolo(self, targets, predictions, img_size):
         img_count_temp = self._img_count
 
         for target in targets:
@@ -74,16 +74,17 @@ class ModelEvaluator:
                 self._gt_bboxes.append(BoundingBox(
                     image_name=str(self._img_count),
                     class_id=str(label),
-                    coordinates=(x - w / 2, y - h / 2, w, h),
+                    coordinates=(x, y, w, h),
                     bb_type=BBType.GROUND_TRUTH,
                     format=BBFormat.XYWH,
+                    type_coordinates=CoordinatesType.RELATIVE,
+                    img_size=img_size
                 ))
             self._img_count += 1
 
         for boxes in predictions:
-            for x1, y1, x2, y2, score, label in boxes:
-                label, score, = int(label.item()), score.item(),
-                x1, y1, x2, y2 = x1.item() / imgs_size[0], y1.item() / imgs_size[1], x2.item() / imgs_size[0], y2.item() / imgs_size[1]
+            for x1, y1, x2, y2, score, label in boxes.tolist():
+                label = int(label)
                 if label >= 0:
                     self._predicted_bboxes.append(
                         BoundingBox(
