@@ -8,7 +8,7 @@ from doors_detection_long_term.doors_detector.models.faster_rcnn import *
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.models.model_names import FASTER_RCNN
-from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_faster_rcnn
+from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_faster_rcnn, seed_everything
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 houses = ['floor1', 'floor4', ]#'chemistry_floor0']
@@ -18,7 +18,7 @@ epochs_qualified_detector = [20, 40]
 fine_tune_quantity = [15, 25, 50, 75]
 device = 'cuda'
 
-
+seed_everything(seed=0)
 def compute_results(model_name, data_loader_train, data_loader_test, description):
     model = FasterRCNN(model_name=FASTER_RCNN, n_labels=3, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=model_name)
     model.eval()
@@ -32,31 +32,29 @@ def compute_results(model_name, data_loader_train, data_loader_test, description
         for images, targets, converted_boxes in tqdm(data_loader_train, total=len(data_loader_train), desc=description):
             images = images.to(device)
             preds = model.model(images)
-            preds = [apply_nms(pred, iou_thresh=0.45) for pred in preds]
+            preds = [apply_nms(pred, iou_thresh=0.5, confidence_threshold=0.01) for pred in preds]
             for pred in preds:
                 pred['labels'] = pred['labels'] - 1
-            evaluator.add_predictions_faster_rcnn(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
-            evaluator_complete_metric.add_predictions_faster_rcnn(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
+            evaluator.add_predictions_faster_rcnn(targets=targets, predictions=preds, img_size=images.size()[2:][::-1])
+            evaluator_complete_metric.add_predictions_faster_rcnn(targets=targets, predictions=preds, img_size=images.size()[2:][::-1])
 
         for images, targets, converted_boxes in tqdm(data_loader_test, total=len(data_loader_test), desc=description):
             images = images.to(device)
             preds = model.model(images)
-            preds = [apply_nms(pred, iou_thresh=0.45) for pred in preds]
+            preds = [apply_nms(pred, iou_thresh=0.5, confidence_threshold=0.01) for pred in preds]
             for pred in preds:
                 pred['labels'] = pred['labels'] - 1
-            evaluator.add_predictions_faster_rcnn(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
-            evaluator_complete_metric.add_predictions_faster_rcnn(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
+            evaluator.add_predictions_faster_rcnn(targets=targets, predictions=preds, img_size=images.size()[2:][::-1])
+            evaluator_complete_metric.add_predictions_faster_rcnn(targets=targets, predictions=preds, img_size=images.size()[2:][::-1])
 
-    metrics = evaluator.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False)
-    complete_metrics = evaluator_complete_metric.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False)
-
-    mAP = 0
-    print('Results per bounding box:')
-    for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
-        mAP += values['AP']
-        print(f'\tLabel {label} -> AP = {values["AP"]}, Total positives = {values["total_positives"]}, TP = {values["TP"]}, FP = {values["FP"]}')
-        #print(f'\t\tPositives = {values["TP"] / values["total_positives"] * 100:.2f}%, False positives = {values["FP"] / (values["TP"] + values["FP"]) * 100:.2f}%')
-    #print(f'\tmAP = {mAP / len(metrics["per_bbox"].keys())}')
+    complete_metrics = {}
+    metrics = {}
+    for iou_threshold in np.arange(0.5, 0.96, 0.05):
+        for confidence_threshold in np.arange(0.5, 0.96, 0.05):
+            iou_threshold = round(iou_threshold, 2)
+            confidence_threshold = round(confidence_threshold, 2)
+            metrics[(iou_threshold, confidence_threshold)] = evaluator.get_metrics(iou_threshold=iou_threshold, confidence_threshold=confidence_threshold, door_no_door_task=False, plot_curves=False)
+            complete_metrics[(iou_threshold, confidence_threshold)] = evaluator_complete_metric.get_metrics(iou_threshold=iou_threshold, confidence_threshold=confidence_threshold, door_no_door_task=False, plot_curves=False)
 
     return metrics, complete_metrics
 
@@ -64,7 +62,7 @@ def compute_results(model_name, data_loader_train, data_loader_test, description
 def save_file(results, complete_results, file_name_1, file_name_2):
 
     results = np.array(results).T
-    columns = ['house', 'detector', 'dataset', 'epochs_gd', 'epochs_qd', 'label',  'AP', 'total_positives', 'TP', 'FP']
+    columns = ['iou_threshold', 'confidence_threshold', 'house', 'detector', 'dataset', 'epochs_gd', 'epochs_qd', 'label',  'AP', 'total_positives', 'TP', 'FP']
     d = {}
     for i, column in enumerate(columns):
         d[column] = results[i]
@@ -77,7 +75,7 @@ def save_file(results, complete_results, file_name_1, file_name_2):
         dataframe.to_excel(writer, sheet_name='s')
 
     complete_results = np.array(complete_results).T
-    columns = ['house', 'detector', 'dataset', 'epochs_gd', 'epochs_qd', 'label',  'total_positives', 'TP', 'FP', 'TPm', 'FPm', 'FPiou']
+    columns = ['iou_threshold', 'confidence_threshold', 'house', 'detector', 'dataset', 'epochs_gd', 'epochs_qd', 'label',  'total_positives', 'TP', 'FP', 'TPm', 'FPm', 'FPiou']
     d = {}
     for i, column in enumerate(columns):
         d[column] = complete_results[i]
@@ -108,11 +106,13 @@ for model_name, dataset, epochs, in model_names_general_detectors:
 
         metrics, complete_metrics = compute_results(model_name, data_loader_train, data_loader_test, f'Test on {house}, GD trained on {dataset} - Epochs GD: {epochs}')
 
-        for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
-            results += [[house, 'GD', dataset, epochs, epochs, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
+        for (iou_threshold, confidence_threshold), metric in metrics.items():
+            for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
+                results += [[iou_threshold, confidence_threshold, house, 'GD', dataset, epochs, epochs, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
-        for label, values in sorted(complete_metrics.items(), key=lambda v: v[0]):
-            results_complete += [[house.replace('_', ''), 'GD', dataset, epochs, epochs, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
+        for (iou_threshold, confidence_threshold), metric in metrics.items():
+            for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
+                results_complete += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'GD', dataset, epochs, epochs, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
 for model_name, house, dataset, quantity, epochs_general, epochs_qualified in model_names_qualified_detectors:
     train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house + '_evening', train_size=0.75)
@@ -122,9 +122,11 @@ for model_name, house, dataset, quantity, epochs_general, epochs_qualified in mo
 
     metrics, complete_metrics = compute_results(model_name, data_loader_train, data_loader_test, f'{house} - GD trained on {dataset} - Epochs GD: {epochs_general} - Epochs qualified {epochs_qualified} - {quantity}%')
 
-    for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
-        results += [[house, f'QD_{quantity}', dataset, epochs_general, epochs_qualified, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
-    for label, values in sorted(complete_metrics.items(), key=lambda v: v[0]):
-        results_complete += [[house.replace('_', ''), 'QD_' + str(quantity), dataset, epochs_general, epochs_qualified, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
+    for (iou_threshold, confidence_threshold), metric in metrics.items():
+        for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
+            results += [[iou_threshold, confidence_threshold, house, f'QD_{quantity}', dataset, epochs_general, epochs_qualified, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
+    for (iou_threshold, confidence_threshold), metric in metrics.items():
+        for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
+            results_complete += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'QD_' + str(quantity), dataset, epochs_general, epochs_qualified, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
 save_file(results, results_complete, 'faster_rcnn_ap_real_data_different_conditions.xlsx', 'faster_rcnn_complete_metric_real_data_different_conditions.xlsx')
