@@ -37,7 +37,7 @@ def compute_results(model_name, data_loader_test, COLORS, description):
                                         0.01,
                                         0.5,
 
-                                        multi_label=True,
+                                        multi_label=False,
                                         agnostic=True,
                                         max_det=300)
 
