@@ -11,7 +11,7 @@ houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 houses = houses.loc[(houses['dataset'] == 'GIBSON') & (houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60))]
 
-labels = ['$GD_{-e}$', '$QD^{25}_e$', '$QD^{50}_e$', '$QD^{75}_e$']
+labels = ['$GD$', '$QD^{25}_e$', '$QD^{50}_e$', '$QD^{75}_e$']
 experiments = ['GD', 'QD_25', 'QD_50', 'QD_75']
 
 houses_list_dtype = CategoricalDtype(
@@ -79,7 +79,7 @@ for i in range(len(keys) -1):
 
 table = ''
 for i in range(4):
-    table += '\multicolumn{1}{c|}{\multirow{2}{*}{' + labels[i] + '}} & Closed '
+    table += '\multirow{2}{*}{' + labels[i] + '} & Closed '
 
     for c, (d, inc) in enumerate(zip([closed_doors_detr_dd2, closed_doors_detr_our], [increments_detr_dd2, increments_detr_our])):
         table += '& ' + str(int(np.rint(d.mean())[i])) + ' & ' + str(int(np.rint(d.std())[i])) + ' & '
@@ -90,7 +90,7 @@ for i in range(4):
 
     table += '\\tabularnewline \n'
 
-    table += '\multicolumn{1}{c|}{} & Open  '
+    table += ' & Open  '
 
     for c, (d, inc) in enumerate(zip([open_doors_faster_detr_dd2, open_doors_faster_detr_out], [increments_detr_dd2, increments_detr_our])):
         table += '& ' + str(int(np.rint(d.mean())[i])) + ' & ' + str(int(np.rint(d.std())[i])) + ' & '
