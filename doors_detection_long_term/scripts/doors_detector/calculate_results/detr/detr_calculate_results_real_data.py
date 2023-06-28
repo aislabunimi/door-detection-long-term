@@ -33,8 +33,8 @@ def compute_results(model_name, data_loader_test, COLORS):
     for images, targets in tqdm(data_loader_test, total=len(data_loader_test), desc='Evaluate model'):
         images = images.to(device)
         outputs = model(images)
-        evaluator.add_predictions(targets=targets, predictions=outputs)
-        evaluator_complete_metric.add_predictions(targets=targets, predictions=outputs)
+        evaluator.add_predictions(targets=targets, predictions=outputs, img_size=images.size()[2:][::-1])
+        evaluator_complete_metric.add_predictions(targets=targets, predictions=outputs, img_size=images.size()[2:][::-1])
 
     complete_metrics = {}
     metrics = {}
