@@ -39,6 +39,8 @@ def compute_results(model_name, data_loader_test, COLORS):
     metrics = {}
     for iou_threshold in np.arange(0.5, 0.96, 0.05):
         for confidence_threshold in np.arange(0.5, 0.96, 0.05):
+            iou_threshold = round(iou_threshold, 2)
+            confidence_threshold = round(confidence_threshold, 2)
             metrics[(iou_threshold, confidence_threshold)] = evaluator.get_metrics(iou_threshold=iou_threshold, confidence_threshold=confidence_threshold, door_no_door_task=False, plot_curves=False, colors=COLORS)
             complete_metrics[(iou_threshold, confidence_threshold)] = evaluator_complete_metric.get_metrics(iou_threshold=iou_threshold, confidence_threshold=confidence_threshold, door_no_door_task=False, plot_curves=False, colors=COLORS)
 
@@ -91,7 +93,7 @@ for model_name, house, epochs in model_names_general_detectors:
     for (iou_threshold, confidence_threshold), metric in metrics.items():
         for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
             results += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'GD', epochs, epochs, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
-    for (iou_threshold, confidence_threshold), complete_metric in metrics.items():
+    for (iou_threshold, confidence_threshold), complete_metric in complete_metrics.items():
         for label, values in sorted(complete_metric.items(), key=lambda v: v[0]):
             results_complete += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'GD', epochs, epochs, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
@@ -105,7 +107,7 @@ for model_name, house, quantity, epochs_general, epochs_qualified in model_names
         for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
             results += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'QD_' + str(quantity), epochs_general, epochs_qualified, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
-    for (iou_threshold, confidence_threshold), complete_metric in metrics.items():
+    for (iou_threshold, confidence_threshold), complete_metric in complete_metrics.items():
         for label, values in sorted(complete_metric.items(), key=lambda v: v[0]):
             results_complete += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'QD_' + str(quantity), epochs_general, epochs_qualified, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
