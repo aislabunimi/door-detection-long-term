@@ -110,8 +110,8 @@ for model_name, dataset, epochs, in model_names_general_detectors:
             for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
                 results += [[iou_threshold, confidence_threshold, house, 'GD', dataset, epochs, epochs, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
-        for (iou_threshold, confidence_threshold), metric in metrics.items():
-            for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
+        for (iou_threshold, confidence_threshold), complete_metric in complete_metrics.items():
+            for label, values in sorted(complete_metric.items(), key=lambda v: v[0]):
                 results_complete += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'GD', dataset, epochs, epochs, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
 for model_name, house, dataset, quantity, epochs_general, epochs_qualified in model_names_qualified_detectors:
@@ -125,8 +125,8 @@ for model_name, house, dataset, quantity, epochs_general, epochs_qualified in mo
     for (iou_threshold, confidence_threshold), metric in metrics.items():
         for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
             results += [[iou_threshold, confidence_threshold, house, f'QD_{quantity}', dataset, epochs_general, epochs_qualified, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
-    for (iou_threshold, confidence_threshold), metric in metrics.items():
-        for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
+    for (iou_threshold, confidence_threshold), complete_metric in complete_metrics.items():
+        for label, values in sorted(complete_metric.items(), key=lambda v: v[0]):
             results_complete += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'QD_' + str(quantity), dataset, epochs_general, epochs_qualified, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
 save_file(results, results_complete, 'faster_rcnn_ap_real_data_different_conditions.xlsx', 'faster_rcnn_complete_metric_real_data_different_conditions.xlsx')
