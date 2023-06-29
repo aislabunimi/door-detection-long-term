@@ -3,11 +3,13 @@ import pandas as pd
 from matplotlib import pyplot as plt, font_manager
 from matplotlib.pyplot import subplots
 from pandas import CategoricalDtype
-
+iou_threshold = 0.5
+confidence_threshold = 0.75
 houses = pd.read_excel('./../../results/faster_rcnn_ap_real_data.xlsx')
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
-houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60))]
+houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
+                    (houses['iou_threshold'] == iou_threshold) & (houses['confidence_threshold'] == confidence_threshold)]
 houses = houses.loc[houses['dataset'] == 'gibson']
 
 labels = ['$GD_{-e}$', '$QD^{15}_e$', '$QD^{25}_e$', '$QD^{50}_e$', '$QD^{75}_e$']
@@ -46,8 +48,8 @@ for i in range(len(keys) -1):
 houses = pd.read_excel('./../../results/yolov5_ap_real_data.xlsx')
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
-houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60))]
-houses = houses.loc[houses['dataset'] == 'gibson']
+houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
+                    (houses['iou_threshold'] == iou_threshold) & (houses['confidence_threshold'] == confidence_threshold)]
 labels = ['$GD_{-e}$', '$QD^{15}_e$', '$QD^{25}_e$', '$QD^{50}_e$', '$QD^{75}_e$']
 experiments = ['GD', 'QD_15', 'QD_25', 'QD_50', 'QD_75']
 
@@ -83,7 +85,8 @@ for i in range(len(keys) -1):
 houses = pd.read_excel('./../../results/detr_ap_real_data.xlsx')
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
-houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60))]
+houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
+                    (houses['iou_threshold'] == iou_threshold) & (houses['confidence_threshold'] == confidence_threshold)]
 houses = houses.loc[houses['dataset'] == 'gibson'.upper()]
 labels = ['$GD_{-e}$', '$QD^{15}_e$', '$QD^{25}_e$', '$QD^{50}_e$', '$QD^{75}_e$']
 experiments = ['GD', 'QD_15', 'QD_25', 'QD_50', 'QD_75']
