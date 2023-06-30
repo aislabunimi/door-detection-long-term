@@ -20,7 +20,6 @@ def box_cxcywh_to_xyxy(x):
          (x_c + 0.5 * w), (y_c + 0.5 * h)]
     return torch.stack(b, dim=-1)
 
-
 def collate_fn(batch_data):
     # Batch data is a list of n tuple, where tuple[0] is the img while tuple[1] are targets (labels, bounding boxes ecc)
     # Batch data is transformed in a list where list[0] contains a list of the images and list[1] contains a list of targets
@@ -119,3 +118,26 @@ def collate_fn_faster_rcnn(batch):
         new_targets.append(t)
 
     return images, targets, new_targets
+
+def collate_fn_bboxes(batch_data):
+    images, targets = collate_fn(batch_data)
+
+    batch_size_width, batch_size_height = images.size()[2], images.size()[3]
+
+    converted_boxes = []
+    for i, target in enumerate(targets):
+        real_size_width, real_size_height = target['size'][1], target['size'][0]
+        scale_boxes = torch.tensor([[real_size_width / batch_size_width, real_size_height / batch_size_height,
+                                     real_size_width / batch_size_width, real_size_height / batch_size_height]])
+        target['boxes'] = target['boxes'] * scale_boxes
+        converted_boxes.append(torch.cat([
+            target['boxes'],
+            target['confidences'].unsqueeze(1),
+            target['labels_encoded']
+            ], dim=1))
+    converted_boxes = torch.stack(converted_boxes, dim=0)
+    filtered = torch.stack([t['filtered'] for t in targets], dim=0)
+
+    return images, targets, converted_boxes, filtered
+
+

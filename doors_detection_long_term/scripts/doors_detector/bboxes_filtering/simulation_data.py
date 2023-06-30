@@ -8,7 +8,7 @@ from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
-from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_yolov5
+from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_yolov5, collate_fn_bboxes
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 num_bboxes = 15
@@ -43,7 +43,26 @@ with torch.no_grad():
         dataset_creator_bboxes.add_yolo_bboxes(images, targets, preds, Type.TRAINING)
 
 
-dataset_creator_bboxes.filter_bboxes(iou_threshold=0.5, filter_multiple_detection=False, consider_label=False)
-dataset_creator_bboxes.visualize_bboxes(show_filtered=True)
+dataset_creator_bboxes.filter_bboxes(iou_threshold=0.75, filter_multiple_detection=False, consider_label=False)
+#dataset_creator_bboxes.visualize_bboxes(show_filtered=True)
+
+train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets()
+
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes, num_workers=4)
+
+for data in train_dataset_bboxes:
+    images, targets, converted_boxes, filtered = data
+    print(images.size())
+    print(converted_boxes.size())
+    print(filtered.size())
+    for image in images:
+        target_image = image.to('cpu')
+        target_image = target_image * torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
+        target_image = target_image + torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
+        target_image = cv2.cvtColor(np.transpose(np.array(target_image), (1, 2, 0)), cv2.COLOR_RGB2BGR)
+
+        cv2.imshow('show', target_image)
+        cv2.waitKey()
+
 
 
