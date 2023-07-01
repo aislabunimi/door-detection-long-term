@@ -25,22 +25,37 @@ BOUNDING_BOX_DATASET: DATASET = 'bounding_box_dataset'
 
 
 class TorchDatasetBBoxes(Dataset):
-    def __init__(self, bboxes_dict: dict, num_boxes: int):
+    def __init__(self, bboxes_dict: dict, num_boxes: int, set_type: SET):
 
         self._bboxes_dict = bboxes_dict
         self._num_boxes = num_boxes
+        scales = [256 + i * 32 for i in range(11)]
 
-        self._transform = T.Compose([
-            #T.RandomResize([std_size], max_size=max_size),
-            T.ToTensor(),
-            T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-        ])
+        if set_type == TEST_SET:
+            self._transform = T.Compose([
+                #T.RandomResize([std_size], max_size=max_size),
+                T.ToTensor(),
+                T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            ])
+        else:
+
+            self._transform = T.Compose([
+                T.RandomSelect(
+                    T.Identity(),
+                    T.Compose([
+                        T.RandomHorizontalFlip(),
+                        T.RandomResize(scales, max_size=800),
+                    ])
+                ),
+                T.ToTensor(),
+                T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            ])
 
     def __len__(self):
         return len(self._bboxes_dict['images'])
 
     def __getitem__(self, idx):
-        image, bboxes, filtered = self._bboxes_dict['images'][idx], self._bboxes_dict['bboxes'][idx], self._bboxes_dict['filtered'][idx]
+        image, bboxes, filtered, gt_bboxes = self._bboxes_dict['images'][idx], self._bboxes_dict['bboxes'][idx], self._bboxes_dict['filtered'][idx], self._bboxes_dict['gt_bboxes'][idx]
 
         target = {}
         (h, w, _) = image.shape
@@ -60,8 +75,6 @@ class TorchDatasetBBoxes(Dataset):
             confidences.append(box.get_confidence())
             labels_encoded.append([0 if i != label else 1 for i in range(2)]) # 2 is the number of label
 
-        print(boxes)
-
         target['boxes'] = torch.tensor(boxes, dtype=torch.float)
         target['labels_encoded'] = torch.tensor(labels_encoded, dtype=torch.float)
         target['confidences'] = torch.tensor(confidences, dtype=torch.float)
@@ -70,7 +83,7 @@ class TorchDatasetBBoxes(Dataset):
         # The BGR image is convert in RGB
         image = (image * 255).astype(np.uint8)
         img, target = self._transform(Image.fromarray(image[..., [2, 1, 0]]), target)
-
+        target['gt_bboxes'] = gt_bboxes
         return img, target
 
 

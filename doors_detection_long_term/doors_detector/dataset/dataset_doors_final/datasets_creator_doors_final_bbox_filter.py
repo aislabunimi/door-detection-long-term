@@ -23,18 +23,19 @@ class DatasetsCreatorDoorsFinalBBoxFilter:
         return DOOR_LABELS
 
     def use_negatives(self, use_negatives: bool) -> 'DatasetsCreatorDoorsFinalBBoxFilter':
-        """
-        Sets the presence of the negative samples in the test set.
-        :param use_negatives: True for including the negatives samples (samples with no doors) in the test set, False to use only positives ones
-        :return: the instance of DatasetsDoorsF
-        """
+
         self._use_negatives = use_negatives
         return self
 
     def create_datasets(self, folder_name: str, train_size_student: float, random_state: int = 42) -> Tuple[DatasetDoorsFinal, DatasetDoorsFinal, DatasetDoorsFinal, DatasetDoorsFinal]:
         """
-        This method returns the training and test sets.
-        :param train_size: the size of the training set in experiment 2. For the first experiment this parameter is not considered, all samples of folders k-1 are considered.
+        The methods returns the following datasets:
+        - train_student: the dataset used to train the student. For the general detectors are all the examples in the other environments
+                        in case of a qualified detectors, it contains the examples used for fine-tuning it
+        - validation_student: the dataset to validate the model (it contains only a few examples from the dataset of other environments)
+        - unlabelled_bbox_filter: contains all the example from the target evironments that are not been used to train the qualified detectors
+                                    all the 75% in case of the GD, otherwise the difference between the 75% and the train student_dataset
+        - test_set: contains the last 25% examples of the target environment, always used for testing
         """
         if isinstance(train_size_student, float):
             assert train_size_student == .0 or train_size_student == 0.15 or train_size_student == 0.25 or train_size_student == 0.5 or train_size_student == 0.75

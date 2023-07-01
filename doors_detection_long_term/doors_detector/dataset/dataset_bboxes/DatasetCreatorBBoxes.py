@@ -7,7 +7,7 @@ from src.bounding_box import BoundingBox
 from src.utils.enumerators import BBType, BBFormat, CoordinatesType
 from sklearn.utils import shuffle
 
-from doors_detection_long_term.doors_detector.dataset.torch_dataset import TorchDatasetBBoxes
+from doors_detection_long_term.doors_detector.dataset.torch_dataset import TorchDatasetBBoxes, TRAIN_SET, TEST_SET
 
 
 class Type(Enum):
@@ -103,10 +103,11 @@ class DatasetsCreatorBBoxes:
         bboxes_dict_converted = {
             'images': [],
             'bboxes': [],
-            'filtered': []
+            'filtered': [],
+            'gt_bboxes': []
         }
 
-        for count, (image, detected_boxes, filtered) in enumerate(zip(bboxes_dict['images'], bboxes_dict['bboxes'], bboxes_dict['filtered'])):
+        for count, (image, detected_boxes, filtered, gt_bboxes) in enumerate(zip(bboxes_dict['images'], bboxes_dict['bboxes'], bboxes_dict['filtered'], bboxes_dict['gt_bboxes'])):
 
             # If the example do not have valid bboxes, it is discarded
             if 1 not in filtered:
@@ -130,23 +131,27 @@ class DatasetsCreatorBBoxes:
             bboxes_dict_converted['images'].append(image)
             bboxes_dict_converted['filtered'].append(filtered)
             bboxes_dict_converted['bboxes'].append(detected_boxes)
+            bboxes_dict_converted['gt_bboxes'].append(gt_bboxes)
         return bboxes_dict_converted
 
     def _shuffle_bboxes_in_images(self, bboxes_dict, num_shuffles):
         bboxes_dict_converted = {
             'images': [],
             'bboxes': [],
-            'filtered': []
+            'filtered': [],
+            'gt_bboxes': []
         }
-        for image, detected_boxes, filtered in zip(bboxes_dict['images'], bboxes_dict['bboxes'], bboxes_dict['filtered']):
+        for image, detected_boxes, filtered, gt_bboxes in zip(bboxes_dict['images'], bboxes_dict['bboxes'], bboxes_dict['filtered'],bboxes_dict['gt_bboxes']):
             bboxes_dict_converted['images'].append(image)
             bboxes_dict_converted['bboxes'].append(detected_boxes)
             bboxes_dict_converted['filtered'].append(filtered)
+            bboxes_dict_converted['gt_bboxes'].append(gt_bboxes)
             for i in range(num_shuffles):
                 bboxes_dict_converted['images'].append(image)
                 new_detected_boxes, new_filtered = shuffle(detected_boxes, filtered, random_state=i)
                 bboxes_dict_converted['bboxes'].append(new_detected_boxes)
                 bboxes_dict_converted['filtered'].append(new_filtered)
+                bboxes_dict_converted['gt_bboxes'].append(gt_bboxes)
         return bboxes_dict_converted
 
 
@@ -156,30 +161,34 @@ class DatasetsCreatorBBoxes:
         bboxes_dict_train = self._shuffle_bboxes_in_images(bboxes_dict_train, num_shuffles=self._num_bboxes)
         bboxes_dict_test = self._filter_images_no_boxes(self._test_bboxes)
 
-        images, bboxes, filtered = shuffle(bboxes_dict_train['images'],
+        images, bboxes, filtered, gt_bboxes = shuffle(bboxes_dict_train['images'],
                                            bboxes_dict_train['bboxes'],
                                            bboxes_dict_train['filtered'],
+                                           bboxes_dict_train['gt_bboxes'],
                                            random_state=random_state)
 
         bboxes_dict_train = {
             'images': images,
             'bboxes': bboxes,
-            'filtered': filtered
+            'filtered': filtered,
+            'gt_bboxes': gt_bboxes
         }
 
-        images, bboxes, filtered = shuffle(bboxes_dict_test['images'],
+        images, bboxes, filtered, gt_bboxes = shuffle(bboxes_dict_test['images'],
                                            bboxes_dict_test['bboxes'],
                                            bboxes_dict_test['filtered'],
+                                           bboxes_dict_test['gt_bboxes'],
                                            random_state=random_state)
 
         bboxes_dict_test = {
             'images': images,
             'bboxes': bboxes,
-            'filtered': filtered
+            'filtered': filtered,
+            'gt_bboxes': gt_bboxes
         }
 
-        return (TorchDatasetBBoxes(bboxes_dict=bboxes_dict_train, num_boxes=self._num_bboxes),
-                TorchDatasetBBoxes(bboxes_dict=bboxes_dict_test, num_boxes=self._num_bboxes))
+        return (TorchDatasetBBoxes(bboxes_dict=bboxes_dict_train, num_boxes=self._num_bboxes, set_type=TRAIN_SET),
+                TorchDatasetBBoxes(bboxes_dict=bboxes_dict_test, num_boxes=self._num_bboxes, set_type=TEST_SET))
 
 
     def add_yolo_bboxes(self, images, targets, preds, bboxes_type: Type):

@@ -120,6 +120,13 @@ def collate_fn_faster_rcnn(batch):
     return images, targets, new_targets
 
 def collate_fn_bboxes(batch_data):
+    """
+    The bounding boxes come encoded as [cx, cy, w, h]
+    Targets is a list of dictionaries, each of them contains the boxes, confidences and labels (encoded in 0,1 vector) of the relative image
+    Converted_bbxes contains a list of lists of bboxes encoded as [cx, cy, w, h]
+    :param batch_data:
+    :return:
+    """
     images, targets = collate_fn(batch_data)
 
     batch_size_width, batch_size_height = images.size()[2], images.size()[3]
@@ -136,6 +143,7 @@ def collate_fn_bboxes(batch_data):
             target['labels_encoded']
             ], dim=1))
     converted_boxes = torch.stack(converted_boxes, dim=0)
+
     filtered = torch.stack([t['filtered'] for t in targets], dim=0)
 
     return images, targets, converted_boxes, filtered
