@@ -1,3 +1,5 @@
+import os
+
 import torch
 import torchvision.models
 from torch import nn
@@ -6,7 +8,7 @@ from torch.nn import Identity, AdaptiveAvgPool2d
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import DATASET
 from doors_detection_long_term.doors_detector.models.generic_model import GenericModel, DESCRIPTION
 from doors_detection_long_term.doors_detector.models.model_names import ModelName
-
+from doors_detection_long_term.scripts.doors_detector.dataset_configurator import trained_models_path
 
 TEST: DESCRIPTION = 0
 class BboxFilterNetwork(GenericModel):
@@ -73,6 +75,15 @@ class BboxFilterNetwork(GenericModel):
             nn.AdaptiveAvgPool1d(1),
             nn.Sigmoid()
         )
+
+        if pretrained:
+            if pretrained:
+                path = os.path.join('train_params', self._model_name + '_' + str(self._description), str(self._dataset_name))
+            if trained_models_path == "":
+                path = os.path.join(os.path.dirname(__file__), path)
+            else:
+                path = os.path.join(trained_models_path, path)
+            self.load_state_dict(torch.load(os.path.join(path, 'model.pth'), map_location=torch.device('cpu')))
 
     def forward(self, images, boxes):
         x = self.backbone(images)
