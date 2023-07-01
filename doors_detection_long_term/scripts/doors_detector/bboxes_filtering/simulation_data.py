@@ -138,19 +138,19 @@ def check_bbox_dataset(dataset):
         cv2.imshow('show', new_image)
         cv2.waitKey()
 
-check_bbox_dataset(train_dataset_bboxes)
+#check_bbox_dataset(train_dataset_bboxes)
 bbox_model = BboxFilterNetwork(num_bboxes=num_bboxes, model_name=BBOX_FILTER_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST)
 bbox_model.to('cuda')
 
-criterion = torch.nn.MultiLabelSoftMarginLoss()
+criterion = torch.nn.MSELoss()
 print(bbox_model.parameters())
-optimizer = torch.optim.Adam(bbox_model.parameters(), lr=0.01)
+optimizer = torch.optim.SGD(bbox_model.parameters(), lr=0.01)
 criterion.to('cuda')
 #for n, p in bbox_model.named_parameters():
 #    if p.requires_grad:
 #        print(n)
 
-losses = {'train': []}
+losses = {'train': [], 'test': []}
 for epoch in range(20):
     model.train()
     optimizer.zero_grad()
@@ -163,14 +163,14 @@ for epoch in range(20):
         filtered = filtered.to('cuda')
 
         preds = bbox_model(images, converted_boxes)
-
+        #print(preds, filtered)
         loss = criterion(preds, filtered)
         temp_losses.append(loss.item())
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
     losses['train'].append(sum(temp_losses) / len(temp_losses))
-    print(losses)
+    print(losses['train'], losses['test'])
 
 
 

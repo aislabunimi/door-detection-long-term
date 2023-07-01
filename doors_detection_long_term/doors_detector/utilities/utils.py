@@ -144,7 +144,7 @@ def collate_fn_bboxes(batch_data):
             ], dim=1))
     converted_boxes = torch.stack(converted_boxes, dim=0)
 
-    filtered = torch.stack([t['filtered'] for t in targets], dim=0)
+    filtered = torch.stack([t['filtered'] for t in targets], dim=0).type(torch.FloatTensor)
 
     return images, targets, converted_boxes, filtered
 
