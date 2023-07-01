@@ -27,7 +27,10 @@ class GenericModel(nn.Module):
         if not os.path.exists(path):
             os.makedirs(path)
 
-        torch.save(self.model.state_dict(), os.path.join(path, 'model.pth'))
+        try:
+            torch.save(self.model.state_dict(), os.path.join(path, 'model.pth'))
+        except AttributeError:
+            torch.save(self.state_dict(), os.path.join(path, 'model.pth'))
         torch.save(
             {
                 'optimizer_state_dict': optimizer_state_dict,

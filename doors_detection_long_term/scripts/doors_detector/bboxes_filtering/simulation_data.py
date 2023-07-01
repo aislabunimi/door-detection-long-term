@@ -32,7 +32,7 @@ model = YOLOv5Model(model_name=YOLOv5, n_labels=len(labels.keys()), pretrained=T
 
 model.to('cuda')
 model.model.eval()
-ap_metric_classic = {0: 0, 1:0}
+ap_metric_classic = {0: 0, 1: 0}
 complete_metric_classic = {'TP': 0, 'FP': 0, 'BFD': 0}
 with torch.no_grad():
     for images, targets, converted_boxes in tqdm(data_loader_unlabelled, total=len(data_loader_unlabelled)):
@@ -83,7 +83,7 @@ with torch.no_grad():
     metrics = evaluator.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False)
     complete_metrics = evaluator_complete_metric.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False)
     for label, values in sorted(metrics['per_bbox'].items(), key=lambda v: v[0]):
-        ap_metric_classic[label] = values['AP']
+        ap_metric_classic[int(label)] = values['AP']
 
     total_positives = 0
     for label, values in sorted(complete_metrics.items(), key=lambda v: v[0]):
@@ -144,15 +144,17 @@ bbox_model.to('cuda')
 
 criterion = torch.nn.MSELoss()
 print(bbox_model.parameters())
-optimizer = torch.optim.SGD(bbox_model.parameters(), lr=0.1, momentum=0.9)
+optimizer = torch.optim.SGD(bbox_model.parameters(), lr=0.01)
 criterion.to('cuda')
 #for n, p in bbox_model.named_parameters():
 #    if p.requires_grad:
 #        print(n)
 
-losses = {'train': [], 'test': []}
+logs = {'train': [], 'test': [], 'ap': {0: [], 1: []}, 'complete_metric': {'TP': [], 'FP': [], 'BFD': []}}
+
 for epoch in range(20):
-    model.train()
+    bbox_model.train()
+    criterion.train()
     optimizer.zero_grad()
 
     temp_losses = []
@@ -169,12 +171,15 @@ for epoch in range(20):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-    losses['train'].append(sum(temp_losses) / len(temp_losses))
-    losses = []
+    logs['train'].append(sum(temp_losses) / len(temp_losses))
 
-    model.eval()
+    temp_losses = []
+
+
     with torch.no_grad():
-        for data in tqdm(test_dataset_bboxes, total=len(train_dataset_bboxes), desc=f'Training epoch {epoch}'):
+        bbox_model.eval()
+        criterion.eval()
+        for data in tqdm(test_dataset_bboxes, total=len(test_dataset_bboxes), desc=f'TEST epoch {epoch}'):
             images, targets, converted_boxes, filtered = data
             images = images.to('cuda')
             converted_boxes = converted_boxes.to('cuda')
@@ -185,8 +190,10 @@ for epoch in range(20):
             loss = criterion(preds, filtered)
             temp_losses.append(loss.item())
 
-    losses['test'].append(sum(temp_losses) / len(temp_losses))
-    print(losses['train'], losses['test'])
+    logs['test'].append(sum(temp_losses) / len(temp_losses))
+    print(logs['train'], logs['test'])
+    bbox_model.save(epoch=epoch, optimizer_state_dict=optimizer.state_dict(), params={}, logs=logs, lr_scheduler_state_dict={})
+
 
 
 
