@@ -144,7 +144,7 @@ bbox_model.to('cuda')
 
 criterion = torch.nn.MSELoss()
 print(bbox_model.parameters())
-optimizer = torch.optim.SGD(bbox_model.parameters(), lr=0.01)
+optimizer = torch.optim.SGD(bbox_model.parameters(), lr=0.1, momentum=0.9)
 criterion.to('cuda')
 #for n, p in bbox_model.named_parameters():
 #    if p.requires_grad:
@@ -170,6 +170,22 @@ for epoch in range(20):
         loss.backward()
         optimizer.step()
     losses['train'].append(sum(temp_losses) / len(temp_losses))
+    losses = []
+
+    model.eval()
+    with torch.no_grad():
+        for data in tqdm(test_dataset_bboxes, total=len(train_dataset_bboxes), desc=f'Training epoch {epoch}'):
+            images, targets, converted_boxes, filtered = data
+            images = images.to('cuda')
+            converted_boxes = converted_boxes.to('cuda')
+            filtered = filtered.to('cuda')
+
+            preds = bbox_model(images, converted_boxes)
+            #print(preds, filtered)
+            loss = criterion(preds, filtered)
+            temp_losses.append(loss.item())
+
+    losses['test'].append(sum(temp_losses) / len(temp_losses))
     print(losses['train'], losses['test'])
 
 
