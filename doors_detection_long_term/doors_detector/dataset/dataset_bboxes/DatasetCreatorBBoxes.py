@@ -155,10 +155,10 @@ class DatasetsCreatorBBoxes:
         return bboxes_dict_converted
 
 
-    def create_datasets(self, random_state: int = 42):
+    def create_datasets(self, num_shuffles:int =10, random_state: int = 42):
 
         bboxes_dict_train = self._filter_images_no_boxes(self._training_bboxes)
-        bboxes_dict_train = self._shuffle_bboxes_in_images(bboxes_dict_train, num_shuffles=5)
+        bboxes_dict_train = self._shuffle_bboxes_in_images(bboxes_dict_train, num_shuffles=num_shuffles)
         bboxes_dict_test = self._filter_images_no_boxes(self._test_bboxes)
 
         images, bboxes, filtered, gt_bboxes = shuffle(bboxes_dict_train['images'],

@@ -8,7 +8,7 @@ from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCrea
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
-from doors_detection_long_term.doors_detector.models.bbox_filter_network import BboxFilterNetwork
+from doors_detection_long_term.doors_detector.models.bbox_filter_network import BboxFilterNetwork, BboxFilterNetworkLoss
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, BBOX_FILTER_NETWORK
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
@@ -100,7 +100,7 @@ print(ap_metric_classic, complete_metric_classic)
 dataset_creator_bboxes.filter_bboxes(iou_threshold=0.75, filter_multiple_detection=False, consider_label=False)
 #dataset_creator_bboxes.visualize_bboxes(show_filtered=True)
 
-train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets()
+train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(num_shulles=10)
 
 train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes, num_workers=4)
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes, num_workers=4)
@@ -144,7 +144,7 @@ check_bbox_dataset(test_dataset_bboxes)
 bbox_model = BboxFilterNetwork(num_bboxes=num_bboxes, model_name=BBOX_FILTER_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST)
 bbox_model.to('cuda')
 
-criterion = torch.nn.MSELoss()
+criterion = BboxFilterNetworkLoss(reduction_image='sum', reduction_global='mean')
 print(bbox_model.parameters())
 optimizer = torch.optim.SGD(bbox_model.parameters(), lr=0.01)
 criterion.to('cuda')

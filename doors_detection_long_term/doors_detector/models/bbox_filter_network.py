@@ -98,3 +98,31 @@ class BboxFilterNetwork(GenericModel):
         x = self.conv5(x)
         x = self.output_layer(x).squeeze(2)
         return x
+
+class BboxFilterNetworkLoss(nn.Module):
+
+    def __init__(self, weight=1.0, reduction_image='sum', reduction_global='mean'):
+        super(BboxFilterNetworkLoss, self).__init__()
+        self._weight = weight
+        if not (reduction_image == 'sum' or reduction_image == 'mean'):
+            raise Exception('Parameter "reduction_image" must be mean|sum')
+        if not (reduction_global == 'sum' or reduction_global == 'mean'):
+            raise Exception('Parameter "reduction_global" must be mean|sum')
+        self._reduction_image = reduction_image
+        self._reduction_global = reduction_global
+
+    def forward(self, preds, targets):
+        temp = -self._weight * (targets * torch.log(preds) + (1.0 - targets) * torch.log(1.0 - preds))
+
+
+        if self._reduction_image == 'mean':
+            reduction_on_image = torch.mean(temp, dim=1)
+        elif self._reduction_image == 'sum':
+            reduction_on_image = torch.sum(temp, dim=1)
+
+
+        if self._reduction_global == 'mean':
+            return torch.mean(reduction_on_image)
+        elif self._reduction_global == 'sum':
+            return torch.sum(reduction_on_image)
+
