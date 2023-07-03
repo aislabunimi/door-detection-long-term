@@ -100,7 +100,7 @@ print(ap_metric_classic, complete_metric_classic)
 dataset_creator_bboxes.filter_bboxes(iou_threshold=0.75, filter_multiple_detection=False, consider_label=False)
 #dataset_creator_bboxes.visualize_bboxes(show_filtered=True)
 
-train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(num_shulles=10)
+train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(num_shuffles=10)
 
 train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes, num_workers=4)
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes, num_workers=4)
