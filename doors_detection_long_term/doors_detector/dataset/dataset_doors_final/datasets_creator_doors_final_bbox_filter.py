@@ -29,7 +29,7 @@ class DatasetsCreatorDoorsFinalBBoxFilter:
 
     def create_datasets(self, folder_name: str, train_size_student: float, random_state: int = 42) -> Tuple[DatasetDoorsFinal, DatasetDoorsFinal, DatasetDoorsFinal, DatasetDoorsFinal]:
         """
-        The methods returns the following datasets:
+        The method returns the following datasets:
         - train_student: the dataset used to train the student. For the general detectors are all the examples in the other environments
                         in case of a qualified detectors, it contains the examples used for fine-tuning it
         - validation_student: the dataset to validate the model (it contains only a few examples from the dataset of other environments)

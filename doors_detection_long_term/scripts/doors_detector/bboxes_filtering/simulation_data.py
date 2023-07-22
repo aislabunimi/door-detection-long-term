@@ -16,7 +16,7 @@ from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-num_bboxes = 15
+num_bboxes = 50
 
 dataset_creator_bboxes = DatasetsCreatorBBoxes(num_bboxes=num_bboxes)
 
@@ -38,27 +38,12 @@ with torch.no_grad():
     for images, targets, converted_boxes in tqdm(data_loader_unlabelled, total=len(data_loader_unlabelled)):
         images = images.to('cuda')
         preds, train_out = model.model(images)
-        preds = non_max_suppression(preds,
-                                    0.01,
-                                    0.90,
-
-                                    multi_label=True,
-                                    agnostic=True,
-                                    max_det=num_bboxes)
-
 
         dataset_creator_bboxes.add_yolo_bboxes(images, targets, preds, Type.TRAINING)
 
     for images, targets, converted_boxes in tqdm(data_loader_test, total=len(data_loader_test)):
         images = images.to('cuda')
         preds, train_out = model.model(images)
-        preds = non_max_suppression(preds,
-                                    0.01,
-                                    0.90,
-
-                                    multi_label=True,
-                                    agnostic=True,
-                                    max_det=num_bboxes)
 
 
         dataset_creator_bboxes.add_yolo_bboxes(images, targets, preds, Type.TEST)
@@ -97,8 +82,8 @@ with torch.no_grad():
 
 print(ap_metric_classic, complete_metric_classic)
 
-dataset_creator_bboxes.filter_bboxes(iou_threshold=0.75, filter_multiple_detection=False, consider_label=False)
-#dataset_creator_bboxes.visualize_bboxes(show_filtered=True)
+dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=0.5)
+dataset_creator_bboxes.visualize_bboxes(show_filtered=True)
 
 train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(num_shuffles=10)
 
