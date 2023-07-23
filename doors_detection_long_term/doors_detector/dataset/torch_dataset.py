@@ -25,10 +25,9 @@ BOUNDING_BOX_DATASET: DATASET = 'bounding_box_dataset'
 
 
 class TorchDatasetBBoxes(Dataset):
-    def __init__(self, bboxes_dict: dict, num_boxes: int, set_type: SET):
+    def __init__(self, bboxes_dict: dict, set_type: SET):
 
         self._bboxes_dict = bboxes_dict
-        self._num_boxes = num_boxes
         scales = [256 + i * 32 for i in range(11)]
 
         if set_type == TEST_SET:
@@ -55,35 +54,54 @@ class TorchDatasetBBoxes(Dataset):
         return len(self._bboxes_dict['images'])
 
     def __getitem__(self, idx):
-        image, bboxes, filtered, gt_bboxes = self._bboxes_dict['images'][idx], self._bboxes_dict['bboxes'][idx], self._bboxes_dict['filtered'][idx], self._bboxes_dict['gt_bboxes'][idx]
+        image, bboxes, gt_bboxes, matched_bboxes = self._bboxes_dict['images'][idx], self._bboxes_dict['bboxes'][idx], self._bboxes_dict['gt_bboxes'][idx], self._bboxes_dict['bboxes_matched'][idx]
 
         target = {}
         (h, w, _) = image.shape
         target['size'] = torch.tensor([int(h), int(w)], dtype=torch.int)
 
-        # Normalize bboxes' size. The bboxes are initially defined as (x_top_left, y_top_left, width, height)
-        # Bboxes representation changes, becoming a tuple (center_x, center_y, width, height).
-        # All values must be normalized in [0, 1], relative to the image's size
-        boxes = []
+        detected_boxes = []
+        original_confidences = []
+        original_labels = []
+
+        target_boxes = []
+        fixed_boxes = [] # the coordinates of the matched gt boxes
         confidences = []
         labels_encoded = []
-        for box in bboxes:
-            x, y, w, h = box.get_absolute_bounding_box()
-            label = int(box.get_class_id())
+        for detected_box, gt_box in matched_bboxes:
+            x, y, w, h = detected_box.get_absolute_bounding_box()
+            original_label = int(detected_box.get_class_id())
 
-            boxes.append((x, y, x + w, y + h))
-            confidences.append(box.get_confidence())
-            labels_encoded.append([0 if i != label else 1 for i in range(2)]) # 2 is the number of label
+            detected_boxes.append((x, y, x + w, y + h))
+            original_confidences.append([detected_box.get_confidence()])
+            original_labels.append([0 if i != original_label else 1 for i in range(2)])
 
-        target['boxes'] = torch.tensor(boxes, dtype=torch.float)
+            confidences.append([0.0] if gt_box is None else [1.0])
+            label = 0 if gt_box is None else int(gt_box.get_class_id()) + 1
+            labels_encoded.append([0 if i != label else 1 for i in range(3)]) # 3 is the number of label (background, closed door, open door)
+
+            gt_x, gt_y, gt_w, gt_h = gt_box.get_absolute_bounding_box() if gt_box is not None else (x, y, w, h)
+
+            fixed_boxes.append((gt_x, gt_y, gt_x + gt_w, gt_y + gt_h))
+
+        len_detected_bboxes = len(detected_boxes)
+
+        target['boxes'] = torch.tensor(detected_boxes + fixed_boxes, dtype=torch.float)
         target['labels_encoded'] = torch.tensor(labels_encoded, dtype=torch.float)
         target['confidences'] = torch.tensor(confidences, dtype=torch.float)
-        target['filtered'] = torch.tensor(filtered)
+        target['original_labels'] = torch.tensor(original_labels)
+        target['original_confidences'] = torch.tensor(original_confidences)
 
         # The BGR image is convert in RGB
         image = (image * 255).astype(np.uint8)
         img, target = self._transform(Image.fromarray(image[..., [2, 1, 0]]), target)
-        target['gt_bboxes'] = gt_bboxes
+
+        detected_boxes = target['boxes'][:len_detected_bboxes]
+        fixed_boxes = target['boxes'][:len_detected_bboxes:]
+
+        target['fixed_boxes'] = fixed_boxes
+        target['detected_boxes'] = detected_boxes
+
         return img, target
 
 
@@ -134,6 +152,7 @@ class TorchDataset(Dataset):
         # Bboxes representation changes, becoming a tuple (center_x, center_y, width, height).
         # All values must be normalized in [0, 1], relative to the image's size
         boxes = door_sample.get_bounding_boxes()
+
         boxes = np.array([(x, y, x + w, y + h) for label, x, y, w, h in boxes])
 
         target['boxes'] = torch.tensor(boxes, dtype=torch.float)

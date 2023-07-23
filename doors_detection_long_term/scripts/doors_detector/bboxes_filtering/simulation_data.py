@@ -8,8 +8,8 @@ from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCrea
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
-from doors_detection_long_term.doors_detector.models.bbox_filter_network import BboxFilterNetwork, BboxFilterNetworkLoss
-from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, BBOX_FILTER_NETWORK
+from doors_detection_long_term.doors_detector.models.bbox_filter_network import BboxFilterNetworkGeometric, BboxFilterNetworkGeometricLoss
+from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, BBOX_FILTER_NETWORK_GEOMETRIC
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
 from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_yolov5, collate_fn_bboxes
@@ -83,9 +83,11 @@ with torch.no_grad():
 print(ap_metric_classic, complete_metric_classic)
 
 dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=0.5)
-dataset_creator_bboxes.visualize_bboxes(show_filtered=True)
+#dataset_creator_bboxes.visualize_bboxes(show_filtered=True)
 
-train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(num_shuffles=10)
+train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets()
+
+print(train_bboxes[0])
 
 train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes, num_workers=4)
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes, num_workers=4)
@@ -93,10 +95,10 @@ test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_f
 #Check the dataset
 def check_bbox_dataset(dataset):
     for data in dataset:
-        images, targets, converted_boxes, filtered = data
+        images, bboxes, fixed_bboxes, confidences, labels = data
         images_opencv = []
         w_image, h_image = images.size()[2:][::-1]
-        for image, target, bboxes, filter in zip(images, targets, converted_boxes, filtered):
+        for image, bbox_list, target, filter in zip(images, targets):
             image = image.to('cpu')
             image = image * torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
             image = image + torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)

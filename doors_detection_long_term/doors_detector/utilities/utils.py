@@ -131,21 +131,27 @@ def collate_fn_bboxes(batch_data):
 
     batch_size_width, batch_size_height = images.size()[2], images.size()[3]
 
-    converted_boxes = []
+    fixed_bboxes = []
+    confidences = []
+    labels = []
+    converted_bboxes = []
     for i, target in enumerate(targets):
         real_size_width, real_size_height = target['size'][1], target['size'][0]
         scale_boxes = torch.tensor([[real_size_width / batch_size_width, real_size_height / batch_size_height,
                                      real_size_width / batch_size_width, real_size_height / batch_size_height]])
         target['boxes'] = target['boxes'] * scale_boxes
-        converted_boxes.append(torch.cat([
-            target['boxes'],
-            target['confidences'].unsqueeze(1),
-            target['labels_encoded']
-            ], dim=1))
-    converted_boxes = torch.stack(converted_boxes, dim=0)
+        bbox_per_image = bbox_per_image * scale_boxes
 
-    filtered = torch.stack([t['filtered'] for t in targets], dim=0).type(torch.FloatTensor)
+        fixed_bboxes.append(target['bboxes'])
+        confidences.append(target['confidences'])
+        labels.append(target['labels'])
+        converted_bboxes.append(bbox_per_image)
 
-    return images, targets, converted_boxes, filtered
+    fixed_bboxes = torch.stack(fixed_bboxes, dim=0)
+    confidences = torch.stack(confidences, dim=0)
+    labels = torch.stack(labels, dim=0)
+    bboxes = torch.stack(converted_bboxes, dim=0)
+
+    return images, bboxes, fixed_bboxes, confidences, labels
 
 

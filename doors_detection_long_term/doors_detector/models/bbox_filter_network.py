@@ -76,10 +76,10 @@ class BboxFilterNetworkGeometric(GenericModel):
 
         return score_features, label_features
 
-class BboxFilterNetworkLoss(nn.Module):
+class BboxFilterNetworkGeometricLoss(nn.Module):
 
     def __init__(self, weight=1.0, reduction_image='sum', reduction_global='mean'):
-        super(BboxFilterNetworkLoss, self).__init__()
+        super(BboxFilterNetworkGeometric, self).__init__()
         self._weight = weight
         if not (reduction_image == 'sum' or reduction_image == 'mean'):
             raise Exception('Parameter "reduction_image" must be mean|sum')
@@ -89,19 +89,13 @@ class BboxFilterNetworkLoss(nn.Module):
         self._reduction_global = reduction_global
 
     def forward(self, preds, targets):
-        temp = -self._weight * (targets * torch.log(preds) + (1.0 - targets) * torch.log(1.0 - preds))
+        scores_features, labels_features = preds
+        label_targets = targets['label_targets']
+        labels_loss = torch.log(labels_features) * label_targets
+        labels_loss = torch.mean(-torch.sum(labels_loss, (2, 1)))
 
+        return torch.tensor(0), labels_loss
 
-        if self._reduction_image == 'mean':
-            reduction_on_image = torch.mean(temp, dim=1)
-        elif self._reduction_image == 'sum':
-            reduction_on_image = torch.sum(temp, dim=1)
-
-
-        if self._reduction_global == 'mean':
-            return torch.mean(reduction_on_image)
-        elif self._reduction_global == 'sum':
-            return torch.sum(reduction_on_image)
 
 
 bboxes = torch.rand((2, 7, 50))

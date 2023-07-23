@@ -94,8 +94,8 @@ class DatasetsCreatorBBoxes:
         self._match_detected_bboxes(self._test_bboxes, iou_threshold_matching)
 
     def create_datasets(self, random_state: int = 42):
-        return (TorchDatasetBBoxes(bboxes_dict=self._training_bboxes, num_boxes=self._num_bboxes, set_type=TRAIN_SET),
-                TorchDatasetBBoxes(bboxes_dict=self._test_bboxes, num_boxes=self._num_bboxes, set_type=TEST_SET))
+        return (TorchDatasetBBoxes(bboxes_dict=self._training_bboxes, set_type=TRAIN_SET),
+                TorchDatasetBBoxes(bboxes_dict=self._test_bboxes, set_type=TEST_SET))
 
 
     def add_yolo_bboxes(self, images, targets, preds, bboxes_type: Type):
