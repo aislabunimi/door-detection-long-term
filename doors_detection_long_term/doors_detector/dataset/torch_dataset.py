@@ -5,8 +5,8 @@ import cv2
 from PIL import Image
 import numpy as np
 import torch
-from src.bounding_box import BoundingBox
-from src.utils.enumerators import BBType, BBFormat
+#from src.bounding_box import BoundingBox
+#from src.utils.enumerators import BBType, BBFormat
 
 from doors_detection_long_term.positions_extractor.doors_dataset.door_sample import DoorSample
 
@@ -22,6 +22,7 @@ DATASET = str
 DEEP_DOORS_2_LABELLED: DATASET = 'deep_doors_2_labelled'
 FINAL_DOORS_DATASET: DATASET = 'final_doors_dataset'
 BOUNDING_BOX_DATASET: DATASET = 'bounding_box_dataset'
+IGIBSON_DATASET: DATASET = 'igibson_dataset'
 
 
 class TorchDatasetBBoxes(Dataset):
