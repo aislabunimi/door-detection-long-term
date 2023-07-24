@@ -68,6 +68,7 @@ class TorchDatasetBBoxes(Dataset):
         fixed_boxes = [] # the coordinates of the matched gt boxes
         confidences = []
         labels_encoded = []
+        ious = []
         for detected_box, gt_box in matched_bboxes:
             x, y, w, h = detected_box.get_absolute_bounding_box()
             original_label = int(detected_box.get_class_id())
@@ -79,7 +80,7 @@ class TorchDatasetBBoxes(Dataset):
             confidences.append([0.0] if gt_box is None else [1.0])
             label = 0 if gt_box is None else int(gt_box.get_class_id()) + 1
             labels_encoded.append([0 if i != label else 1 for i in range(3)]) # 3 is the number of label (background, closed door, open door)
-
+            ious.append([0.0] if gt_box is None else [BoundingBox.iou(detected_box, gt_box)])
             gt_x, gt_y, gt_w, gt_h = gt_box.get_absolute_bounding_box() if gt_box is not None else (x, y, w, h)
 
             fixed_boxes.append((gt_x, gt_y, gt_x + gt_w, gt_y + gt_h))
@@ -91,17 +92,21 @@ class TorchDatasetBBoxes(Dataset):
         target['confidences'] = torch.tensor(confidences, dtype=torch.float)
         target['original_labels'] = torch.tensor(original_labels)
         target['original_confidences'] = torch.tensor(original_confidences)
+        target['ious'] = torch.tensor(ious)
 
         # The BGR image is convert in RGB
         image = (image * 255).astype(np.uint8)
         img, target = self._transform(Image.fromarray(image[..., [2, 1, 0]]), target)
 
         detected_boxes = target['boxes'][:len_detected_bboxes]
-        fixed_boxes = target['boxes'][:len_detected_bboxes:]
+        fixed_boxes = target['boxes'][len_detected_bboxes:]
+
+        # Convert bboxes from (X, Y, W, H) in (CX, CY, W, H)
+        #detected_boxes = torch.cat([detected_boxes[:, :2] + detected_boxes[:, 2:] / 2, detected_boxes[:, 2:]], dim=1)
+        #fixed_boxes = torch.cat([fixed_boxes[:, :2] + fixed_boxes[:, 2:] / 2, fixed_boxes[:, 2:]], dim=1)
 
         target['fixed_boxes'] = fixed_boxes
         target['detected_boxes'] = detected_boxes
-
         return img, target
 
 

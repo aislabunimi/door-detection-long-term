@@ -95,39 +95,41 @@ test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_f
 #Check the dataset
 def check_bbox_dataset(dataset):
     for data in dataset:
-        images, bboxes, fixed_bboxes, confidences, labels = data
+        images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious = data
         images_opencv = []
         w_image, h_image = images.size()[2:][::-1]
-        for image, bbox_list, target, filter in zip(images, targets):
+        for image, detected_list, fixed_list, confidences_list, labels_list, ious_list in zip(images, detected_bboxes.tolist(), fixed_bboxes.tolist(), confidences.tolist(), labels_encoded.tolist(), ious.tolist()):
             image = image.to('cpu')
             image = image * torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
             image = image + torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
-            image_converted_bboxes = cv2.cvtColor(np.transpose(np.array(image), (1, 2, 0)), cv2.COLOR_RGB2BGR)
-            image_converted_bboxes_all = image_converted_bboxes.copy()
-            target_image = image_converted_bboxes.copy()
-            for (cx, cy, w, h, confidence, closed, open), f in zip(bboxes.tolist(), filter.tolist()):
-                print(f)
+            image_detected = cv2.cvtColor(np.transpose(np.array(image), (1, 2, 0)), cv2.COLOR_RGB2BGR)
+            image_detected_high_conf = image_detected.copy()
+            image_matched = image_detected.copy()
+            for (cx, cy, w, h, confidence, closed, open), (cx_f, cy_f, w_f, h_f) in zip(detected_list, fixed_list):
+                #print(cx, cy, w, h)
                 x, y, x2, y2 = np.array([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2]) * np.array([w_image, h_image, w_image, h_image])
                 x, y, x2, y2 = round(x), round(y), round(x2), round(y2)
+                print(x, y, x2, y2)
                 label = 0 if closed == 1 else 1
-                image_converted_bboxes_all = cv2.rectangle(image_converted_bboxes_all, (x, y),
+                image_detected = cv2.rectangle(image_detected, (x, y),
                                                        (x2, y2), colors[label], 2)
-                if f==1:
-                    image_converted_bboxes = cv2.rectangle(image_converted_bboxes, (x, y),
-                                                 (x2, y2), colors[label], 2)
-            for box in target['gt_bboxes']:
-                x, y, w, h = box.get_absolute_bounding_box()
-                print(x, y, w, h)
-                label = int(box.get_class_id())
-                target_image = cv2.rectangle(target_image, (int(x), int(y)),
-                                                       (int(x + w), int(y + h)), colors[label], 2)
+                if confidence >= 0.75:
+                    image_detected_high_conf = cv2.rectangle(image_detected_high_conf, (x, y),
+                                                   (x2, y2), colors[label], 2)
 
-            images_opencv.append(cv2.hconcat([target_image, image_converted_bboxes_all, image_converted_bboxes]))
+                if not(cx == cx_f and cy == cy_f and w == w_f and h == h_f):
+                    image_matched = cv2.rectangle(image_matched, (x, y),
+                                                   (x2, y2), colors[label], 2)
+                else:
+                    image_matched = cv2.rectangle(image_matched, (x, y),
+                                                  (x2, y2),(0,0,0), 2)
+
+            images_opencv.append(cv2.hconcat([image_detected, image_detected_high_conf, image_matched]))
         new_image = cv2.vconcat(images_opencv)
         cv2.imshow('show', new_image)
         cv2.waitKey()
 
-check_bbox_dataset(test_dataset_bboxes)
+#check_bbox_dataset(train_dataset_bboxes)
 bbox_model = BboxFilterNetwork(num_bboxes=num_bboxes, model_name=BBOX_FILTER_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST)
 bbox_model.to('cuda')
 

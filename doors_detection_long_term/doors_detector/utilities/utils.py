@@ -131,27 +131,36 @@ def collate_fn_bboxes(batch_data):
 
     batch_size_width, batch_size_height = images.size()[2], images.size()[3]
 
-    fixed_bboxes = []
+    fixed_boxes = []
+    detected_boxes = []
     confidences = []
-    labels = []
-    converted_bboxes = []
+    labels_encoded = []
+    ious = []
     for i, target in enumerate(targets):
+
+        # Rescale bboxes according to the batch global size
         real_size_width, real_size_height = target['size'][1], target['size'][0]
         scale_boxes = torch.tensor([[real_size_width / batch_size_width, real_size_height / batch_size_height,
                                      real_size_width / batch_size_width, real_size_height / batch_size_height]])
-        target['boxes'] = target['boxes'] * scale_boxes
-        bbox_per_image = bbox_per_image * scale_boxes
+        target['fixed_boxes'] = target['fixed_boxes'] * scale_boxes
+        target['detected_boxes'] = target['detected_boxes'] * scale_boxes
 
-        fixed_bboxes.append(target['bboxes'])
+        fixed_boxes.append(target['fixed_boxes'])
+        detected_boxes.append(
+            torch.cat([target['detected_boxes'],
+                       target['original_confidences'],
+                       target['original_labels']], dim=1)
+        )
         confidences.append(target['confidences'])
-        labels.append(target['labels'])
-        converted_bboxes.append(bbox_per_image)
+        labels_encoded.append(target['labels_encoded'])
+        ious.append(target['ious'])
 
-    fixed_bboxes = torch.stack(fixed_bboxes, dim=0)
+    fixed_bboxes = torch.stack(fixed_boxes, dim=0)
+    detected_boxes = torch.stack(detected_boxes, dim=0)
     confidences = torch.stack(confidences, dim=0)
-    labels = torch.stack(labels, dim=0)
-    bboxes = torch.stack(converted_bboxes, dim=0)
+    labels_encoded = torch.stack(labels_encoded, dim=0)
+    ious = torch.stack(ious, dim=0)
 
-    return images, bboxes, fixed_bboxes, confidences, labels
+    return images, detected_boxes, fixed_bboxes, confidences, labels_encoded, ious
 
 
