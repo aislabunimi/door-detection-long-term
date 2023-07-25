@@ -14,13 +14,14 @@ import torchvision.transforms as T
 train, validation, labels, _ = get_igibson_dataset_scene("Rs_int")
 print(f"Train dataset size: {len(train)} | Validation dataset size: {len(validation)}")
 data_loader_train = DataLoader(train, batch_size=16, collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
-data_loader_validation = DataLoader(validation, batch_size=8, collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
+data_loader_validation = DataLoader(validation, batch_size=16, collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
 
 COLORS = np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
 save_path = "/media/michele/Elements/dataloader_test"
 
 fig = plt.figure(figsize=(16, 16))
-grid = ImageGrid(fig, 111, nrows_ncols=(4, 4), axes_pad=0)
+nrows, ncols = 2, 2
+grid = ImageGrid(fig, 111, nrows_ncols=(nrows, ncols), axes_pad=0)
 
 train_save_path = os.path.join(save_path, "train")
 if not os.path.exists(train_save_path):
@@ -60,7 +61,7 @@ for data_index, data in enumerate(data_loader_train):
     batch_save_path = os.path.join(train_save_path, "batch_"+str(data_index)+".png")
     print("saving", batch_save_path)
     fig.savefig(batch_save_path, dpi=fig.dpi)
-    grid = ImageGrid(fig, 111, nrows_ncols=(4, 4), axes_pad=0)
+    grid = ImageGrid(fig, 111, nrows_ncols=(nrows, ncols), axes_pad=0)
     #break
 
 
@@ -96,5 +97,5 @@ for data_index, data in enumerate(data_loader_validation):
     batch_save_path = os.path.join(test_save_path, "batch_"+str(data_index)+".png")
     print("saving", batch_save_path)
     fig.savefig(batch_save_path, dpi=fig.dpi)
-    grid = ImageGrid(fig, 111, nrows_ncols=(4, 4), axes_pad=0)
+    grid = ImageGrid(fig, 111, nrows_ncols=(nrows, ncols), axes_pad=0)
     #break
