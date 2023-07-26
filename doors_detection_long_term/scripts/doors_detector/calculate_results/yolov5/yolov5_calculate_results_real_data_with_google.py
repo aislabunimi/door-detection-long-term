@@ -91,7 +91,7 @@ def save_file(results, complete_results, file_name_1, file_name_2):
         dataframe.to_excel(writer, sheet_name='s')
 
     complete_results = np.array(complete_results).T
-    columns = ['iou_threshold', 'confidence_threshold', 'house', 'detector', 'dataset', 'epochs_gd', 'epochs_qd', 'label',  'total_positives', 'TP', 'FP', 'TPm', 'FPm', 'FPiou']
+    columns = ['goggle', 'iou_threshold', 'confidence_threshold', 'house', 'detector', 'dataset', 'epochs_gd', 'epochs_qd', 'label',  'total_positives', 'TP', 'FP', 'TPm', 'FPm', 'FPiou']
     d = {}
     for i, column in enumerate(columns):
         d[column] = complete_results[i]
