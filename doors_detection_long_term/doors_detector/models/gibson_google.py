@@ -1,3 +1,5 @@
+import os
+
 import torch
 from torch import nn
 
@@ -10,10 +12,10 @@ class GibsonGoggle(nn.Module):
 
         comp = CompletionNet(norm=nn.BatchNorm2d, nf=64)
         comp = nn.DataParallel(comp)
-        comp.load_state_dict(
-        torch.load("gibson_goggle/unfiller_rgb.pth"))
-
-        self.model = comp.module
+        comp.load_state_dict(torch.load(os.path.dirname(os.path.abspath(__file__)) + "/gibson_goggle/unfiller_rgb.pth"))
+        model = comp.module
+        model.eval()
+        self.model = model
 
     def forward(self, images, mask):
         return self.model(images, mask)
