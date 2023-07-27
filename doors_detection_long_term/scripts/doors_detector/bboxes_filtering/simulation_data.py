@@ -91,7 +91,7 @@ train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets()
 
 print(train_bboxes[0])
 
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes, num_workers=4)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=64, collate_fn=collate_fn_bboxes, num_workers=4)
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes, num_workers=4)
 
 #Check the dataset
@@ -139,7 +139,7 @@ bbox_model.to('cuda')
 criterion = BboxFilterNetworkGeometricLoss(reduction_image='sum', reduction_global='mean')
 
 optimizer = optim.Adam(bbox_model.parameters(), lr=0.001)
-scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.5)
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
 criterion.to('cuda')
 #for n, p in bbox_model.named_parameters():
 #    if p.requires_grad:
