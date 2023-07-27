@@ -1,5 +1,7 @@
+import cv2
 import numpy as np
 import pandas as pd
+from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
@@ -10,6 +12,7 @@ from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
+from torchvision.transforms import transforms
 from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_yolov5, seed_everything
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
@@ -27,13 +30,25 @@ device = 'cuda'
 seed_everything(seed=0)
 
 def apply_goggle(images):
-    mask = torch.zeros((1, 2, images.size()[2], images.size()[3]), device='cuda')
+    imgv = Variable(torch.zeros(1, 3, images.size()[2], images.size()[3]), volatile=True).cuda()
+    maskv = Variable(torch.zeros(1, 2, images.size()[2], images.size()[3]), volatile=True).cuda()
 
-    images[:,0,:,:].data.fill_(0.05)
-    mask[:,1,:,:].data.fill_(1)
-    images = gibson_google(images, mask)
+    target_image = images.to('cpu')[0]
+    target_image = target_image * torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
+    target_image = target_image + torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
+    target_image = cv2.cvtColor(np.transpose(np.array(target_image), (1, 2, 0)), cv2.COLOR_RGB2BGR)
 
-    return images
+    tf = transforms.ToTensor()
+    source = tf(target_image)
+    imgv.data.copy_(source)
+    maskv[:,0,:,:].data.fill_(0.05)
+    maskv[:,1,:,:].data.fill_(1)
+    recon = gibson_google(imgv, maskv)
+    recon = recon[:, [2,1,0],:,:]
+    tf = transforms.Compose([transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+    recon = tf(recon)
+
+    return recon
 
 def compute_results(model_name, data_loader_test, description, with_goggle):
     model = YOLOv5Model(model_name=YOLOv5, n_labels=2, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=model_name)
@@ -48,8 +63,15 @@ def compute_results(model_name, data_loader_test, description, with_goggle):
         for images, targets, converted_boxes in tqdm(data_loader_test, total=len(data_loader_test), desc=description):
             images = images.to(device)
 
-            if with_goggle:
+            if with_goggle == 1:
                 images = apply_goggle(images)
+                #target_image = images.to('cpu')[0]
+                #target_image = target_image * torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
+                #target_image = target_image + torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
+                #target_image = cv2.cvtColor(np.transpose(np.array(target_image), (1, 2, 0)), cv2.COLOR_RGB2BGR)
+
+                #cv2.imshow('frame',target_image)
+                #cv2.waitKey()
 
             preds, train_out = model.model(images)
             #print(preds.size(), train_out[0].size(), train_out[1].size(), train_out[2].size())
@@ -119,7 +141,7 @@ for model_name, dataset, epochs, in model_names_general_detectors:
         data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 
         for with_goggle in [0, 1]:
-            metrics, complete_metrics = compute_results(model_name, data_loader_test, f'Test on {house}, GD trained on {dataset} - Epochs GD: {epochs}', with_google=with_goggle)
+            metrics, complete_metrics = compute_results(model_name, data_loader_test, f'Test on {house}, GD trained on {dataset} - Epochs GD: {epochs}', with_goggle=with_goggle)
 
 
             for (iou_threshold, confidence_threshold), metric in metrics.items():
