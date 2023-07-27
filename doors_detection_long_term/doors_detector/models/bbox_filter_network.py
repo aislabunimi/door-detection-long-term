@@ -154,15 +154,15 @@ class BboxFilterNetworkImage(GenericModel):
                                      boxes[:, 1:2, :] - boxes[:, 3:4, :] / 2,
                                      boxes[:, 0:1, :] + boxes[:, 2:3, :] / 2,
                                      boxes[:, 1:2, :] + boxes[:, 3:4, :] / 2], dim=1).transpose(1, 2)
-        print(converted_boxes *torch.tensor([x.size()[3:][::-1] + x.size()[3:][::-1]], device=x.device))
+
         converted_boxes = torch.round(converted_boxes * torch.tensor([x.size()[3:][::-1] + x.size()[3:][::-1]], device=x.device))
-        print(converted_boxes)
-        converted_boxes[converted_boxes < 0.0] = 0.0
-        converted_boxes[converted_boxes[:, :, 0] > x.size()[4]] = x.size()[4]
-        converted_boxes[converted_boxes[:, :, 2] > x.size()[4]] = x.size()[4]
-        converted_boxes[converted_boxes[:, :, 1] > x.size()[3]] = x.size()[3]
-        converted_boxes[converted_boxes[:, :, 3] > x.size()[3]] = x.size()[3]
+        converted_boxes[converted_boxes <= 0.0] = 0.0
+        converted_boxes[converted_boxes[:, :, 0] >= x.size()[4]] = x.size()[4]
+        converted_boxes[converted_boxes[:, :, 2] >= x.size()[4]] = x.size()[4]
+        converted_boxes[converted_boxes[:, :, 1] >= x.size()[3]] = x.size()[3]
+        converted_boxes[converted_boxes[:, :, 3] >= x.size()[3]] = x.size()[3]
         converted_boxes = converted_boxes.type(torch.int32)
+        #print(converted_boxes)
 
         mask = torch.zeros(x.size(), device=x.device)
         for n_batch, batch in enumerate(converted_boxes):
@@ -208,8 +208,8 @@ class BboxFilterNetworkGeometricLoss(nn.Module):
 
     def forward(self, preds, confidences, label_targets):
         scores_features, labels_features = preds
-        labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[0.20, 0.7, 0.10]], device='cuda')
-        labels_loss = torch.mean(-torch.mean(labels_loss, (2, 1)))
+        labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[0.20, 0.7, 0.10]], device=label_targets.device)
+        labels_loss = torch.sum(-torch.mean(labels_loss, (2, 1)))
 
         return torch.tensor(0), labels_loss
 

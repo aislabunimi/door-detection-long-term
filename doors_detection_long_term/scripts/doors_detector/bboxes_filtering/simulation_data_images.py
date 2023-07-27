@@ -20,7 +20,7 @@ from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-num_bboxes = 15
+num_bboxes = 10
 
 dataset_creator_bboxes = DatasetsCreatorBBoxes(num_bboxes=num_bboxes)
 
@@ -91,9 +91,7 @@ dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=0.5)
 
 train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets()
 
-print(train_bboxes[0])
-
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes, num_workers=4)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=8, collate_fn=collate_fn_bboxes, num_workers=4)
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes, num_workers=4)
 
 #Check the dataset
@@ -135,7 +133,7 @@ def check_bbox_dataset(dataset):
         cv2.waitKey()
 
 #check_bbox_dataset(train_dataset_bboxes)
-bbox_model = BboxFilterNetworkImage(fpn_channels=256, n_labels=3, model_name=BBOX_FILTER_NETWORK_IMAGE, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST)
+bbox_model = BboxFilterNetworkImage(fpn_channels=128, n_labels=3, model_name=BBOX_FILTER_NETWORK_IMAGE, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST)
 bbox_model.to('cuda')
 
 criterion = BboxFilterNetworkGeometricLoss(reduction_image='sum', reduction_global='mean')
@@ -143,9 +141,9 @@ criterion = BboxFilterNetworkGeometricLoss(reduction_image='sum', reduction_glob
 optimizer = optim.Adam(bbox_model.parameters(), lr=0.001)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.5)
 criterion.to('cuda')
-#for n, p in bbox_model.named_parameters():
-#    if p.requires_grad:
-#        print(n)
+for n, p in bbox_model.named_parameters():
+    if p.requires_grad:
+        print(n)
 
 logs = {'train': [], 'test': [], 'ap': {0: [], 1: []}, 'complete_metric': {'TP': [], 'FP': [], 'BFD': []}}
 
