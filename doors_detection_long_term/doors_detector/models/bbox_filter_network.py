@@ -188,8 +188,7 @@ class BboxFilterNetworkImage(GenericModel):
 
         score_features = self.shared_mlp_5(mixed_features)
         label_features = self.shared_mlp_6(mixed_features)
-
-        score_features = torch.squeeze(score_features)
+        score_features = torch.squeeze(score_features, dim=1)
         label_features = torch.transpose(label_features, 1, 2)
         return score_features, label_features
 

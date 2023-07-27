@@ -138,14 +138,16 @@ train_total = {0:0, 1:0}
 test_total = {0:0, 1:0}
 for data in train_dataset_bboxes:
     images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious = data
-    for confidence in confidences:
-        train_total[int(confidence)] += 1
+    for confidence_per_image in confidences.tolist():
+        for confidence in confidence_per_image:
+            train_total[int(confidence)] += 1
 
 for data in test_dataset_bboxes:
     images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious = data
-    for confidence in confidences:
-        test_total[int(confidence)] += 1
-
+    for confidence_per_image in confidences.tolist():
+        for confidence in confidence_per_image:
+            test_total[int(confidence)] += 1
+print(test_total, train_total)
 train_accuracy = {0: [], 1: []}
 test_accuracy = {0: [], 1: []}
 
@@ -195,7 +197,9 @@ for epoch in range(60):
             predicted_confidences = preds[0]
 
             for predicted, target in zip(predicted_confidences, confidences):
+
                 for p_conf, gt_conf in zip(predicted.tolist(), target.tolist()):
+
                     if p_conf <= 0.5 and gt_conf == 0:
                         temp_accuracy[0] +=1
                     elif p_conf > 0.5 and gt_conf == 1:
@@ -212,14 +216,16 @@ for epoch in range(60):
 
             preds = bbox_model(images, detected_bboxes)
             loss_confidence, loss_label = criterion(preds, confidences, labels_encoded)
-            final_loss = loss_label
+            final_loss = loss_confidence
 
             temp_losses.append(final_loss.item())
 
             predicted_confidences = preds[0]
 
+
             for predicted, target in zip(predicted_confidences, confidences):
                 for p_conf, gt_conf in zip(predicted.tolist(), target.tolist()):
+
                     if p_conf <= 0.5 and gt_conf == 0:
                         temp_accuracy[0] +=1
                     elif p_conf > 0.5 and gt_conf == 1:
