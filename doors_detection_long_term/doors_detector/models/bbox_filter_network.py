@@ -187,11 +187,11 @@ class BboxFilterNetworkImage(GenericModel):
         mixed_features = self.shared_mlp_4(mixed_features)
 
         score_features = self.shared_mlp_5(mixed_features)
-        label_features = self.shared_mlp_6(mixed_features)
+        #label_features = self.shared_mlp_6(mixed_features)
 
         score_features = torch.squeeze(score_features)
-        label_features = torch.transpose(label_features, 1, 2)
-        return score_features, label_features
+        #label_features = torch.transpose(label_features, 1, 2)
+        return score_features, torch.zeros(1)
 
 
 class BboxFilterNetworkGeometricLoss(nn.Module):
@@ -209,14 +209,26 @@ class BboxFilterNetworkGeometricLoss(nn.Module):
     def forward(self, preds, confidences, label_targets):
         scores_features, labels_features = preds
         labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[0.20, 0.7, 0.10]], device=label_targets.device)
-        labels_loss = torch.sum(-torch.mean(labels_loss, (2, 1)))
+        labels_loss = torch.mean(-torch.mean(torch.sum(labels_loss, 2), 1))
 
         return torch.tensor(0), labels_loss
 
-"""
+class BboxFilterNetworkSuppress(nn.Module):
+
+    def __init__(self):
+        super(BboxFilterNetworkSuppress, self).__init__()
+
+    def forward(self, preds, confidences, label_targets):
+        scores_features, labels_features = preds
+        scores_features = -(confidences * torch.log(scores_features) + ((1 - confidences) * torch.log(1-scores_features)))
+        scores_features = torch.mean(scores_features, (1, 0))
+
+        return scores_features, torch.tensor(0)
+
+
 model = BboxFilterNetworkImage(fpn_channels=256, n_labels=3, model_name=BBOX_FILTER_NETWORK_IMAGE, description=IMAGE_TEST, dataset_name=FINAL_DOORS_DATASET, pretrained=False)
 x = torch.rand(2, 3, 240, 320)
 output = model(x, torch.rand(2, 7, 50))
-print(output[1].size())
-"""
+print(output[0])
+
 
