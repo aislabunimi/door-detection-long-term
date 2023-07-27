@@ -146,11 +146,13 @@ def collate_fn_bboxes(batch_data):
         target['detected_boxes'] = target['detected_boxes'] * scale_boxes
 
         fixed_boxes.append(target['fixed_boxes'])
+
         detected_boxes.append(
             torch.cat([target['detected_boxes'],
                        target['original_confidences'],
                        target['original_labels']], dim=1)
         )
+
         confidences.append(target['confidences'])
         labels_encoded.append(target['labels_encoded'])
         ious.append(target['ious'])
@@ -161,6 +163,6 @@ def collate_fn_bboxes(batch_data):
     labels_encoded = torch.stack(labels_encoded, dim=0)
     ious = torch.stack(ious, dim=0)
 
-    return images, detected_boxes, fixed_bboxes, confidences, labels_encoded, ious
+    return images, torch.transpose(detected_boxes, 1, 2), fixed_bboxes, confidences, labels_encoded, ious
 
 

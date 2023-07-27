@@ -10,8 +10,10 @@ from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCrea
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
-from doors_detection_long_term.doors_detector.models.bbox_filter_network import BboxFilterNetworkGeometric, BboxFilterNetworkGeometricLoss
-from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, BBOX_FILTER_NETWORK_GEOMETRIC
+from doors_detection_long_term.doors_detector.models.bbox_filter_network import BboxFilterNetworkGeometric, \
+    BboxFilterNetworkGeometricLoss, BboxFilterNetworkImage
+from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, BBOX_FILTER_NETWORK_GEOMETRIC, \
+    BBOX_FILTER_NETWORK_IMAGE
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
 from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_yolov5, collate_fn_bboxes
@@ -132,8 +134,8 @@ def check_bbox_dataset(dataset):
         cv2.imshow('show', new_image)
         cv2.waitKey()
 
-check_bbox_dataset(train_dataset_bboxes)
-bbox_model = BboxFilterNetworkGeometric(initial_channels=7, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST)
+#check_bbox_dataset(train_dataset_bboxes)
+bbox_model = BboxFilterNetworkImage(fpn_channels=256, n_labels=3, model_name=BBOX_FILTER_NETWORK_IMAGE, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST)
 bbox_model.to('cuda')
 
 criterion = BboxFilterNetworkGeometricLoss(reduction_image='sum', reduction_global='mean')

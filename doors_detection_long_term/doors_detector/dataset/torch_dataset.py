@@ -38,6 +38,7 @@ class TorchDatasetBBoxes(Dataset):
             ])
         else:
 
+
             self._transform = T.Compose([
                 T.RandomSelect(
                     T.Identity(),
