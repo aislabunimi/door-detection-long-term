@@ -62,10 +62,10 @@ class BboxFilterNetworkGeometric(GenericModel):
         local_features_2 = self.shared_mlp_2(local_features_1)
         local_features_3 = self.shared_mlp_3(local_features_2)
 
-        global_features_1 = nn.MaxPool1d(local_features_2.size(-1))(local_features_2)
+        global_features_1 = torch.max(local_features_2, 2, keepdim=True)[0]
         global_features_1 = global_features_1.repeat(1, 1, local_features_1.size(-1))
 
-        global_features_2 = nn.MaxPool1d(local_features_3.size(-1))(local_features_3)
+        global_features_2 = torch.max(local_features_3, 2, keepdim=True)[0]
         global_features_2 = global_features_2.repeat(1, 1, local_features_1.size(-1))
 
         mixed_features = torch.cat([local_features_1, global_features_1, global_features_2], 1)
@@ -176,7 +176,7 @@ class BboxFilterNetworkImage(GenericModel):
         local_features_2 = self.shared_mlp_2(local_features_1)
         #local_features_3 = self.shared_mlp_3(local_features_2)
 
-        global_features_1 = nn.MaxPool1d(local_features_2.size(-1))(local_features_2)
+        global_features_1 = torch.max(local_features_2, 2, keepdim=True)[0]
         global_features_1 = global_features_1.repeat(1, 1, local_features_1.size(-1))
 
         #global_features_2 = nn.MaxPool1d(local_features_3.size(-1))(local_features_3)

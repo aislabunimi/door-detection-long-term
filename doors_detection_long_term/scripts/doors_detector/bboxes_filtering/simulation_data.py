@@ -132,7 +132,7 @@ def check_bbox_dataset(dataset):
         cv2.imshow('show', new_image)
         cv2.waitKey()
 
-check_bbox_dataset(train_dataset_bboxes)
+#check_bbox_dataset(train_dataset_bboxes)
 bbox_model = BboxFilterNetworkGeometric(initial_channels=7, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST)
 bbox_model.to('cuda')
 
