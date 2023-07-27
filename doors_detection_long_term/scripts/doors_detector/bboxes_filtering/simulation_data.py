@@ -18,7 +18,7 @@ from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-num_bboxes = 15
+num_bboxes = 20
 
 dataset_creator_bboxes = DatasetsCreatorBBoxes(num_bboxes=num_bboxes)
 
@@ -252,7 +252,7 @@ for epoch in range(60):
     plt.plot([i for i in range(len(train_accuracy[2]))], train_accuracy[2], label='open')
     plt.title('Train accuracy')
     plt.legend()
-    plt.savefig('train.svg')
+    plt.savefig('train_geometric.svg')
 
     fig = plt.figure()
     plt.plot([i for i in range(len(test_accuracy[0]))], test_accuracy[0], label='background')
@@ -260,7 +260,7 @@ for epoch in range(60):
     plt.plot([i for i in range(len(test_accuracy[2]))], test_accuracy[2], label='open')
     plt.title('Val accuracy')
     plt.legend()
-    plt.savefig('val.svg')
+    plt.savefig('val_geometric.svg')
     print(train_accuracy)
     logs['test'].append(sum(temp_losses) / len(temp_losses))
     print(logs['train'], logs['test'])
@@ -270,7 +270,7 @@ for epoch in range(60):
     plt.plot([i for i in range(len(logs['train']))], logs['test'], label='test_loss')
     plt.title('Losses')
     plt.legend()
-    plt.savefig('losses.svg')
+    plt.savefig('losses_geometric.svg')
     bbox_model.save(epoch=epoch, optimizer_state_dict=optimizer.state_dict(), params={}, logs=logs, lr_scheduler_state_dict={})
 
 
