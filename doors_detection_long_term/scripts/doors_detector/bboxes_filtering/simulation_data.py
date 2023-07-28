@@ -91,8 +91,8 @@ train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets()
 
 print(train_bboxes[0])
 
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=64, collate_fn=collate_fn_bboxes, num_workers=4)
-test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes, num_workers=4)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=32, collate_fn=collate_fn_bboxes, num_workers=4)
+test_dataset_bboxes = DataLoader(test_bboxes, batch_size=32, collate_fn=collate_fn_bboxes, num_workers=4)
 
 #Check the dataset
 def check_bbox_dataset(dataset):

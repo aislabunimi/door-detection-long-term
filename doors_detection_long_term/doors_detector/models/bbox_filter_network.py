@@ -120,19 +120,16 @@ class BboxFilterNetworkImage(GenericModel):
         super(BboxFilterNetworkImage, self).__init__(model_name, dataset_name, description)
 
         self.fpn = ResNet50FPN(channels=fpn_channels)
-        self.adaptive_avgpool_3d = nn.AdaptiveAvgPool3d((fpn_channels, 1, 1))
 
-        self.shared_mlp_1 = SharedMLP(channels=[fpn_channels, 256, 512, 512])
-        self.shared_mlp_2 = SharedMLP(channels=[512, 1024, 1024, 2048])
+        self.shared_mlp_1 = SharedMLP(channels=[fpn_channels, 256])
+        self.shared_mlp_2 = SharedMLP(channels=[256, 512, 1024])
         #self.shared_mlp_3 = SharedMLP(channels=[256, 256, 512, 1024])
 
-        self.shared_mlp_4 = SharedMLP(channels=[2048 + 512, 2048, 1024, 512, 256, 128])
+        self.shared_mlp_4 = SharedMLP(channels=[1024 + 256, 1024, 512, 256, 128])
 
         self.shared_mlp_5 = SharedMLP(channels=[128, 64, 32, 16, 1], last_activation=nn.Sigmoid())
 
         self.shared_mlp_6 = SharedMLP(channels=[128, 64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
-
-
 
         if pretrained:
             if pretrained:
@@ -146,8 +143,7 @@ class BboxFilterNetworkImage(GenericModel):
     def forward(self, images, boxes):
         x = self.fpn(images)
         x = x['x0']
-        x = x.unsqueeze(1)
-        x = x.repeat(1, boxes.size(-1), 1, 1, 1)
+
 
         # Convert boxes from [cx, cy, w, h] to [x1, y1, x2, y2]
         converted_boxes = torch.cat([boxes[:, 0:1, :] - boxes[:, 2:3, :] / 2,
@@ -155,22 +151,30 @@ class BboxFilterNetworkImage(GenericModel):
                                      boxes[:, 0:1, :] + boxes[:, 2:3, :] / 2,
                                      boxes[:, 1:2, :] + boxes[:, 3:4, :] / 2], dim=1).transpose(1, 2)
 
-        converted_boxes = torch.round(converted_boxes * torch.tensor([x.size()[3:][::-1] + x.size()[3:][::-1]], device=x.device))
+        converted_boxes = torch.round(converted_boxes * torch.tensor([x.size()[2:][::-1] + x.size()[2:][::-1]], device=x.device))
         converted_boxes[converted_boxes <= 0.0] = 0.0
-        converted_boxes[converted_boxes[:, :, 0] >= x.size()[4]] = x.size()[4]
-        converted_boxes[converted_boxes[:, :, 2] >= x.size()[4]] = x.size()[4]
-        converted_boxes[converted_boxes[:, :, 1] >= x.size()[3]] = x.size()[3]
-        converted_boxes[converted_boxes[:, :, 3] >= x.size()[3]] = x.size()[3]
+        converted_boxes[converted_boxes[:, :, 0] >= x.size(-1)] = x.size(-1)
+        converted_boxes[converted_boxes[:, :, 2] >= x.size(-1)] = x.size(-1)
+        converted_boxes[converted_boxes[:, :, 1] >= x.size(-2)] = x.size(-2)
+        converted_boxes[converted_boxes[:, :, 3] >= x.size(-2)] = x.size(-2)
         converted_boxes = converted_boxes.type(torch.int32)
         #print(converted_boxes)
 
-        mask = torch.zeros(x.size(), device=x.device)
+        boxes_features = []
+        mask = torch.zeros(x.size()[1:], device=x.device)
         for n_batch, batch in enumerate(converted_boxes):
+            boxes_features_batch = []
             for n_box, (x1, y1, x2, y2) in enumerate(batch):
-                mask[n_batch, n_box, :, y1 : y2, x1 : x2] = 1.0
+                mask[:, :, :] = 0
+                mask[:, y1 : y2, x1 : x2] = 1.0
+                box_features = x[n_batch] * mask
+                box_features = torch.amax(box_features, dim=(1, 2)).unsqueeze(0)
+                boxes_features_batch.append(box_features)
+            boxes_features.append(torch.cat(boxes_features_batch, dim=0).unsqueeze(0))
 
-        x = x * mask
-        x = self.adaptive_avgpool_3d(x).squeeze((3, 4)).transpose(1, 2)
+        x = torch.cat(boxes_features, dim=0).transpose(1, 2)
+
+
 
         local_features_1 = self.shared_mlp_1(x)
         local_features_2 = self.shared_mlp_2(local_features_1)
@@ -207,7 +211,7 @@ class BboxFilterNetworkGeometricLoss(nn.Module):
 
     def forward(self, preds, confidences, label_targets):
         scores_features, labels_features = preds
-        labels_loss = torch.log(labels_features) * label_targets * torch.tensor([[0.50, 0.5, 0.10]], device=label_targets.device)
+        labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[0.50, 0.5, 0.10]], device=label_targets.device)
         labels_loss = torch.mean(-torch.mean(torch.sum(labels_loss, 2), 1))
 
         return torch.tensor(0), labels_loss
@@ -225,7 +229,7 @@ class BboxFilterNetworkSuppress(nn.Module):
         return scores_features, torch.tensor(0)
 
 
-model = BboxFilterNetworkImage(fpn_channels=256, n_labels=3, model_name=BBOX_FILTER_NETWORK_IMAGE, description=IMAGE_TEST, dataset_name=FINAL_DOORS_DATASET, pretrained=False)
+model = BboxFilterNetworkImage(fpn_channels=128, n_labels=3, model_name=BBOX_FILTER_NETWORK_IMAGE, description=IMAGE_TEST, dataset_name=FINAL_DOORS_DATASET, pretrained=False)
 x = torch.rand(2, 3, 240, 320)
 output = model(x, torch.rand(2, 7, 50))
 print(output[0])
