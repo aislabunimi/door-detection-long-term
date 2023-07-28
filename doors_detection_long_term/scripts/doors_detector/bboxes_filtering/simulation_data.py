@@ -87,11 +87,11 @@ print(ap_metric_classic, complete_metric_classic)
 dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=0.5)
 #dataset_creator_bboxes.visualize_bboxes(show_filtered=True)
 
-train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=True)
+train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=False)
 
 print(train_bboxes[0])
 
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=32, collate_fn=collate_fn_bboxes, num_workers=4)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=32, collate_fn=collate_fn_bboxes, num_workers=4, shuffle=True)
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=32, collate_fn=collate_fn_bboxes, num_workers=4)
 
 #Check the dataset

@@ -24,6 +24,7 @@ class SharedMLP(nn.Module):
         layers = []
         for in_channels, out_channels in zip(channels[:-1], channels[1:]):
             layers += [nn.Conv1d(in_channels=in_channels, out_channels=out_channels, kernel_size=1),
+                       #nn.Dropout1d(p=0.8),
                        nn.BatchNorm1d(num_features=out_channels),
                        nn.ReLU()]
         layers[-1] = last_activation
@@ -37,15 +38,15 @@ class BboxFilterNetworkGeometric(GenericModel):
         super(BboxFilterNetworkGeometric, self).__init__(model_name, dataset_name, description)
         self._initial_channels = initial_channels
 
-        self.shared_mlp_1 = SharedMLP(channels=[initial_channels, 16, 32, 64])
-        self.shared_mlp_2 = SharedMLP(channels=[64, 64, 128, 256, 512])
+        self.shared_mlp_1 = SharedMLP(channels=[initial_channels, 16, 32])
+        self.shared_mlp_2 = SharedMLP(channels=[32, 64, 128])
         self.shared_mlp_3 = SharedMLP(channels=[512, 512, 1024])
 
-        self.shared_mlp_4 = SharedMLP(channels=[1024 + 512, 512, 256, 128])
+        self.shared_mlp_4 = SharedMLP(channels=[32 + 128, 128, 64])
 
-        self.shared_mlp_5 = SharedMLP(channels=[128, 64, 32, 16, 1], last_activation=nn.Sigmoid())
+        self.shared_mlp_5 = SharedMLP(channels=[ 64, 32, 16, 1], last_activation=nn.Sigmoid())
 
-        self.shared_mlp_6 = SharedMLP(channels=[128, 64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
+        self.shared_mlp_6 = SharedMLP(channels=[64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
 
 
         if pretrained:
@@ -60,15 +61,15 @@ class BboxFilterNetworkGeometric(GenericModel):
     def forward(self, images, bboxes):
         local_features_1 = self.shared_mlp_1(bboxes)
         local_features_2 = self.shared_mlp_2(local_features_1)
-        local_features_3 = self.shared_mlp_3(local_features_2)
+        #local_features_3 = self.shared_mlp_3(local_features_2)
 
-        #global_features_1 = torch.max(local_features_2, 2, keepdim=True)[0]
-        #global_features_1 = global_features_1.repeat(1, 1, local_features_1.size(-1))
+        global_features_1 = torch.max(local_features_2, 2, keepdim=True)[0]
+        global_features_1 = global_features_1.repeat(1, 1, local_features_1.size(-1))
 
-        global_features_2 = torch.max(local_features_3, 2, keepdim=True)[0]
-        global_features_2 = global_features_2.repeat(1, 1, local_features_1.size(-1))
+        #global_features_2 = torch.max(local_features_3, 2, keepdim=True)[0]
+        #global_features_2 = global_features_2.repeat(1, 1, local_features_1.size(-1))
 
-        mixed_features = torch.cat([local_features_2, global_features_2], 1)
+        mixed_features = torch.cat([local_features_1, global_features_1], 1)
 
         mixed_features = self.shared_mlp_4(mixed_features)
 
@@ -213,7 +214,7 @@ class BboxFilterNetworkGeometricLoss(nn.Module):
 
     def forward(self, preds, confidences, label_targets):
         scores_features, labels_features = preds
-        labels_loss = torch.log(labels_features) * label_targets * torch.tensor([[0.15, 0.7, 0.15]], device=label_targets.device)
+        labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[0.15, 0.7, 0.15]], device=label_targets.device)
         labels_loss = torch.mean(torch.sum(torch.sum(labels_loss, 2) * -1, 1))
 
         return torch.tensor(0), labels_loss
