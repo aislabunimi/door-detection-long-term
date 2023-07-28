@@ -90,7 +90,7 @@ if __name__ == "__main__":
 
     model, compute_loss, optimizer, scheduler, scaler, start_epoch, nl, nw, nb, amp, nbs, accumulate, lf, logs = \
         prepare_model(
-            descrition=globals()[f'EXP_1_IGIBSON_ALL_SCENES_ALL_MODES_EPOCHS_{epochs_general_detector[0]}'.upper()],
+            descrition=globals()[f'EXP_2_IGIBSON_ALL_SCENES_REALISTIC_MODE_EPOCHS_{epochs_general_detector[0]}'.upper()],
             reload_model=False,
             restart_checkpoint=False,
             epochs=epochs_general_detector[-1]
@@ -108,7 +108,7 @@ if __name__ == "__main__":
 
         model.train()
         optimizer.zero_grad()
-        for d, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'all scenes - all modes - Epoch {epoch} - Train model'):
+        for d, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'all scenes - realistic mode - Epoch {epoch} - Train model'):
             ni = d + nb * epoch
 
             # warmup
@@ -150,12 +150,12 @@ if __name__ == "__main__":
 
         logs['train'].append({'loss': sum(accumulate_loss, 0) / len(accumulate_loss)})
 
-        print(f'----> All scenes - all modes - EPOCH SUMMARY TRAIN [{epoch}] -> ' + ', '.join([f'{k}: {v}' for k, v in logs['train'][epoch].items()]))
+        print(f'----> All scenes - realistic mode - EPOCH SUMMARY TRAIN [{epoch}] -> ' + ', '.join([f'{k}: {v}' for k, v in logs['train'][epoch].items()]))
 
         # Train loss after backpropagation
         with torch.no_grad():
             accumulate_loss = []
-            for i, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'all scenes - all modes - Epoch {epoch} - Test model with training data'):
+            for i, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'all scenes - realistic mode - Epoch {epoch} - Test model with training data'):
                 images, targets, converted_boxes = data
 
                 images = images.to('cuda')
@@ -170,7 +170,7 @@ if __name__ == "__main__":
         # Validation
         with torch.no_grad():
             accumulate_loss = []
-            for i, data in tqdm(enumerate(data_loader_validation), total=len(data_loader_validation), desc=f'all scenes - all modes - Epoch {epoch} - Test model with validation data'):
+            for i, data in tqdm(enumerate(data_loader_validation), total=len(data_loader_validation), desc=f'all scenes - realistic mode - Epoch {epoch} - Test model with validation data'):
                 images, targets, converted_boxes = data
 
                 images = images.to('cuda')
@@ -207,13 +207,13 @@ if __name__ == "__main__":
         # Change the model description on each epoch step
         if epoch == epochs_general_detector[epoch_count] - 1 and epoch_count < len(epochs_general_detector) -1:
             epoch_count += 1
-            model.set_description(globals()[f'EXP_1_IGIBSON_ALL_SCENES_ALL_MODES_EPOCHS_{epochs_general_detector[epoch_count]}'.upper()])
+            model.set_description(globals()[f'EXP_2_IGIBSON_ALL_SCENES_REALISTIC_MODE_EPOCHS_{epochs_general_detector[epoch_count]}'.upper()])
 
 
     # Qualify the general detectors trained before
     for epochs_general, quantity in [(e, q) for e in epochs_general_detector for q in fine_tune_quantity]:
         epoch_count = 0
-        print(f'all scenes all modes, general detectors trained for {epochs_general} epochs, fine tune train set: {quantity}')
+        print(f'all scenes realistic mode, general detectors trained for {epochs_general} epochs, fine tune train set: {quantity}')
 
         train, validation, labels, _ = get_igibson_dataset_all_scenes()
         print(f'Train set size: {len(train)}', f'Validation set size: {len(validation)}')
@@ -223,7 +223,7 @@ if __name__ == "__main__":
 
         model, compute_loss, optimizer, scheduler, scaler, start_epoch, nl, nw, nb, amp, nbs, accumulate, lf, logs = \
             prepare_model(
-                description=globals()[f'EXP_1_IGIBSON_ALL_SCENES_ALL_MODES_EPOCHS_{epochs_general_detector[0]}'.upper()],
+                description=globals()[f'EXP_2_IGIBSON_ALL_SCENES_REALISTIC_MODE_EPOCHS_{epochs_general_detector[0]}'.upper()],
                 reload_model=True,
                 restart_checkpoint=False,
                 epochs=epochs_general_detector[-1]
@@ -231,7 +231,7 @@ if __name__ == "__main__":
         print_logs_every = 10
         last_opt_step = -1
         model.to('cuda')
-        model.set_description(globals()[f'EXP_1_ALL_SCENES_ALL_MODES_EPOCHS_GD_{epochs_general}_QD_{epochs_qualified_detectors[0]}_FT_{quantity}'.upper()])
+        model.set_description(globals()[f'EXP_2_ALL_SCENES_REALISTIC_MODE_EPOCHS_GD_{epochs_general}_QD_{epochs_qualified_detectors[0]}_FT_{quantity}'.upper()])
         print_logs_every = 10
 
         start_time = time.time()
@@ -243,7 +243,7 @@ if __name__ == "__main__":
 
             model.train()
             optimizer.zero_grad()
-            for d, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'All scenes - all modes - Epoch {epoch} - Fine tune with {quantity}% of examples'):
+            for d, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'All scenes - realistic mode - Epoch {epoch} - Fine tune with {quantity}% of examples'):
                 ni = d + nb * epoch
 
                 # warmup
@@ -287,7 +287,7 @@ if __name__ == "__main__":
             # Train loss after backpropagation
             with torch.no_grad():
                 accumulate_loss = []
-                for i, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'all scenes - all modes - Epoch {epoch} - Test model with training data'):
+                for i, data in tqdm(enumerate(data_loader_train), total=len(data_loader_train), desc=f'all scenes - realistic mode - Epoch {epoch} - Test model with training data'):
                     images, targets, converted_boxes = data
 
                     images = images.to('cuda')
@@ -302,7 +302,7 @@ if __name__ == "__main__":
             # Validation
             with torch.no_grad():
                 accumulate_loss = []
-                for i, data in tqdm(enumerate(data_loader_validation), total=len(data_loader_validation), desc=f'all scenes - all modes - Epoch {epoch} - Test model with validation data'):
+                for i, data in tqdm(enumerate(data_loader_validation), total=len(data_loader_validation), desc=f'all scenes - realistic mode - Epoch {epoch} - Test model with validation data'):
                     images, targets, converted_boxes = data
 
                     images = images.to('cuda')
@@ -339,4 +339,4 @@ if __name__ == "__main__":
             # Change the model description on each epoch step
             if epoch == epochs_qualified_detectors[epoch_count] - 1 and epoch_count < len(epochs_qualified_detectors) -1:
                 epoch_count += 1
-                model.set_description(globals()[f'EXP_1_ALL_SCENES_ALL_MODES_EPOCHS_GD_{epochs_general}_QD_{epochs_qualified_detectors[epoch_count]}_FT_{quantity}'.upper()])
+                model.set_description(globals()[f'EXP_2_ALL_SCENES_REALISTIC_MODE_EPOCHS_GD_{epochs_general}_QD_{epochs_qualified_detectors[epoch_count]}_FT_{quantity}'.upper()])

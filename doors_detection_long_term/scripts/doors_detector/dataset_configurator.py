@@ -31,7 +31,7 @@ trained_models_path = "/home/antonazzi/myfiles/trained_models"
 deep_doors_2_labelled_dataset_path = '/home/antonazzi/myfiles/deep_doors_2_labelled'
 final_doors_dataset_path = '/home/antonazzi/myfiles/final_doors_dataset/'
 real_final_doors_dataset_path = '/home/antonazzi/myfiles/final_doors_dataset_real'
-igibson_doors_dataset_path = '/media/michele/Elements/dataset'
+igibson_doors_dataset_path = '/media/michele/Elements/dataset2'
 
 
 def get_deep_doors_2_labelled_sets():

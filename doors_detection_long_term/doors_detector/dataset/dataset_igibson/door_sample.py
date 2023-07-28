@@ -33,6 +33,7 @@ DoorSample = SampleGenerator(name="IGibsonSample", label_set={0, 1}) \
     .add_dataset_field(field_name="depth_image", field_type=np.ndarray, save_function=slm.save_compressed_numpy_array, load_function=dsm.load_compressed_numpy_array) \
     .add_dataset_field(field_name="semantic_image", field_type=np.ndarray, save_function=slm.save_compressed_numpy_array, load_function=dsm.load_compressed_numpy_array) \
     .add_dataset_field(field_name="bounding_boxes", field_type=list, save_function=dsm.save_tuple_list, load_function=dsm.load_tuple_list) \
+    .add_dataset_field(field_name="semantic_instance_image", field_type=np.ndarray, save_function=slm.save_compressed_numpy_array, load_function=dsm.load_compressed_numpy_array) \
     .add_custom_method(method_name='show_sample', function=show_sample) \
     .generate_sample_class()
 

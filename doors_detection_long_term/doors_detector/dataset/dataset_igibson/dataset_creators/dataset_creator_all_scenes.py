@@ -29,46 +29,50 @@ class DatasetCreatorAllScenes:
         return self
     
     def create_datasets(self, doors_config:str = None, random_state: int = 42) -> Tuple[DatasetDoorsIGibson]:
-        def print_information(dataframe):
-            information_text = \
-            f""">\t Total samples: {len(dataframe.index)}\n""" + \
-            f""">\t Samples labels: {sorted(dataframe.label.unique())}\n""" + \
-            f""">\t Folders considered: {len(dataframe.folder_name.unique())}"""
-
-            information_text += "\n>\t Folders contributions:"
-            for folder_name in sorted(dataframe.folder_name.unique()):
-                information_text += f"""\n>\t\t- {folder_name}: {len(dataframe[dataframe.folder_name == folder_name])}"""
-                if DoorSample.GET_LABEL_SET():
-                    information_text += " of which"
-                    for label in sorted(list(DoorSample.GET_LABEL_SET())):
-                        information_text += f""" {len(dataframe[(dataframe.folder_name == folder_name) & (dataframe.label == label)])} have label {label}"""
-
-            print(information_text)
-
-        def filter_by_configuration(dataframe_row):
-            folder_name = dataframe_row.folder_name
-            metadata_filepath = os.path.join(self._dataset_path, folder_name, self._metadata_filename)
-            with open(metadata_filepath, "r") as mf:
-                metadata = json.loads(mf.read())
-
-            return metadata["doors_method"] == doors_config
-
+        ## rows with doors
         shuffled_dataframe = shuffle(self._dataframe, random_state=random_state)
         shuffled_dataframe = shuffled_dataframe[shuffled_dataframe.label == 1]
+
+        ## rows with doors config
         if doors_config in ["full open", "closed", "random open", "realistic"]:
-            mask = shuffled_dataframe.apply(filter_by_configuration, axis=1)
+            mask = shuffled_dataframe.apply(self.filter_by_configuration, axis=1, doors_config=doors_config)
             shuffled_dataframe = shuffled_dataframe[mask]
 
+        ## Splitting
         train_index, validation_index = train_test_split(shuffled_dataframe.index.tolist(), train_size=0.95, random_state=random_state)
-
         train_dataframe = shuffled_dataframe.loc[train_index]
         validation_dataframe = shuffled_dataframe.loc[validation_index]
 
+        ## printing infos
         for title, dataset in zip(["Original frame", "Training frame", "Validation frame"], [self._dataframe, train_dataframe, validation_dataframe]):
             print(title)
-            print_information(dataset)
+            self.print_information(dataset)
 
         return (
             DatasetDoorsIGibson(self._dataset_path, train_dataframe, TRAIN_SET, std_size=512, max_size=800, scales=[512 + i * 32 for i in range(11)]),
             DatasetDoorsIGibson(self._dataset_path, validation_dataframe, TEST_SET, std_size=512, max_size=800, scales=[512 + i * 32 for i in range(11)])
         )
+    
+    def print_information(self, dataframe):
+        information_text = \
+        f""">\t Total samples: {len(dataframe.index)}\n""" + \
+        f""">\t Samples labels: {sorted(dataframe.label.unique())}\n""" + \
+        f""">\t Folders considered: {len(dataframe.folder_name.unique())}"""
+
+        information_text += "\n>\t Folders contributions:"
+        for folder_name in sorted(dataframe.folder_name.unique()):
+            information_text += f"""\n>\t\t- {folder_name}: {len(dataframe[dataframe.folder_name == folder_name])}"""
+            if DoorSample.GET_LABEL_SET():
+                information_text += " of which"
+                for label in sorted(list(DoorSample.GET_LABEL_SET())):
+                    information_text += f""" {len(dataframe[(dataframe.folder_name == folder_name) & (dataframe.label == label)])} have label {label}"""
+
+        print(information_text)
+
+    def filter_by_configuration(self, dataframe_row, doors_config):
+        folder_name = dataframe_row.folder_name
+        metadata_filepath = os.path.join(self._dataset_path, folder_name, self._metadata_filename)
+        with open(metadata_filepath, "r") as mf:
+            metadata = json.loads(mf.read())
+
+        return metadata["doors_method"] == doors_config
