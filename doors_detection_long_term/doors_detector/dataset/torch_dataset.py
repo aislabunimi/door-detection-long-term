@@ -28,9 +28,9 @@ class TorchDatasetBBoxes(Dataset):
     def __init__(self, bboxes_dict: dict, set_type: SET):
 
         self._bboxes_dict = bboxes_dict
-        scales = [256 + i * 32 for i in range(11)]
+        scales = [256 + i * 32 for i in range(7)]
 
-        if set_type == TEST_SET or True:
+        if set_type == TEST_SET:
             self._transform = T.Compose([
                 #T.RandomResize([std_size], max_size=max_size),
                 T.ToTensor(),

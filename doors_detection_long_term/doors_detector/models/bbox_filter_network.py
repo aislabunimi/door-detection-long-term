@@ -142,7 +142,7 @@ class BboxFilterNetworkImage(GenericModel):
 
     def forward(self, images, boxes):
         x = self.fpn(images)
-        x = x['x0']
+        x = x['x1']
 
 
         # Convert boxes from [cx, cy, w, h] to [x1, y1, x2, y2]
@@ -157,7 +157,9 @@ class BboxFilterNetworkImage(GenericModel):
         converted_boxes[converted_boxes[:, :, 2] >= x.size(-1)] = x.size(-1)
         converted_boxes[converted_boxes[:, :, 1] >= x.size(-2)] = x.size(-2)
         converted_boxes[converted_boxes[:, :, 3] >= x.size(-2)] = x.size(-2)
+
         converted_boxes = converted_boxes.type(torch.int32)
+
         #print(converted_boxes)
 
         boxes_features = []
@@ -165,10 +167,10 @@ class BboxFilterNetworkImage(GenericModel):
         for n_batch, batch in enumerate(converted_boxes):
             boxes_features_batch = []
             for n_box, (x1, y1, x2, y2) in enumerate(batch):
-                mask = torch.zeros(x.size()[1:], device=x.device)
+                mask = torch.zeros(x.size()[1:], device=x.device, requires_grad=False)
                 mask[:, y1 : y2, x1 : x2] = 1.0
                 box_features = x[n_batch] * mask
-                box_features = torch.amax(box_features, dim=(1, 2)).unsqueeze(0)
+                box_features = torch.max(torch.max(box_features, dim=2)[0], dim=1)[0].unsqueeze(0)
                 boxes_features_batch.append(box_features)
             boxes_features.append(torch.cat(boxes_features_batch, dim=0).unsqueeze(0))
 
@@ -211,7 +213,7 @@ class BboxFilterNetworkGeometricLoss(nn.Module):
 
     def forward(self, preds, confidences, label_targets):
         scores_features, labels_features = preds
-        labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[0.50, 0.5, 0.10]], device=label_targets.device)
+        labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[0.15, 0.7, 0.15]], device=label_targets.device)
         labels_loss = torch.mean(-torch.mean(torch.sum(labels_loss, 2), 1))
 
         return torch.tensor(0), labels_loss
