@@ -20,7 +20,7 @@ from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-num_bboxes = 30
+num_bboxes = 20
 
 dataset_creator_bboxes = DatasetsCreatorBBoxes(num_bboxes=num_bboxes)
 
@@ -91,7 +91,7 @@ dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=0.5)
 
 train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=True, apply_transforms_to_train=False)
 
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=16, collate_fn=collate_fn_bboxes, num_workers=4, shuffle=False)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=32, collate_fn=collate_fn_bboxes, num_workers=4, shuffle=False)
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes, num_workers=4)
 
 #Check the dataset
