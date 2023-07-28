@@ -116,7 +116,6 @@ class TorchDatasetBBoxes(Dataset):
                 np.array(ious),
                 random_state=random_state
             )
-            print('------------------------')
 
         target['labels_encoded'] = torch.tensor(labels_encoded, dtype=torch.float)
         target['confidences'] = torch.tensor(confidences, dtype=torch.float)
