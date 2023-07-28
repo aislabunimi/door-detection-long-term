@@ -161,11 +161,11 @@ class BboxFilterNetworkImage(GenericModel):
         #print(converted_boxes)
 
         boxes_features = []
-        mask = torch.zeros(x.size()[1:], device=x.device)
+
         for n_batch, batch in enumerate(converted_boxes):
             boxes_features_batch = []
             for n_box, (x1, y1, x2, y2) in enumerate(batch):
-                mask[:, :, :] = 0
+                mask = torch.zeros(x.size()[1:], device=x.device)
                 mask[:, y1 : y2, x1 : x2] = 1.0
                 box_features = x[n_batch] * mask
                 box_features = torch.amax(box_features, dim=(1, 2)).unsqueeze(0)

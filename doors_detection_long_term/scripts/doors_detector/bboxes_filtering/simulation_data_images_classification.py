@@ -20,7 +20,7 @@ from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-num_bboxes = 20
+num_bboxes = 10
 
 dataset_creator_bboxes = DatasetsCreatorBBoxes(num_bboxes=num_bboxes)
 
