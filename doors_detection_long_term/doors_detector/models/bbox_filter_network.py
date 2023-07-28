@@ -38,10 +38,10 @@ class BboxFilterNetworkGeometric(GenericModel):
         self._initial_channels = initial_channels
 
         self.shared_mlp_1 = SharedMLP(channels=[initial_channels, 16, 32, 64])
-        self.shared_mlp_2 = SharedMLP(channels=[64, 64, 128, 256])
-        self.shared_mlp_3 = SharedMLP(channels=[256, 256, 512, 1024])
+        self.shared_mlp_2 = SharedMLP(channels=[64, 64, 128, 256, 512])
+        self.shared_mlp_3 = SharedMLP(channels=[512, 512, 1024])
 
-        self.shared_mlp_4 = SharedMLP(channels=[1024 + 256 + 64, 512, 256, 128])
+        self.shared_mlp_4 = SharedMLP(channels=[1024 + 512, 512, 256, 128])
 
         self.shared_mlp_5 = SharedMLP(channels=[128, 64, 32, 16, 1], last_activation=nn.Sigmoid())
 
@@ -62,13 +62,13 @@ class BboxFilterNetworkGeometric(GenericModel):
         local_features_2 = self.shared_mlp_2(local_features_1)
         local_features_3 = self.shared_mlp_3(local_features_2)
 
-        global_features_1 = torch.max(local_features_2, 2, keepdim=True)[0]
-        global_features_1 = global_features_1.repeat(1, 1, local_features_1.size(-1))
+        #global_features_1 = torch.max(local_features_2, 2, keepdim=True)[0]
+        #global_features_1 = global_features_1.repeat(1, 1, local_features_1.size(-1))
 
         global_features_2 = torch.max(local_features_3, 2, keepdim=True)[0]
         global_features_2 = global_features_2.repeat(1, 1, local_features_1.size(-1))
 
-        mixed_features = torch.cat([local_features_1, global_features_1, global_features_2], 1)
+        mixed_features = torch.cat([local_features_2, global_features_2], 1)
 
         mixed_features = self.shared_mlp_4(mixed_features)
 
@@ -213,7 +213,7 @@ class BboxFilterNetworkGeometricLoss(nn.Module):
 
     def forward(self, preds, confidences, label_targets):
         scores_features, labels_features = preds
-        labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[0.15, 0.7, 0.15]], device=label_targets.device)
+        labels_loss = torch.log(labels_features) * label_targets * torch.tensor([[0.15, 0.7, 0.15]], device=label_targets.device)
         labels_loss = torch.mean(torch.sum(torch.sum(labels_loss, 2) * -1, 1))
 
         return torch.tensor(0), labels_loss
