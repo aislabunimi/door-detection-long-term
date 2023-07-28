@@ -87,7 +87,7 @@ print(ap_metric_classic, complete_metric_classic)
 dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=0.5)
 #dataset_creator_bboxes.visualize_bboxes(show_filtered=True)
 
-train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets()
+train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=True)
 
 print(train_bboxes[0])
 

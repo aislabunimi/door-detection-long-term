@@ -1,10 +1,12 @@
 from abc import abstractmethod
+import random
 from typing import Type, List, Tuple
 
 import cv2
 from PIL import Image
 import numpy as np
 import torch
+from sklearn.utils import shuffle
 from src.bounding_box import BoundingBox
 from src.utils.enumerators import BBType, BBFormat
 
@@ -25,8 +27,9 @@ BOUNDING_BOX_DATASET: DATASET = 'bounding_box_dataset'
 
 
 class TorchDatasetBBoxes(Dataset):
-    def __init__(self, bboxes_dict: dict, set_type: SET):
+    def __init__(self, bboxes_dict: dict, set_type: SET, shuffle: bool = False):
 
+        self._shuffle = shuffle
         self._bboxes_dict = bboxes_dict
         scales = [256 + i * 32 for i in range(7)]
 
@@ -37,8 +40,6 @@ class TorchDatasetBBoxes(Dataset):
                 T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
             ])
         else:
-
-
             self._transform = T.Compose([
                 T.RandomSelect(
                     T.Identity(),
@@ -89,25 +90,41 @@ class TorchDatasetBBoxes(Dataset):
         len_detected_bboxes = len(detected_boxes)
 
         target['boxes'] = torch.tensor(detected_boxes + fixed_boxes, dtype=torch.float)
-        target['labels_encoded'] = torch.tensor(labels_encoded, dtype=torch.float)
-        target['confidences'] = torch.tensor(confidences, dtype=torch.float)
-        target['original_labels'] = torch.tensor(original_labels)
-        target['original_confidences'] = torch.tensor(original_confidences)
-        target['ious'] = torch.tensor(ious)
+
+        #target['labels_encoded'] = torch.tensor(labels_encoded, dtype=torch.float)
+        #target['confidences'] = torch.tensor(confidences, dtype=torch.float)
+        #target['original_labels'] = torch.tensor(original_labels)
+        #target['original_confidences'] = torch.tensor(original_confidences)
+        #target['ious'] = torch.tensor(ious)
 
         # The BGR image is convert in RGB
         image = (image * 255).astype(np.uint8)
         img, target = self._transform(Image.fromarray(image[..., [2, 1, 0]]), target)
 
-        detected_boxes = target['boxes'][:len_detected_bboxes]
-        fixed_boxes = target['boxes'][len_detected_bboxes:]
+        detected_boxes = target['boxes'][:len_detected_bboxes].tolist()
+        fixed_boxes = target['boxes'][len_detected_bboxes:].tolist()
 
-        # Convert bboxes from (X, Y, W, H) in (CX, CY, W, H)
-        #detected_boxes = torch.cat([detected_boxes[:, :2] + detected_boxes[:, 2:] / 2, detected_boxes[:, 2:]], dim=1)
-        #fixed_boxes = torch.cat([fixed_boxes[:, :2] + fixed_boxes[:, 2:] / 2, fixed_boxes[:, 2:]], dim=1)
+        if self._shuffle:
+            random_state = random.randint(1, 1000)
+            fixed_boxes, detected_boxes, labels_encoded, confidences, original_labels, original_confidences, ious = shuffle(
+                np.array(fixed_boxes),
+                np.array(detected_boxes),
+                np.array(labels_encoded),
+                np.array(confidences),
+                np.array(original_labels),
+                np.array(original_confidences),
+                np.array(ious),
+                random_state=random_state
+            )
+            print('------------------------')
 
-        target['fixed_boxes'] = fixed_boxes
-        target['detected_boxes'] = detected_boxes
+        target['labels_encoded'] = torch.tensor(labels_encoded, dtype=torch.float)
+        target['confidences'] = torch.tensor(confidences, dtype=torch.float)
+        target['original_labels'] = torch.tensor(original_labels, dtype=torch.float)
+        target['original_confidences'] = torch.tensor(original_confidences, dtype=torch.float)
+        target['ious'] = torch.tensor(ious, dtype=torch.float)
+        target['fixed_boxes'] = torch.tensor(fixed_boxes, dtype=torch.float)
+        target['detected_boxes'] = torch.tensor(detected_boxes, dtype=torch.float)
         return img, target
 
 
