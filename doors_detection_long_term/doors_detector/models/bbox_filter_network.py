@@ -44,7 +44,7 @@ class BboxFilterNetworkGeometric(GenericModel):
 
         self.shared_mlp_4 = SharedMLP(channels=[32 + 128, 128, 64])
 
-        self.shared_mlp_5 = SharedMLP(channels=[ 64, 32, 16, 1], last_activation=nn.Sigmoid())
+        self.shared_mlp_5 = SharedMLP(channels=[64, 32, 16, 1], last_activation=nn.Sigmoid())
 
         self.shared_mlp_6 = SharedMLP(channels=[64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
 
