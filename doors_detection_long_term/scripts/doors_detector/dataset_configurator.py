@@ -13,6 +13,8 @@ from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datase
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_final import DatasetsCreatorDoorsFinal
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_final_bbox_filter import \
     DatasetsCreatorDoorsFinalBBoxFilter
+from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_final_bbox_filter_one_house import \
+    DatasetsCreatorDoorsFinalBBoxFilterOneHouse
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_final_epoch_analysis import \
     DatasetsCreatorDoorsFinalEpochAnalysis
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_no_door_task import \
@@ -25,6 +27,7 @@ trained_models_path = "/home/antonazzi/myfiles/trained_models"
 deep_doors_2_labelled_dataset_path = '/home/antonazzi/myfiles/deep_doors_2_labelled'
 final_doors_dataset_path = '/home/antonazzi/myfiles/final_doors_dataset/'
 real_final_doors_dataset_path = '/home/antonazzi/myfiles/final_doors_dataset_real'
+box_filtering_dataset_path = '/home/antonazzi/myfiles/box_filtering_dataset'
 
 
 
@@ -100,6 +103,13 @@ def get_final_doors_dataset_bbox_filter(folder_name: str, train_size_student: fl
     labels = dataset_creator.get_labels()
 
     return train_student, validation_student, unlabelled_bbox_filter, test, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
+
+def get_final_doors_dataset_bbox_filter_one_house(folder_name: str):
+    dataset_creator = DatasetsCreatorDoorsFinalBBoxFilterOneHouse(dataset_path=final_doors_dataset_path)
+    train, test = dataset_creator.create_datasets(folder_name=folder_name)
+    labels = dataset_creator.get_labels()
+
+    return train, test, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
 
 def get_final_doors_dataset_real_data_bbox_filter(folder_name: str, train_size: float = 0.15, control_size: float = 0.15, fine_tune_size: float = 0.45, test_size: float = 0.25):
     dataset_creator = DatasetsCreatorRealDataBboxFilter(dataset_path=real_final_doors_dataset_path)

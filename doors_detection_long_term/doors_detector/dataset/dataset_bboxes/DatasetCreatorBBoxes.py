@@ -3,15 +3,19 @@ from enum import Enum
 import cv2
 import numpy as np
 import torch
+from generic_dataset.dataset_folder_manager import DatasetFolderManager
+from generic_dataset.dataset_manager import DatasetManager
 from src.bounding_box import BoundingBox
 from src.utils.enumerators import BBType, BBFormat, CoordinatesType
 from sklearn.utils import shuffle
 
+from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.box_filtering_example import BoxFilteringExample
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import TorchDatasetBBoxes, TRAIN_SET, TEST_SET
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import xywh2xyxy
+from doors_detection_long_term.scripts.doors_detector.dataset_configurator import box_filtering_dataset_path
 
 
-class Type(Enum):
+class ExampleType(Enum):
     TRAINING = 1
     TEST = 2
 
@@ -34,10 +38,10 @@ class DatasetsCreatorBBoxes:
             'bboxes_matched': [],
         }
 
-    def visualize_bboxes(self, show_filtered: bool = False, bboxes_type: Type = Type.TRAINING):
-        if bboxes_type == Type.TEST:
+    def visualize_bboxes(self, show_filtered: bool = False, bboxes_type: ExampleType = ExampleType.TRAINING):
+        if bboxes_type == ExampleType.TEST:
             bboxes_dict = self._test_bboxes
-        elif bboxes_type == Type.TRAINING:
+        elif bboxes_type == ExampleType.TRAINING:
             bboxes_dict = self._training_bboxes
         for i, (image, bboxes, target_bboxes, matched_bboxes) in enumerate(zip(bboxes_dict['images'], bboxes_dict['bboxes'], bboxes_dict['gt_bboxes'], bboxes_dict['bboxes_matched'])):
             img_size = image.shape
@@ -48,7 +52,7 @@ class DatasetsCreatorBBoxes:
 
             for bbox in target_bboxes:
                 x1, y1, x2, y2 = bbox.get_absolute_bounding_box(BBFormat.XYX2Y2)
-                target_image = cv2.rectangle(target_image, (int(x1), int(y1)), (int(x2), int(y2)), self._colors[int(bbox.get_class_id())], 2)
+                target_image = cv2.rectangle(target_image, (int(x1), int(y1)), (int(x2), int(y2)), self._colors[int(float(bbox.get_class_id()))], 2)
 
                 # Create a matched image for each gt bbox
                 matched_image = image.copy()
@@ -57,12 +61,12 @@ class DatasetsCreatorBBoxes:
                 for detected_box, gt_box in matched_bboxes:
                     if gt_box == bbox:
                         x1, y1, x2, y2 = detected_box.get_absolute_bounding_box(BBFormat.XYX2Y2)
-                        matched_image = cv2.rectangle(matched_image, (int(x1), int(y1)), (int(x2), int(y2)), self._colors[int(bbox.get_class_id())], 2)
+                        matched_image = cv2.rectangle(matched_image, (int(x1), int(y1)), (int(x2), int(y2)), self._colors[int(float(bbox.get_class_id()))], 2)
                 matched_images.append(matched_image)
 
             for bbox in bboxes:
                 x1, y1, x2, y2 = bbox.get_absolute_bounding_box(BBFormat.XYX2Y2)
-                show_image = cv2.rectangle(show_image, (int(x1), int(y1)), (int(x2), int(y2)), self._colors[int(bbox.get_class_id())], 2)
+                show_image = cv2.rectangle(show_image, (int(x1), int(y1)), (int(x2), int(y2)), self._colors[int(float(bbox.get_class_id()))], 2)
 
             for detected_box, gt_box in matched_bboxes:
                 if gt_box == None:
@@ -97,11 +101,66 @@ class DatasetsCreatorBBoxes:
         return (TorchDatasetBBoxes(bboxes_dict=self._training_bboxes, set_type=TRAIN_SET if apply_transforms_to_train else TEST_SET, shuffle=shuffle_boxes),
                 TorchDatasetBBoxes(bboxes_dict=self._test_bboxes, set_type=TEST_SET, shuffle=False))
 
+    def export_dataset(self, folder_name: str):
+        dataset_manager = DatasetManager(dataset_path=box_filtering_dataset_path, sample_class=BoxFilteringExample)
+        if folder_name in dataset_manager.get_folder_names():
+            raise Exception('Change folder name')
+        folder_manager = DatasetFolderManager(dataset_path=box_filtering_dataset_path, folder_name=folder_name, sample_class=BoxFilteringExample)
 
-    def add_yolo_bboxes(self, images, targets, preds, bboxes_type: Type):
-        if bboxes_type == Type.TEST:
+        def save_dictionary(dataset, example_type):
+            for image, gt_boxes, bboxes in zip(dataset['images'], dataset['gt_bboxes'], dataset['bboxes']):
+                example = BoxFilteringExample()
+                example.set_bgr_image((image*255).astype(np.uint8))
+                example.set_example_type(float(1 if example_type == ExampleType.TRAINING else 2))
+
+                gt_bboxes_converted = [list(box.get_absolute_bounding_box(BBFormat.XYX2Y2)) + [int(box.get_class_id()), 1.0] for box in gt_boxes]
+                bboxes_converted = [list(box.get_absolute_bounding_box(BBFormat.XYX2Y2)) + [int(box.get_class_id()), box.get_confidence()] for box in bboxes]
+
+                example.set_gt_bounding_boxes(np.array(gt_bboxes_converted))
+                example.set_detected_bounding_boxes(np.array(bboxes_converted))
+                folder_manager.save_sample(example, use_thread=True)
+
+        save_dictionary(self._training_bboxes, ExampleType.TRAINING)
+        save_dictionary(self._test_bboxes, ExampleType.TEST)
+        folder_manager.save_metadata()
+
+    def load_dataset(self, folder_name: str):
+        dataset_manager = DatasetManager(dataset_path=box_filtering_dataset_path, sample_class=BoxFilteringExample)
+        if folder_name not in dataset_manager.get_folder_names():
+            raise Exception('Folder name doen\'t exists')
+
+        folder_manager = DatasetFolderManager(dataset_path=box_filtering_dataset_path, folder_name=folder_name, sample_class=BoxFilteringExample)
+        for (label, relative_count) in folder_manager.get_samples_information():
+            sample = folder_manager.load_sample_using_relative_count(label=label, relative_count=relative_count, use_thread=False)
+            dictionary = self._training_bboxes if ExampleType(int(sample.get_example_type())) == ExampleType.TRAINING else self._test_bboxes
+            dictionary['images'].append(sample.get_bgr_image())
+            gt_bboxes = []
+            for x1, y1, x2, y2, label, conf in sample.get_gt_bounding_boxes():
+                gt_bboxes.append(BoundingBox(
+                    image_name=str(relative_count),
+                    class_id=str(int(float(label))),
+                    coordinates=(int(x1), int(y1), int(x2), int(y2)),
+                    bb_type=BBType.GROUND_TRUTH,
+                    format=BBFormat.XYX2Y2,
+                ))
+            dictionary['gt_bboxes'].append(gt_bboxes)
+
+            bboxes = []
+            for x1, y1, x2, y2, label, conf in sample.get_detected_bounding_boxes():
+                bboxes.append(BoundingBox(
+                    image_name=str(relative_count),
+                    class_id=str(int(float(label))),
+                    coordinates=(int(x1), int(y1), int(x2), int(y2)),
+                    bb_type=BBType.DETECTED,
+                    format=BBFormat.XYX2Y2,
+                    confidence=conf
+                ))
+            dictionary['bboxes'].append(bboxes)
+
+    def add_yolo_bboxes(self, images, targets, preds, bboxes_type: ExampleType):
+        if bboxes_type == ExampleType.TEST:
             bboxes_dict = self._test_bboxes
-        elif bboxes_type == Type.TRAINING:
+        elif bboxes_type == ExampleType.TRAINING:
             bboxes_dict = self._training_bboxes
 
         img_size = images.size()[2:][::-1]

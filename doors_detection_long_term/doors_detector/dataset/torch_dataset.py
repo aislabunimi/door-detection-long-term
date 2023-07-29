@@ -98,7 +98,8 @@ class TorchDatasetBBoxes(Dataset):
         #target['ious'] = torch.tensor(ious)
 
         # The BGR image is convert in RGB
-        image = (image * 255).astype(np.uint8)
+        if image.dtype != np.uint8:
+            image = (image * 255).astype(np.uint8)
         img, target = self._transform(Image.fromarray(image[..., [2, 1, 0]]), target)
 
         detected_boxes = target['boxes'][:len_detected_bboxes].tolist()

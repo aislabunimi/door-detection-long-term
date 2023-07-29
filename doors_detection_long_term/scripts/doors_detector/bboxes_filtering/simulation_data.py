@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCreatorBBoxes import DatasetsCreatorBBoxes, \
-    Type
+    ExampleType
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
@@ -41,14 +41,14 @@ with torch.no_grad():
         images = images.to('cuda')
         preds, train_out = model.model(images)
 
-        dataset_creator_bboxes.add_yolo_bboxes(images, targets, preds, Type.TRAINING)
+        dataset_creator_bboxes.add_yolo_bboxes(images, targets, preds, ExampleType.TRAINING)
 
     for images, targets, converted_boxes in tqdm(data_loader_test, total=len(data_loader_test)):
         images = images.to('cuda')
         preds, train_out = model.model(images)
 
 
-        dataset_creator_bboxes.add_yolo_bboxes(images, targets, preds, Type.TEST)
+        dataset_creator_bboxes.add_yolo_bboxes(images, targets, preds, ExampleType.TEST)
 
     # Calculate metrics
     evaluator = MyEvaluator()
@@ -132,7 +132,7 @@ def check_bbox_dataset(dataset):
         cv2.imshow('show', new_image)
         cv2.waitKey()
 
-#check_bbox_dataset(train_dataset_bboxes)
+check_bbox_dataset(train_dataset_bboxes)
 bbox_model = BboxFilterNetworkGeometric(initial_channels=7, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST)
 bbox_model.to('cuda')
 

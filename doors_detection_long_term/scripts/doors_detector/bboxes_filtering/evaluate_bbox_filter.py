@@ -3,7 +3,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCreatorBBoxes import DatasetsCreatorBBoxes, \
-    Type
+    ExampleType
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
@@ -41,7 +41,7 @@ with torch.no_grad():
                                     max_det=num_bboxes)
 
 
-        dataset_creator_bboxes.add_yolo_bboxes(images, targets, preds, Type.TEST)
+        dataset_creator_bboxes.add_yolo_bboxes(images, targets, preds, ExampleType.TEST)
 
 dataset_creator_bboxes.filter_bboxes(iou_threshold=0.75, filter_multiple_detection=False, consider_label=False)
 #dataset_creator_bboxes.visualize_bboxes(show_filtered=True)
