@@ -20,10 +20,9 @@ class ExampleType(Enum):
     TEST = 2
 
 class DatasetsCreatorBBoxes:
-    def __init__(self,  num_bboxes):
+    def __init__(self, max_bboxes: int = 200):
         self._colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-        self._num_bboxes = num_bboxes
-
+        self._max_bboxes = max_bboxes
         self._img_count = 0
         self._training_bboxes = {
             'images': [],
@@ -92,6 +91,13 @@ class DatasetsCreatorBBoxes:
                 matching.append((detected_bbox, matched_gt))
             matching_images.append(matching)
         dataset_dict['bboxes_matched'] = matching_images
+
+    def select_n_bounding_boxes(self, num_bboxes: int):
+        for i, bboxes in enumerate(self._training_bboxes['bboxes']):
+            self._training_bboxes['bboxes'][i] = sorted(bboxes, key=lambda x: x.get_confidence(), reverse=True)[:num_bboxes]
+
+        for i, bboxes in enumerate(self._test_bboxes['bboxes']):
+            self._test_bboxes['bboxes'][i] = sorted(bboxes, key=lambda x: x.get_confidence(), reverse=True)[:num_bboxes]
 
     def match_bboxes_with_gt(self, iou_threshold_matching: float = 0.5):
         self._match_detected_bboxes(self._training_bboxes, iou_threshold_matching)
@@ -198,7 +204,7 @@ class DatasetsCreatorBBoxes:
             for (x1, y1, x2, y2), score, label in zip(coords.tolist(), conf.tolist(), labels.tolist()):
                 label = int(label)
                 if label >= 0:
-                    detected_boxes.append(BoundingBox(
+                    box = BoundingBox(
                         image_name=str(img_count_temp),
                         class_id=str(label),
                         type_coordinates=CoordinatesType.ABSOLUTE,
@@ -207,7 +213,11 @@ class DatasetsCreatorBBoxes:
                         format=BBFormat.XYWH,
                         confidence=score,
                         img_size=img_size
-                    ))
-            detected_boxes = sorted(detected_boxes, key=lambda x: x.get_confidence(), reverse=True)[:self._num_bboxes]
+                    )
+
+                    x1, y1, x2, y2 = box.get_absolute_bounding_box(BBFormat.XYX2Y2)
+                    if x2 > x1 + 1 and y2 > y1 + 1:
+                        detected_boxes.append(box)
+            detected_boxes = sorted(detected_boxes, key=lambda x: x.get_confidence(), reverse=True)[:self._max_bboxes]
             bboxes_dict['bboxes'].append(detected_boxes)
             img_count_temp += 1

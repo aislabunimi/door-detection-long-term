@@ -20,7 +20,7 @@ from doors_detection_long_term.scripts.doors_detector.dataset_configurator impor
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 num_bboxes = 20
 
-dataset_creator_bboxes = DatasetsCreatorBBoxes(num_bboxes=num_bboxes)
+dataset_creator_bboxes = DatasetsCreatorBBoxes()
 
 houses = ['house_1', 'house_2', 'house_7', 'house_9', 'house_10', 'house_13', 'house_15', 'house_20', 'house_21', 'house_22']
 
