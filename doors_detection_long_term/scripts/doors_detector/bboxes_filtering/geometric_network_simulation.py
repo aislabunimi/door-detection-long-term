@@ -70,10 +70,11 @@ class BboxFilterNetworkGeometric(GenericModel):
 
         return score_features, label_features
 
-class BboxFilterNetworkGeometricLoss(nn.Module):
+
+class BboxFilterNetworkGeometricLabelLoss(nn.Module):
 
     def __init__(self, weight=1.0, reduction_image='sum', reduction_global='mean'):
-        super(BboxFilterNetworkGeometricLoss, self).__init__()
+        super(BboxFilterNetworkGeometricLabelLoss, self).__init__()
         self._weight = weight
         if not (reduction_image == 'sum' or reduction_image == 'mean'):
             raise Exception('Parameter "reduction_image" must be mean|sum')
@@ -82,12 +83,19 @@ class BboxFilterNetworkGeometricLoss(nn.Module):
         self._reduction_image = reduction_image
         self._reduction_global = reduction_global
 
-    def forward(self, preds, confidences, label_targets):
+    def forward(self, preds, label_targets):
         scores_features, labels_features = preds
         labels_loss = torch.log(labels_features) * label_targets * torch.tensor([[0.3, 0.5, 0.2]], device=label_targets.device)
         labels_loss = torch.mean(torch.sum(torch.sum(labels_loss, 2) * -1, 1))
 
-        return torch.tensor(0), labels_loss
+        return labels_loss
+
+class BboxFilterNetworkGeometricConfidenceLoss(nn.Module):
+    def forward(self, preds, confidences):
+        scores_features, labels_features = preds
+        confidence_loss = torch.mean(torch.sum(torch.abs(scores_features - confidences), dim=1))
+
+        return confidence_loss
 
 dataset_creator_bboxes = DatasetsCreatorBBoxes()
 dataset_creator_bboxes.load_dataset(folder_name='yolov5_simulation_dataset')
@@ -98,6 +106,9 @@ train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes
 
 train_dataset_bboxes = DataLoader(train_bboxes, batch_size=64, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=64, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
+
+
+# Calculate Metrics in real worlds
 
 #Check the dataset
 def check_bbox_dataset(dataset):
@@ -141,16 +152,18 @@ def check_bbox_dataset(dataset):
 bbox_model = BboxFilterNetworkGeometric(initial_channels=7, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST)
 bbox_model.to('cuda')
 
-criterion = BboxFilterNetworkGeometricLoss(reduction_image='sum', reduction_global='mean')
+criterion_label = BboxFilterNetworkGeometricLabelLoss(reduction_image='sum', reduction_global='mean')
+criterion_confidence = BboxFilterNetworkGeometricConfidenceLoss()
 
 optimizer = optim.Adam(bbox_model.parameters(), lr=0.001)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
-criterion.to('cuda')
+criterion_label.to('cuda')
+criterion_confidence.to('cuda')
 #for n, p in bbox_model.named_parameters():
 #    if p.requires_grad:
 #        print(n)
 
-logs = {'train': [], 'test': [], 'ap': {0: [], 1: []}, 'complete_metric': {'TP': [], 'FP': [], 'BFD': []}}
+logs = {'train': {'loss_label':[], 'loss_confidence':[], 'loss_final':[]}, 'test': {'loss_label':[], 'loss_confidence':[], 'loss_final':[]}, 'ap': {0: [], 1: []}, 'complete_metric': {'TP': [], 'FP': [], 'BFD': []}}
 
 # compute total labels
 train_total = {0:0, 1:0, 2:0}
@@ -173,35 +186,47 @@ test_accuracy = {0: [], 1: [], 2: []}
 for epoch in range(60):
     #scheduler.step()
     bbox_model.train()
-    criterion.train()
+    criterion_label.train()
     optimizer.zero_grad()
 
-    temp_losses = []
+    temp_losses_label = []
+    temp_losses_confidence = []
+    temp_losses_final = []
+
     for data in tqdm(train_dataset_bboxes, total=len(train_dataset_bboxes), desc=f'Training epoch {epoch}'):
         images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious = data
         images = images.to('cuda')
         detected_bboxes = detected_bboxes.to('cuda')
         confidences = confidences.to('cuda')
         labels_encoded = labels_encoded.to('cuda')
+        ious = ious.to('cuda')
 
         preds = bbox_model(images, detected_bboxes)
         #print(preds, filtered)
-        loss_confidence, loss_label = criterion(preds, confidences, labels_encoded)
-        final_loss = loss_label
+        loss_label = criterion_label(preds, labels_encoded)
+        loss_confidence = criterion_confidence(preds, ious)
+        final_loss = loss_label + loss_confidence
 
-        temp_losses.append(final_loss.item())
+        temp_losses_label.append(loss_label.item())
+        temp_losses_confidence.append(loss_confidence.item())
+        temp_losses_final.append(final_loss.item())
         optimizer.zero_grad()
         final_loss.backward()
         #official_loss.backward()
         optimizer.step()
-    logs['train'].append(sum(temp_losses) / len(temp_losses))
+    logs['train']['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
+    logs['train']['loss_confidence'].append(sum(temp_losses_confidence) / len(temp_losses_confidence))
+    logs['train']['loss_label'].append(sum(temp_losses_label) / len(temp_losses_label))
 
-    temp_losses = []
+    temp_losses_label = []
+    temp_losses_confidence = []
+    temp_losses_final = []
 
     with torch.no_grad():
 
         bbox_model.eval()
-        criterion.eval()
+        criterion_label.eval()
+        criterion_confidence.eval()
 
         temp_accuracy = {0:0, 1:0, 2:0}
         for data in tqdm(train_dataset_bboxes, total=len(train_dataset_bboxes), desc=f'TEST epoch {epoch}'):
@@ -210,6 +235,7 @@ for epoch in range(60):
             detected_bboxes = detected_bboxes.to('cuda')
             confidences = confidences.to('cuda')
             labels_encoded = labels_encoded.to('cuda')
+            ious = ious.to('cuda')
 
             preds = bbox_model(images, detected_bboxes)
 
@@ -233,12 +259,16 @@ for epoch in range(60):
             detected_bboxes = detected_bboxes.to('cuda')
             confidences = confidences.to('cuda')
             labels_encoded = labels_encoded.to('cuda')
+            ious = ious.to('cuda')
 
             preds = bbox_model(images, detected_bboxes)
-            loss_confidence, loss_label = criterion(preds, confidences, labels_encoded)
-            final_loss = loss_label
+            loss_label = criterion_label(preds, labels_encoded)
+            loss_confidence = criterion_confidence(preds, ious)
+            final_loss = loss_label + loss_confidence
 
-            temp_losses.append(final_loss.item())
+            temp_losses_final.append(final_loss.item())
+            temp_losses_confidence.append(loss_confidence.item())
+            temp_losses_label.append(loss_label.item())
 
             predicted_labels = preds[1]
 
@@ -269,15 +299,24 @@ for epoch in range(60):
     plt.legend()
     plt.savefig('val_geometric.svg')
     print(test_accuracy)
-    logs['test'].append(sum(temp_losses) / len(temp_losses))
+    logs['test']['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
+    logs['test']['loss_confidence'].append(sum(temp_losses_confidence) / len(temp_losses_confidence))
+    logs['test']['loss_label'].append(sum(temp_losses_label) / len(temp_losses_label))
     print(logs['train'], logs['test'])
 
     fig = plt.figure()
-    plt.plot([i for i in range(len(logs['train']))], logs['train'], label='train_loss')
-    plt.plot([i for i in range(len(logs['train']))], logs['test'], label='test_loss')
+    plt.plot([i for i in range(len(logs['train']['loss_label']))], logs['train']['loss_label'], label='train_loss')
+    plt.plot([i for i in range(len(logs['train']['loss_label']))], logs['test']['loss_label'], label='test_loss')
     plt.title('Losses')
     plt.legend()
-    plt.savefig('losses_geometric.svg')
+    plt.savefig('losses_geometric_label.svg')
+
+    fig = plt.figure()
+    plt.plot([i for i in range(len(logs['train']['loss_confidence']))], logs['train']['loss_confidence'], label='train_loss')
+    plt.plot([i for i in range(len(logs['train']['loss_confidence']))], logs['test']['loss_confidence'], label='test_loss')
+    plt.title('Losses')
+    plt.legend()
+    plt.savefig('losses_geometric_confidence.svg')
     bbox_model.save(epoch=epoch, optimizer_state_dict=optimizer.state_dict(), params={}, logs=logs, lr_scheduler_state_dict={})
 
 

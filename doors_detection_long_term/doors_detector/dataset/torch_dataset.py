@@ -82,7 +82,7 @@ class TorchDatasetBBoxes(Dataset):
             confidences.append(0.0 if gt_box is None else 1.0)
             label = 0 if gt_box is None else int(gt_box.get_class_id()) + 1
             labels_encoded.append([0 if i != label else 1 for i in range(3)]) # 3 is the number of label (background, closed door, open door)
-            ious.append([0.0] if gt_box is None else [BoundingBox.iou(detected_box, gt_box)])
+            ious.append(0.0 if gt_box is None else BoundingBox.iou(detected_box, gt_box))
             gt_x, gt_y, gt_w, gt_h = gt_box.get_absolute_bounding_box() if gt_box is not None else (x, y, w, h)
 
             fixed_boxes.append((gt_x, gt_y, gt_x + gt_w, gt_y + gt_h))
