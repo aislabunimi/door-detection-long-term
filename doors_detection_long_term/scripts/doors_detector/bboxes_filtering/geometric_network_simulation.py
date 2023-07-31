@@ -68,7 +68,7 @@ class BboxFilterNetworkGeometric(GenericModel):
         score_features = self.shared_mlp_5(mixed_features)
         label_features = self.shared_mlp_6(mixed_features)
 
-        score_features = torch.squeeze(score_features)
+        score_features = torch.squeeze(score_features, dim=1)
         label_features = torch.transpose(label_features, 1, 2)
 
         return score_features, label_features
@@ -164,7 +164,7 @@ with torch.no_grad():
 
         #dataset_creator_bboxes_real_world.visualize_bboxes(bboxes_type=ExampleType.TEST)
         _, test_bboxes = dataset_creator_bboxes_real_world.create_datasets(shuffle_boxes=False, apply_transforms_to_train=False)
-        datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=64, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=False)
+        datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=False)
 
 
 performances_in_real_worlds['AP']['0'] = sum(performances_in_real_worlds['AP']['0']) / len(performances_in_real_worlds['AP']['0'])
@@ -330,12 +330,13 @@ for epoch in range(60):
             test_accuracy[i].append(temp_accuracy[i] / test_total[i])
 
     # Test with real world data
-    evaluator = MyEvaluator()
-    evaluator_complete_metric = MyEvaluatorCompleteMetric()
+
     temp = {'AP':{'0':[], '1':[]}, 'TP': [], 'FP': [], 'TPm': [], 'FPiou': []}
     for house, dataset_real_world in datasets_real_worlds.items():
+        evaluator = MyEvaluator()
+        evaluator_complete_metric = MyEvaluatorCompleteMetric()
         t= {'TP': [], 'FP': [], 'TPm': [], 'FPiou': []}
-        for data in tqdm(test_dataset_bboxes, total=len(dataset_real_world), desc=f'TEST in {house}, epoch {epoch}'):
+        for data in tqdm(dataset_real_world, total=len(dataset_real_world), desc=f'TEST in {house}, epoch {epoch}'):
             images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes = data
             images = images.to('cuda')
             detected_bboxes = detected_bboxes.to('cuda')
@@ -353,7 +354,6 @@ for epoch in range(60):
 
         for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
             temp['AP'][label].append(values['AP'])
-
 
         for label, values in sorted(metric_complete.items(), key=lambda v: v[0]):
             t['TP'].append(values['TP'])
