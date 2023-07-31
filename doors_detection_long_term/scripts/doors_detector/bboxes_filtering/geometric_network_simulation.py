@@ -163,6 +163,24 @@ performances_in_real_worlds['FPiou'] = sum(performances_in_real_worlds['FPiou'])
 
 
 print(performances_in_real_worlds)
+
+# Plot evaluation in real worlds
+fig = plt.figure()
+plt.axhline(y=performances_in_real_worlds['AP']['0'], color = 'r', linestyle = '--', label='closed doors')
+plt.axhline(y=performances_in_real_worlds['AP']['1'], color = 'g', linestyle = '--', label='open doors')
+plt.title('AP')
+plt.legend()
+plt.savefig('AP.svg')
+
+fig = plt.figure()
+plt.axhline(y=performances_in_real_worlds['TP'], color = 'g', linestyle = '--', label='TP')
+plt.axhline(y=performances_in_real_worlds['FP'], color = 'r', linestyle = '--', label='FP')
+plt.axhline(y=performances_in_real_worlds['TPm'], color = 'forestgreen', linestyle = '--', label='TPm')
+plt.axhline(y=performances_in_real_worlds['FPiou'], color = 'salmon', linestyle = '--', label='FPiou')
+plt.title('Complete metric')
+plt.legend()
+plt.savefig('complete_metric.svg')
+
 #Check the dataset
 def check_bbox_dataset(dataset):
     for data in dataset:
@@ -371,6 +389,9 @@ for epoch in range(60):
     plt.legend()
     plt.savefig('losses_geometric_confidence.svg')
     bbox_model.save(epoch=epoch, optimizer_state_dict=optimizer.state_dict(), params={}, logs=logs, lr_scheduler_state_dict={})
+
+
+
 
 
 
