@@ -129,7 +129,7 @@ yolo_gd.eval()
 performances_in_real_worlds = {'AP': {'0': [], '1': []},
                                'TP': [], 'FP': [], 'TPm': [], 'FPiou': []}
 
-datasets_real_world = {}
+datasets_real_worlds = {}
 with torch.no_grad():
     for house in houses:
         dataset_creator_bboxes_real_world = DatasetsCreatorBBoxes()
@@ -164,7 +164,7 @@ with torch.no_grad():
 
         #dataset_creator_bboxes_real_world.visualize_bboxes(bboxes_type=ExampleType.TEST)
         _, test_bboxes = dataset_creator_bboxes_real_world.create_datasets(shuffle_boxes=False, apply_transforms_to_train=False)
-        datasets_real_world[house] = DataLoader(test_bboxes, batch_size=64, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=False)
+        datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=64, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=False)
 
 
 performances_in_real_worlds['AP']['0'] = sum(performances_in_real_worlds['AP']['0']) / len(performances_in_real_worlds['AP']['0'])
@@ -228,7 +228,8 @@ for data in test_dataset_bboxes:
 
 train_accuracy = {0: [], 1: [], 2: []}
 test_accuracy = {0: [], 1: [], 2: []}
-
+performances_in_real_worlds_bbox_filtering = {'AP': {'0': [], '1': []},
+                               'TP': [], 'FP': [], 'TPm': [], 'FPiou': []}
 for epoch in range(60):
     #scheduler.step()
     bbox_model.train()
@@ -328,6 +329,49 @@ for epoch in range(60):
         for i in range(3):
             test_accuracy[i].append(temp_accuracy[i] / test_total[i])
 
+    # Test with real world data
+    evaluator = MyEvaluator()
+    evaluator_complete_metric = MyEvaluatorCompleteMetric()
+    temp = {'AP':{'0':[], '1':[]}, 'TP': [], 'FP': [], 'TPm': [], 'FPiou': []}
+    for house, dataset_real_world in datasets_real_worlds.items():
+        t= {'TP': [], 'FP': [], 'TPm': [], 'FPiou': []}
+        for data in tqdm(test_dataset_bboxes, total=len(dataset_real_world), desc=f'TEST in {house}, epoch {epoch}'):
+            images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes = data
+            images = images.to('cuda')
+            detected_bboxes = detected_bboxes.to('cuda')
+            confidences = confidences.to('cuda')
+            labels_encoded = labels_encoded.to('cuda')
+            ious = ious.to('cuda')
+
+            preds = bbox_model(images, detected_bboxes)
+
+            evaluator.add_predictions_bboxes_filtering(detected_bboxes, preds, target_boxes, img_size=images.size()[2:][::-1])
+            evaluator_complete_metric.add_predictions_bboxes_filtering(detected_bboxes, preds, target_boxes, img_size=images.size()[2:][::-1])
+
+        metric = evaluator.get_metrics(iou_threshold=iou_threshold_matching, confidence_threshold=confidence_threshold)
+        metric_complete = evaluator_complete_metric.get_metrics(iou_threshold=iou_threshold_matching, confidence_threshold=confidence_threshold)
+
+        for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
+            temp['AP'][label].append(values['AP'])
+
+
+        for label, values in sorted(metric_complete.items(), key=lambda v: v[0]):
+            t['TP'].append(values['TP'])
+            t['FP'].append(values['FP'])
+            t['TPm'].append(values['TPm'])
+            t['FPiou'].append(values['FPiou'])
+        temp['TP'].append(sum(t['TP']))
+        temp['FP'].append(sum(t['FP']))
+        temp['TPm'].append(sum(t['TPm']))
+        temp['FPiou'].append(sum(t['FPiou']))
+
+    performances_in_real_worlds_bbox_filtering['AP']['0'].append(sum(temp['AP']['0']) / len(temp['AP']['1']))
+    performances_in_real_worlds_bbox_filtering['AP']['1'].append(sum(temp['AP']['1']) / len(temp['AP']['1']))
+    performances_in_real_worlds_bbox_filtering['TP'].append(sum(temp['TP']))
+    performances_in_real_worlds_bbox_filtering['FP'].append(sum(temp['FP']))
+    performances_in_real_worlds_bbox_filtering['TPm'].append(sum(temp['TPm']))
+    performances_in_real_worlds_bbox_filtering['FPiou'].append(sum(temp['FPiou']))
+    print(performances_in_real_worlds_bbox_filtering)
     print(train_accuracy)
     fig = plt.figure()
     plt.plot([i for i in range(len(train_accuracy[0]))], train_accuracy[0], label='background')
