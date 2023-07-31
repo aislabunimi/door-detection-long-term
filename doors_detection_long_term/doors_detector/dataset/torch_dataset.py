@@ -71,6 +71,14 @@ class TorchDatasetBBoxes(Dataset):
         confidences = []
         labels_encoded = []
         ious = []
+
+        for gt_box in gt_bboxes:
+            x, y, w, h = gt_box.get_absolute_bounding_box()
+            original_label = int(gt_box.get_class_id())
+            target_boxes.append([x, y, x + w, y + h, original_label])
+
+        target_boxes = torch.tensor(target_boxes)
+
         for detected_box, gt_box in matched_bboxes:
             x, y, w, h = detected_box.get_absolute_bounding_box()
             original_label = int(detected_box.get_class_id())
@@ -88,8 +96,9 @@ class TorchDatasetBBoxes(Dataset):
             fixed_boxes.append((gt_x, gt_y, gt_x + gt_w, gt_y + gt_h))
 
         len_detected_bboxes = len(detected_boxes)
+        len_fixed_bboxes = len(fixed_boxes)
 
-        target['boxes'] = torch.tensor(detected_boxes + fixed_boxes, dtype=torch.float)
+        target['boxes'] = torch.tensor(detected_boxes + fixed_boxes + target_boxes[:, :4].tolist(), dtype=torch.float)
 
         #target['labels_encoded'] = torch.tensor(labels_encoded, dtype=torch.float)
         #target['confidences'] = torch.tensor(confidences, dtype=torch.float)
@@ -103,7 +112,8 @@ class TorchDatasetBBoxes(Dataset):
         img, target = self._transform(Image.fromarray(image[..., [2, 1, 0]]), target)
 
         detected_boxes = target['boxes'][:len_detected_bboxes].tolist()
-        fixed_boxes = target['boxes'][len_detected_bboxes:].tolist()
+        fixed_boxes = target['boxes'][len_detected_bboxes:len_detected_bboxes + len_fixed_bboxes].tolist()
+        target_bboxes_modified = target['boxes'][len_detected_bboxes + len_fixed_bboxes:]
 
         if self._shuffle:
             random_state = random.randint(1, 1000)
@@ -125,6 +135,8 @@ class TorchDatasetBBoxes(Dataset):
         target['ious'] = torch.tensor(ious, dtype=torch.float)
         target['fixed_boxes'] = torch.tensor(fixed_boxes, dtype=torch.float)
         target['detected_boxes'] = torch.tensor(detected_boxes, dtype=torch.float)
+        target_boxes[:, :4] = target_bboxes_modified
+        target['target_boxes'] = target_boxes
         return img, target
 
 

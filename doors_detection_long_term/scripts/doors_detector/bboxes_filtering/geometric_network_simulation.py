@@ -15,7 +15,8 @@ from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, 
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
 from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_yolov5, collate_fn_bboxes
-from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering import bounding_box_filtering_yolo
+from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering import bounding_box_filtering_yolo, \
+    check_bbox_dataset
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
@@ -163,7 +164,7 @@ with torch.no_grad():
 
         #dataset_creator_bboxes_real_world.visualize_bboxes(bboxes_type=ExampleType.TEST)
         _, test_bboxes = dataset_creator_bboxes_real_world.create_datasets(shuffle_boxes=False, apply_transforms_to_train=False)
-        datasets_real_world[house] = DataLoader(test_bboxes, batch_size=2, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=False)
+        datasets_real_world[house] = DataLoader(test_bboxes, batch_size=64, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=False)
 
 
 performances_in_real_worlds['AP']['0'] = sum(performances_in_real_worlds['AP']['0']) / len(performances_in_real_worlds['AP']['0'])
@@ -193,50 +194,7 @@ plt.title('Complete metric')
 plt.legend()
 plt.savefig('complete_metric.svg')
 
-#Check the dataset
-def check_bbox_dataset(dataset):
-    for data in dataset:
-        images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious = data
-        detected_bboxes = torch.transpose(detected_bboxes, 1, 2)
-        images_opencv = []
-        w_image, h_image = images.size()[2:][::-1]
-        for image, detected_list, fixed_list, confidences_list, labels_list, ious_list in zip(images, detected_bboxes.tolist(), fixed_bboxes.tolist(), confidences.tolist(), labels_encoded.tolist(), ious.tolist()):
-            image = image.to('cpu')
-            image = image * torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
-            image = image + torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
-            image_detected = cv2.cvtColor(np.transpose(np.array(image), (1, 2, 0)), cv2.COLOR_RGB2BGR)
-            image_detected_high_conf = image_detected.copy()
-            image_correct_label = image_detected.copy()
-            for (cx, cy, w, h, confidence, closed, open), (back, closed, open) in zip(detected_list, labels_list):
-                #print(cx, cy, w, h)
-                x, y, x2, y2 = np.array([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2]) * np.array([w_image, h_image, w_image, h_image])
-                x, y, x2, y2 = round(x), round(y), round(x2), round(y2)
-                print(x, y, x2, y2)
-                label = 0 if closed == 1 else 1
-                image_detected = cv2.rectangle(image_detected, (x, y),
-                                                       (x2, y2), colors[label], 2)
-                if confidence >= confidence_threshold:
-                    image_detected_high_conf = cv2.rectangle(image_detected_high_conf, (x, y),
-                                                   (x2, y2), colors[label], 2)
-
-                if back == 1:
-                    color = (0,0,0)
-                elif closed == 1:
-                    color= ( 0, 0, 255)
-                else:
-                    color =( 0,255, 0)
-
-                image_correct_label = cv2.rectangle(image_correct_label, (x, y),
-                                               (x2, y2), color, 2)
-
-
-
-            images_opencv.append(cv2.hconcat([image_detected, image_detected_high_conf, image_correct_label]))
-        new_image = cv2.vconcat(images_opencv)
-        cv2.imshow('show', new_image)
-        cv2.waitKey()
-
-#check_bbox_dataset(datasets_real_world['floor4'])
+#check_bbox_dataset(datasets_real_world['floor4'], confidence_threshold)
 bbox_model = BboxFilterNetworkGeometric(initial_channels=7, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST)
 bbox_model.to('cuda')
 
@@ -257,13 +215,13 @@ logs = {'train': {'loss_label':[], 'loss_confidence':[], 'loss_final':[]}, 'test
 train_total = {0:0, 1:0, 2:0}
 test_total = {0:0, 1:0, 2:0}
 for data in train_dataset_bboxes:
-    images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious = data
+    images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes = data
     for labels in labels_encoded:
         for label in labels:
             train_total[int((label == 1).nonzero(as_tuple=True)[0])] += 1
 
 for data in test_dataset_bboxes:
-    images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious = data
+    images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes = data
     for labels in labels_encoded:
         for label in labels:
             test_total[int((label == 1).nonzero(as_tuple=True)[0])] += 1
@@ -282,7 +240,7 @@ for epoch in range(60):
     temp_losses_final = []
 
     for data in tqdm(train_dataset_bboxes, total=len(train_dataset_bboxes), desc=f'Training epoch {epoch}'):
-        images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious = data
+        images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes = data
         images = images.to('cuda')
         detected_bboxes = detected_bboxes.to('cuda')
         confidences = confidences.to('cuda')
@@ -318,7 +276,7 @@ for epoch in range(60):
 
         temp_accuracy = {0:0, 1:0, 2:0}
         for data in tqdm(train_dataset_bboxes, total=len(train_dataset_bboxes), desc=f'TEST epoch {epoch}'):
-            images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious = data
+            images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes = data
             images = images.to('cuda')
             detected_bboxes = detected_bboxes.to('cuda')
             confidences = confidences.to('cuda')
@@ -342,7 +300,7 @@ for epoch in range(60):
         temp_accuracy = {0:0, 1:0, 2:0}
 
         for data in tqdm(test_dataset_bboxes, total=len(test_dataset_bboxes), desc=f'TEST epoch {epoch}'):
-            images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious = data
+            images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes = data
             images = images.to('cuda')
             detected_bboxes = detected_bboxes.to('cuda')
             confidences = confidences.to('cuda')

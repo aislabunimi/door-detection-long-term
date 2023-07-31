@@ -133,11 +133,13 @@ def collate_fn_bboxes(use_confidence: bool = True):
         confidences 0 if the bbox is suppressed (background), 1 otherwise
         labels_encoded: the ground truth labels of the bounding boxes [background, closed, open]
         ious: the iou with the target bbox. It is 0 if the bbox is background
+        target_boxes: the target bounding boxes encoded as [cx, cy, w, h, label]
         """
         images, targets = collate_fn(batch_data)
 
         batch_size_width, batch_size_height = images.size()[2], images.size()[3]
 
+        target_boxes = []
         fixed_boxes = []
         detected_boxes = []
         confidences = []
@@ -151,8 +153,10 @@ def collate_fn_bboxes(use_confidence: bool = True):
                                          real_size_width / batch_size_width, real_size_height / batch_size_height]])
             target['fixed_boxes'] = target['fixed_boxes'] * scale_boxes
             target['detected_boxes'] = target['detected_boxes'] * scale_boxes
+            target['target_boxes'][:, :4] *= scale_boxes
 
             fixed_boxes.append(target['fixed_boxes'])
+            target_boxes.append(target['target_boxes'])
 
             if use_confidence:
                 detected_boxes.append(
@@ -176,7 +180,7 @@ def collate_fn_bboxes(use_confidence: bool = True):
         labels_encoded = torch.stack(labels_encoded, dim=0)
         ious = torch.stack(ious, dim=0)
 
-        return images, torch.transpose(detected_boxes, 1, 2), fixed_bboxes, confidences, labels_encoded, ious
+        return images, torch.transpose(detected_boxes, 1, 2), fixed_bboxes, confidences, labels_encoded, ious, target_boxes
     return _collate_fn_bboxes
 
 

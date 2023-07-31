@@ -23,11 +23,11 @@ test_dataset_bboxes = DataLoader(test_bboxes, batch_size=2, collate_fn=collate_f
 #Check the dataset
 def check_bbox_dataset(dataset):
     for data in dataset:
-        images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious = data
+        images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes = data
         detected_bboxes = torch.transpose(detected_bboxes, 1, 2)
         images_opencv = []
         w_image, h_image = images.size()[2:][::-1]
-        for image, detected_list, fixed_list, confidences_list, labels_list, ious_list in zip(images, detected_bboxes.tolist(), fixed_bboxes.tolist(), confidences.tolist(), labels_encoded.tolist(), ious.tolist()):
+        for image, detected_list, fixed_list, confidences_list, labels_list, ious_list, target_boxes_list in zip(images, detected_bboxes.tolist(), fixed_bboxes.tolist(), confidences.tolist(), labels_encoded.tolist(), ious.tolist(), target_boxes):
             image = image.to('cpu')
             image = image * torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
             image = image + torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
