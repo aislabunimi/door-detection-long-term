@@ -127,13 +127,17 @@ yolo_gd.eval()
 
 performances_in_real_worlds = {'AP': {'0': [], '1': []},
                                'TP': [], 'FP': [], 'TPm': [], 'FPiou': []}
+
+datasets_real_world = {}
 with torch.no_grad():
     for house in houses:
+        dataset_creator_bboxes_real_world = DatasetsCreatorBBoxes()
         evaluator = MyEvaluator()
         evaluator_complete_metric = MyEvaluatorCompleteMetric()
         for images, targets, converted_boxes in tqdm(data_loaders_real_word[house], total=len(data_loaders_real_word[house]), desc=f'Evaluating yolo GD in {house}'):
             images = images.to('cuda')
             preds, train_out = yolo_gd.model(images)
+            dataset_creator_bboxes_real_world.add_yolo_bboxes(images=images, targets=targets, preds=preds, bboxes_type=ExampleType.TEST)
             preds = bounding_box_filtering_yolo(preds, max_detections=300, iou_threshold=iou_threshold_matching, confidence_threshold=0.01, apply_nms=True)
             #preds = non_max_suppression(preds,0.01,0.5,multi_label=False, agnostic=True,max_det=300)
             evaluator.add_predictions_yolo(targets=targets, predictions=preds, img_size=images.size()[2:][::-1])
@@ -153,6 +157,14 @@ with torch.no_grad():
         performances_in_real_worlds['FP'].append(sum(temp['FP']))
         performances_in_real_worlds['TPm'].append(sum(temp['TPm']))
         performances_in_real_worlds['FPiou'].append(sum(temp['FPiou']))
+
+        dataset_creator_bboxes_real_world.select_n_bounding_boxes(num_bboxes=num_bboxes)
+        dataset_creator_bboxes_real_world.match_bboxes_with_gt(iou_threshold_matching=iou_threshold_matching)
+
+        #dataset_creator_bboxes_real_world.visualize_bboxes(bboxes_type=ExampleType.TEST)
+        _, test_bboxes = dataset_creator_bboxes_real_world.create_datasets(shuffle_boxes=False, apply_transforms_to_train=False)
+        datasets_real_world[house] = DataLoader(test_bboxes, batch_size=2, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=False)
+
 
 performances_in_real_worlds['AP']['0'] = sum(performances_in_real_worlds['AP']['0']) / len(performances_in_real_worlds['AP']['0'])
 performances_in_real_worlds['AP']['1'] = sum(performances_in_real_worlds['AP']['1']) / len(performances_in_real_worlds['AP']['1'])
@@ -194,8 +206,8 @@ def check_bbox_dataset(dataset):
             image = image + torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
             image_detected = cv2.cvtColor(np.transpose(np.array(image), (1, 2, 0)), cv2.COLOR_RGB2BGR)
             image_detected_high_conf = image_detected.copy()
-            image_matched = image_detected.copy()
-            for (cx, cy, w, h, confidence, closed, open), (cx_f, cy_f, w_f, h_f) in zip(detected_list, fixed_list):
+            image_correct_label = image_detected.copy()
+            for (cx, cy, w, h, confidence, closed, open), (back, closed, open) in zip(detected_list, labels_list):
                 #print(cx, cy, w, h)
                 x, y, x2, y2 = np.array([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2]) * np.array([w_image, h_image, w_image, h_image])
                 x, y, x2, y2 = round(x), round(y), round(x2), round(y2)
@@ -203,23 +215,28 @@ def check_bbox_dataset(dataset):
                 label = 0 if closed == 1 else 1
                 image_detected = cv2.rectangle(image_detected, (x, y),
                                                        (x2, y2), colors[label], 2)
-                if confidence >= 0.75:
+                if confidence >= confidence_threshold:
                     image_detected_high_conf = cv2.rectangle(image_detected_high_conf, (x, y),
                                                    (x2, y2), colors[label], 2)
 
-                if not(cx == cx_f and cy == cy_f and w == w_f and h == h_f):
-                    image_matched = cv2.rectangle(image_matched, (x, y),
-                                                   (x2, y2), colors[label], 2)
+                if back == 1:
+                    color = (0,0,0)
+                elif closed == 1:
+                    color= ( 0, 0, 255)
                 else:
-                    image_matched = cv2.rectangle(image_matched, (x, y),
-                                                  (x2, y2),(0,0,0), 2)
+                    color =( 0,255, 0)
 
-            images_opencv.append(cv2.hconcat([image_detected, image_detected_high_conf, image_matched]))
+                image_correct_label = cv2.rectangle(image_correct_label, (x, y),
+                                               (x2, y2), color, 2)
+
+
+
+            images_opencv.append(cv2.hconcat([image_detected, image_detected_high_conf, image_correct_label]))
         new_image = cv2.vconcat(images_opencv)
         cv2.imshow('show', new_image)
         cv2.waitKey()
 
-#check_bbox_dataset(train_dataset_bboxes)
+#check_bbox_dataset(datasets_real_world['floor4'])
 bbox_model = BboxFilterNetworkGeometric(initial_channels=7, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST)
 bbox_model.to('cuda')
 

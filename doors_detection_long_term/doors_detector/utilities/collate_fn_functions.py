@@ -127,6 +127,12 @@ def collate_fn_bboxes(use_confidence: bool = True):
         Converted_bbxes contains a list of lists of bboxes encoded as [cx, cy, w, h]
         :param batch_data:
         :return:
+        images,
+        detected_bounding_boxes encoded as [cx, cy, w, h, original_confidence, original_label_encoded],
+        fixed_bounding_boxes,
+        confidences 0 if the bbox is suppressed (background), 1 otherwise
+        labels_encoded: the ground truth labels of the bounding boxes [background, closed, open]
+        ious: the iou with the target bbox. It is 0 if the bbox is background
         """
         images, targets = collate_fn(batch_data)
 
