@@ -14,7 +14,7 @@ from doors_detection_long_term.doors_detector.dataset.torch_dataset import DEEP_
 from doors_detection_long_term.doors_detector.models.detr import PostProcess
 from doors_detection_long_term.doors_detector.models.detr_door_detector import *
 from doors_detection_long_term.doors_detector.models.model_names import DETR_RESNET50
-from doors_detection_long_term.doors_detector.utilities.utils import seed_everything
+from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import seed_everything
 from dataset_configurator import *
 
 folder_manager = DatasetFolderManager(dataset_path=real_final_doors_dataset_path, folder_name='chemistry_floor0', sample_class=DoorSample)

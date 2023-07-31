@@ -13,9 +13,9 @@ from doors_detection_long_term.doors_detector.models.model_names import FASTER_R
 from doors_detection_long_term.doors_detector.models.faster_rcnn import *
 
 from doors_detection_long_term.doors_detector.utilities.plot import plot_losses
-from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_faster_rcnn
+from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_faster_rcnn
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
-from doors_detection_long_term.doors_detector.utilities.utils import seed_everything
+from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import seed_everything
 
 
 device = 'cuda'

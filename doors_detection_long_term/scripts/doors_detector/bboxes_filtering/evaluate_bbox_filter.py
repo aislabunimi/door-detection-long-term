@@ -11,7 +11,7 @@ from doors_detection_long_term.doors_detector.models.bbox_filter_network import 
 from doors_detection_long_term.doors_detector.models.model_names import BBOX_FILTER_NETWORK, YOLOv5
 from doors_detection_long_term.doors_detector.models.yolov5 import YOLOv5Model, EXP_1_HOUSE_1_60_EPOCHS
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
-from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_yolov5, collate_fn_bboxes
+from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_yolov5, collate_fn_bboxes
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import get_final_doors_dataset_bbox_filter
 
 num_bboxes = 15

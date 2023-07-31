@@ -4,7 +4,7 @@ import torch
 from torch.utils.data import DataLoader
 
 from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCreatorBBoxes import DatasetsCreatorBBoxes
-from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_bboxes
+from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_bboxes
 
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 num_bboxes = 20

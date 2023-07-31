@@ -14,7 +14,7 @@ from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_
 from doors_detection_long_term.doors_detector.models.detr_door_detector import \
     EXP_2_FLOOR1_GIBSON_60_FINE_TUNE_15_EPOCHS_40, DetrDoorDetector
 from doors_detection_long_term.doors_detector.models.model_names import DETR_RESNET50
-from doors_detection_long_term.doors_detector.utilities.utils import collate_fn
+from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import get_final_doors_dataset_real_data
 from doors_detection_long_term.scripts.doors_detector.tensorrt.tensorrt_converter import model_to_tensorrt
 

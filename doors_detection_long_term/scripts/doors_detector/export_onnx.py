@@ -5,7 +5,7 @@ from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL
 from doors_detection_long_term.doors_detector.models.detr_door_detector import *
 from doors_detection_long_term.doors_detector.models.model_names import DETR_RESNET50, YOLOv5
 from doors_detection_long_term.doors_detector.models.yolov5 import *
-from doors_detection_long_term.doors_detector.utilities.utils import seed_everything
+from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import seed_everything
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import get_final_doors_dataset_epoch_analysis
 
 device = 'cuda'

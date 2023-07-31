@@ -15,9 +15,9 @@ from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general i
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.loss import ComputeLoss
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.torch_utils import smart_optimizer
 from doors_detection_long_term.doors_detector.utilities.plot import plot_losses
-from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_faster_rcnn
+from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_faster_rcnn
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
-from doors_detection_long_term.doors_detector.utilities.utils import seed_everything
+from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import seed_everything
 
 
 device = 'cuda'

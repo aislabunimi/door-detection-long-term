@@ -14,13 +14,15 @@ from doors_detection_long_term.doors_detector.models.bbox_filter_network import 
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, BBOX_FILTER_NETWORK_GEOMETRIC
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
-from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_yolov5, collate_fn_bboxes
+from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_yolov5, collate_fn_bboxes
+from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering import bounding_box_filtering_yolo
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 num_bboxes = 20
 
 iou_threshold_matching = 0.5
+confidence_threshold = 0.75
 
 class BboxFilterNetworkGeometric(GenericModel):
     def __init__(self, model_name: ModelName, pretrained: bool, initial_channels: int, n_labels: int, dataset_name: DATASET, description: DESCRIPTION):
@@ -109,7 +111,58 @@ test_dataset_bboxes = DataLoader(test_bboxes, batch_size=64, collate_fn=collate_
 
 
 # Calculate Metrics in real worlds
+houses = ['floor1', 'floor4', 'chemistry_floor0']
 
+data_loaders_real_word = {}
+labels = None
+for house in houses:
+    _, test, l, _ = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25)
+    labels = l
+    data_loader_test = DataLoader(test, batch_size=2, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
+    data_loaders_real_word[house] = data_loader_test
+
+yolo_gd = YOLOv5Model(model_name=YOLOv5, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=globals()[f'EXP_GENERAL_DETECTOR_GIBSON_60_EPOCHS'.upper()])
+yolo_gd.to('cuda')
+yolo_gd.eval()
+
+performances_in_real_worlds = {'AP': {'0': [], '1': []},
+                               'TP': [], 'FP': [], 'TPm': [], 'FPiou': []}
+with torch.no_grad():
+    for house in houses:
+        evaluator = MyEvaluator()
+        evaluator_complete_metric = MyEvaluatorCompleteMetric()
+        for images, targets, converted_boxes in tqdm(data_loaders_real_word[house], total=len(data_loaders_real_word[house]), desc=f'Evaluating yolo GD in {house}'):
+            images = images.to('cuda')
+            preds, train_out = yolo_gd.model(images)
+            preds = bounding_box_filtering_yolo(preds, max_detections=300, iou_threshold=iou_threshold_matching, confidence_threshold=0.01, apply_nms=True)
+            #preds = non_max_suppression(preds,0.01,0.5,multi_label=False, agnostic=True,max_det=300)
+            evaluator.add_predictions_yolo(targets=targets, predictions=preds, img_size=images.size()[2:][::-1])
+            evaluator_complete_metric.add_predictions_yolo(targets=targets, predictions=preds, img_size=images.size()[2:][::-1])
+        metric = evaluator.get_metrics(iou_threshold=iou_threshold_matching, confidence_threshold=confidence_threshold)
+        metric_complete = evaluator_complete_metric.get_metrics(iou_threshold=iou_threshold_matching, confidence_threshold=confidence_threshold)
+        for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
+            performances_in_real_worlds['AP'][label].append(values['AP'])
+
+        temp = {'TP': [], 'FP': [], 'TPm': [], 'FPiou': []}
+        for label, values in sorted(metric_complete.items(), key=lambda v: v[0]):
+            temp['TP'].append(values['TP'])
+            temp['FP'].append(values['FP'])
+            temp['TPm'].append(values['TPm'])
+            temp['FPiou'].append(values['FPiou'])
+        performances_in_real_worlds['TP'].append(sum(temp['TP']))
+        performances_in_real_worlds['FP'].append(sum(temp['FP']))
+        performances_in_real_worlds['TPm'].append(sum(temp['TPm']))
+        performances_in_real_worlds['FPiou'].append(sum(temp['FPiou']))
+
+performances_in_real_worlds['AP']['0'] = sum(performances_in_real_worlds['AP']['0']) / len(performances_in_real_worlds['AP']['0'])
+performances_in_real_worlds['AP']['1'] = sum(performances_in_real_worlds['AP']['1']) / len(performances_in_real_worlds['AP']['1'])
+performances_in_real_worlds['TP'] = sum(performances_in_real_worlds['TP'])
+performances_in_real_worlds['FP'] = sum(performances_in_real_worlds['FP'])
+performances_in_real_worlds['TPm'] = sum(performances_in_real_worlds['TPm'])
+performances_in_real_worlds['FPiou'] = sum(performances_in_real_worlds['FPiou'])
+
+
+print(performances_in_real_worlds)
 #Check the dataset
 def check_bbox_dataset(dataset):
     for data in dataset:

@@ -3,7 +3,7 @@ import torch
 from torch import nn
 
 from doors_detection_long_term.doors_detector.models.model_names import ModelName
-from doors_detection_long_term.doors_detector.utilities import utils
+from doors_detection_long_term.doors_detector.utilities import collate_fn_functions
 
 
 class PostProcess(nn.Module):
