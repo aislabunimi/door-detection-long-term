@@ -59,10 +59,12 @@ def check_bbox_dataset(dataset, confidence_threshold):
         cv2.waitKey()
 
 
-def plot_results(epoch, count, images, bboxes, preds, targets, confidence_threshold):
+def plot_results(epoch, count, env, images, bboxes, preds, targets, confidence_threshold):
     if not os.path.exists('/home/antonazzi/myfiles/bbox_filtering/'+str(epoch)):
         os.makedirs('/home/antonazzi/myfiles/bbox_filtering/'+str(epoch))
-    colors = {0: (0, 0, 255), 1: (0, 255, 0)}
+    if not os.path.exists('/home/antonazzi/myfiles/bbox_filtering/'+str(epoch) + f'/{env}'):
+        os.makedirs('/home/antonazzi/myfiles/bbox_filtering/'+str(epoch) + f'/{env}')
+    colors = {0: (0, 0, 1), 1: (0, 1, 0)}
 
     for image, bboxes_image, confidences, labels, target in zip(images, bboxes, preds[0], preds[1], targets):
         bboxes_image = bboxes_image.transpose(0, 1)
@@ -90,7 +92,7 @@ def plot_results(epoch, count, images, bboxes, preds, targets, confidence_thresh
                                              (x2, y2), colors[label], 2)
 
         image = cv2.hconcat([target_image, image_detected])
-        cv2.imwrite('/home/antonazzi/myfiles/bbox_filtering/'+ str(epoch)+f"/{count}.png", (image*255).astype(np.uint8))
+        cv2.imwrite('/home/antonazzi/myfiles/bbox_filtering/'+str(epoch) + f'/{env}'+f"/{count}.png", (image*255).astype(np.uint8))
 
 
 def bounding_box_filtering_yolo(predictions, max_detections, iou_threshold=0.5, confidence_threshold=0.01, apply_nms: bool = False):

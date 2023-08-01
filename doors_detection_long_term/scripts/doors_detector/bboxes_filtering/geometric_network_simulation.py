@@ -88,7 +88,7 @@ class BboxFilterNetworkGeometricLabelLoss(nn.Module):
 
     def forward(self, preds, label_targets):
         scores_features, labels_features = preds
-        labels_loss = torch.log(labels_features) * label_targets * torch.tensor([[0.3, 0.5, 0.2]], device=label_targets.device)
+        labels_loss = torch.log(labels_features) * label_targets * torch.tensor([[0.15, 0.7, 0.15]], device=label_targets.device)
         labels_loss = torch.mean(torch.sum(torch.sum(labels_loss, 2) * -1, 1))
 
         return labels_loss
@@ -345,7 +345,7 @@ for epoch in range(60):
 
             preds = bbox_model(images, detected_bboxes)
 
-            #plot_results(epoch=epoch, count=c, images=images, bboxes=detected_bboxes, preds=preds, targets=target_boxes, confidence_threshold = confidence_threshold)
+            plot_results(epoch=epoch, count=c, env=house, images=images, bboxes=detected_bboxes, preds=preds, targets=target_boxes, confidence_threshold = confidence_threshold)
 
             evaluator.add_predictions_bboxes_filtering(detected_bboxes, preds, target_boxes, img_size=images.size()[2:][::-1])
             evaluator_complete_metric.add_predictions_bboxes_filtering(detected_bboxes, preds, target_boxes, img_size=images.size()[2:][::-1])
@@ -368,6 +368,29 @@ for epoch in range(60):
     performances_in_real_worlds_bbox_filtering['FP'].append(sum(temp['FP']))
     performances_in_real_worlds_bbox_filtering['TPm'].append(sum(temp['TPm']))
     performances_in_real_worlds_bbox_filtering['FPiou'].append(sum(temp['FPiou']))
+
+    # Plot evaluation in real worlds
+    fig = plt.figure()
+    plt.axhline(y=performances_in_real_worlds['AP']['0'], color = 'r', linestyle = '--', label='closed doors')
+    plt.axhline(y=performances_in_real_worlds['AP']['1'], color = 'g', linestyle = '--', label='open doors')
+    plt.title('AP')
+    plt.legend()
+    plt.savefig('AP.svg')
+
+    fig = plt.figure()
+    plt.axhline(y=performances_in_real_worlds['TP'], color = 'g', linestyle = '--', label='TP')
+    plt.axhline(y=performances_in_real_worlds['FP'], color = 'r', linestyle = '--', label='FP')
+    plt.axhline(y=performances_in_real_worlds['TPm'], color = 'forestgreen', linestyle = '--', label='TPm')
+    plt.axhline(y=performances_in_real_worlds['FPiou'], color = 'salmon', linestyle = '--', label='FPiou')
+    plt.plot([i for i in range(len(performances_in_real_worlds_bbox_filtering['TP']))], performances_in_real_worlds_bbox_filtering['TP'], label='TP')
+    plt.plot([i for i in range(len(performances_in_real_worlds_bbox_filtering['FP']))], performances_in_real_worlds_bbox_filtering['FP'], label='FP')
+    plt.plot([i for i in range(len(performances_in_real_worlds_bbox_filtering['TPm']))], performances_in_real_worlds_bbox_filtering['TPm'], label='TPm')
+    plt.plot([i for i in range(len(performances_in_real_worlds_bbox_filtering['FPiou']))], performances_in_real_worlds_bbox_filtering['FPiou'], label='FPiou')
+
+    plt.title('Complete metric')
+    plt.legend()
+    plt.savefig('complete_metric.svg')
+
     print(performances_in_real_worlds_bbox_filtering)
     print(train_accuracy)
     fig = plt.figure()
