@@ -1,3 +1,5 @@
+import os
+
 import cv2
 import numpy as np
 import torch
@@ -55,6 +57,41 @@ def check_bbox_dataset(dataset, confidence_threshold):
         new_image = cv2.vconcat(images_opencv)
         cv2.imshow('show', new_image)
         cv2.waitKey()
+
+
+def plot_results(epoch, count, images, bboxes, preds, targets, confidence_threshold):
+    if not os.path.exists('/home/antonazzi/myfiles/bbox_filtering/'+str(epoch)):
+        os.makedirs('/home/antonazzi/myfiles/bbox_filtering/'+str(epoch))
+    colors = {0: (0, 0, 255), 1: (0, 255, 0)}
+
+    for image, bboxes_image, confidences, labels, target in zip(images, bboxes, preds[0], preds[1], targets):
+        bboxes_image = bboxes_image.transpose(0, 1)
+        w_image, h_image = image.size()[1:][::-1]
+        image = image.to('cpu')
+        image = image * torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
+        image = image + torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
+        image_detected = cv2.cvtColor(np.transpose(np.array(image), (1, 2, 0)), cv2.COLOR_RGB2BGR)
+        target_image = image_detected.copy()
+        for (cx, cy, w, h), confidence, (back, closed, open) in zip(bboxes_image[:, :4].tolist(), confidences.tolist(), labels.tolist()):
+            #print(cx, cy, w, h)
+            x, y, x2, y2 = np.array([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2]) * np.array([w_image, h_image, w_image, h_image])
+            x, y, x2, y2 = round(x), round(y), round(x2), round(y2)
+            if back == 1 or confidence < confidence_threshold:
+                continue
+            label = 0 if closed == 1 else 1
+            image_detected = cv2.rectangle(image_detected, (x, y),
+                                               (x2, y2), colors[label], 2)
+
+        for cx, cy, w, h, label in target.tolist():
+            x, y, x2, y2 = np.array([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2]) * np.array([w_image, h_image, w_image, h_image])
+            x, y, x2, y2 = round(x), round(y), round(x2), round(y2)
+            label = int(label)
+            target_image = cv2.rectangle(target_image, (x, y),
+                                             (x2, y2), colors[label], 2)
+
+        image = cv2.hconcat([target_image, image_detected])
+        cv2.imwrite('/home/antonazzi/myfiles/bbox_filtering/'+ str(epoch)+f"/{count}.png", (image*255).astype(np.uint8))
+
 
 def bounding_box_filtering_yolo(predictions, max_detections, iou_threshold=0.5, confidence_threshold=0.01, apply_nms: bool = False):
     bboxes = []

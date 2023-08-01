@@ -218,6 +218,7 @@ class DatasetsCreatorBBoxes:
                     x1, y1, x2, y2 = box.get_absolute_bounding_box(BBFormat.XYX2Y2)
                     if x2 > x1 + 1 and y2 > y1 + 1:
                         detected_boxes.append(box)
+
             detected_boxes = sorted(detected_boxes, key=lambda x: x.get_confidence(), reverse=True)[:self._max_bboxes]
             bboxes_dict['bboxes'].append(detected_boxes)
             img_count_temp += 1

@@ -147,9 +147,10 @@ class ModelEvaluator:
             self._img_count += 1
 
         for bboxes_image, new_confidences, new_labels in zip(bboxes, new_values[0], new_values[1]):
-            for (x, y, w, h), confidence, labels in zip(bboxes_image[:, :4].tolist(), new_confidences.tolist(), new_labels.tolist()):
+            for (x, y, w, h), confidence, labels in zip(bboxes_image.transpose(0, 1)[:, :4].tolist(), new_confidences.tolist(), new_labels.tolist()):
                 label = labels.index(max(labels))
                 # If label == 0 then the bbox is background, so it is filtered
+
                 if label == 0:
                     continue
 
@@ -163,9 +164,9 @@ class ModelEvaluator:
                     type_coordinates=CoordinatesType.RELATIVE,
                     img_size=img_size
                 )
-                x1, y1, x2, y2 = box.get_absolute_bounding_box(BBFormat.XYX2Y2)
-                if x2 > x1 + 1 and y2 > y1 + 1:
-                    self._predicted_bboxes.append(box)
+                #x1, y1, x2, y2 = box.get_absolute_bounding_box(BBFormat.XYX2Y2)
+
+                self._predicted_bboxes.append(box)
             img_count_temp += 1
 
     @abstractmethod

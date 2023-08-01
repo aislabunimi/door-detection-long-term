@@ -16,7 +16,7 @@ from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
 from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_yolov5, collate_fn_bboxes
 from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering import bounding_box_filtering_yolo, \
-    check_bbox_dataset
+    check_bbox_dataset, plot_results
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
@@ -194,7 +194,7 @@ plt.title('Complete metric')
 plt.legend()
 plt.savefig('complete_metric.svg')
 
-#check_bbox_dataset(datasets_real_world['floor4'], confidence_threshold)
+#check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold)
 bbox_model = BboxFilterNetworkGeometric(initial_channels=7, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST)
 bbox_model.to('cuda')
 
@@ -335,8 +335,7 @@ for epoch in range(60):
     for house, dataset_real_world in datasets_real_worlds.items():
         evaluator = MyEvaluator()
         evaluator_complete_metric = MyEvaluatorCompleteMetric()
-        t= {'TP': [], 'FP': [], 'TPm': [], 'FPiou': []}
-        for data in tqdm(dataset_real_world, total=len(dataset_real_world), desc=f'TEST in {house}, epoch {epoch}'):
+        for c, data in tqdm(enumerate(dataset_real_world), total=len(dataset_real_world), desc=f'TEST in {house}, epoch {epoch}'):
             images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes = data
             images = images.to('cuda')
             detected_bboxes = detected_bboxes.to('cuda')
@@ -345,6 +344,8 @@ for epoch in range(60):
             ious = ious.to('cuda')
 
             preds = bbox_model(images, detected_bboxes)
+
+            #plot_results(epoch=epoch, count=c, images=images, bboxes=detected_bboxes, preds=preds, targets=target_boxes, confidence_threshold = confidence_threshold)
 
             evaluator.add_predictions_bboxes_filtering(detected_bboxes, preds, target_boxes, img_size=images.size()[2:][::-1])
             evaluator_complete_metric.add_predictions_bboxes_filtering(detected_bboxes, preds, target_boxes, img_size=images.size()[2:][::-1])
@@ -356,16 +357,12 @@ for epoch in range(60):
             temp['AP'][label].append(values['AP'])
 
         for label, values in sorted(metric_complete.items(), key=lambda v: v[0]):
-            t['TP'].append(values['TP'])
-            t['FP'].append(values['FP'])
-            t['TPm'].append(values['TPm'])
-            t['FPiou'].append(values['FPiou'])
-        temp['TP'].append(sum(t['TP']))
-        temp['FP'].append(sum(t['FP']))
-        temp['TPm'].append(sum(t['TPm']))
-        temp['FPiou'].append(sum(t['FPiou']))
+            temp['TP'].append(values['TP'])
+            temp['FP'].append(values['FP'])
+            temp['TPm'].append(values['TPm'])
+            temp['FPiou'].append(values['FPiou'])
 
-    performances_in_real_worlds_bbox_filtering['AP']['0'].append(sum(temp['AP']['0']) / len(temp['AP']['1']))
+    performances_in_real_worlds_bbox_filtering['AP']['0'].append(sum(temp['AP']['0']) / len(temp['AP']['0']))
     performances_in_real_worlds_bbox_filtering['AP']['1'].append(sum(temp['AP']['1']) / len(temp['AP']['1']))
     performances_in_real_worlds_bbox_filtering['TP'].append(sum(temp['TP']))
     performances_in_real_worlds_bbox_filtering['FP'].append(sum(temp['FP']))
