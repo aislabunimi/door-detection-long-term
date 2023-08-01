@@ -35,13 +35,13 @@ class BboxFilterNetworkGeometric(GenericModel):
         self.resnet = ResNet(BasicBlock, [3, 4, 6, 3])
         state_dict = load_state_dict_from_url('https://download.pytorch.org/models/resnet34-333f7ec4.pth', progress=True)
         self.resnet.load_state_dict(state_dict)
-        self.resnet.fc = nn.Linear(512, 256, bias=True)
+        self.resnet.fc = nn.Linear(512, 512, bias=True)
 
         self.shared_mlp_1 = SharedMLP(channels=[initial_channels, 16, 32, 64])
-        self.shared_mlp_2 = SharedMLP(channels=[64, 128, 256])
+        self.shared_mlp_2 = SharedMLP(channels=[64, 128, 256, 512])
         self.shared_mlp_3 = SharedMLP(channels=[512, 512, 1024])
 
-        self.shared_mlp_4 = SharedMLP(channels=[64 + 256 + 256, 512, 256, 128, 64])
+        self.shared_mlp_4 = SharedMLP(channels=[64 + 512 + 512, 512, 256, 128, 64])
 
         self.shared_mlp_5 = SharedMLP(channels=[64, 32, 16, 1], last_activation=nn.Sigmoid())
 
@@ -103,7 +103,7 @@ class BboxFilterNetworkGeometricLabelLoss(nn.Module):
 
     def forward(self, preds, label_targets):
         scores_features, labels_features = preds
-        labels_loss = torch.log(labels_features) * label_targets * torch.tensor([[0.15, 0.7, 0.15]], device=label_targets.device)
+        labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[0.15, 0.7, 0.15]], device=label_targets.device)
         labels_loss = torch.mean(torch.sum(torch.sum(labels_loss, 2) * -1, 1))
 
         return labels_loss
