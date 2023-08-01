@@ -26,12 +26,12 @@ from doors_detection_long_term.doors_detector.dataset.dataset_igibson.dataset_cr
 
 # The path in which the trained model are saved and loaded
 # If the string is empty, they are saved in a folder in this repository (/models/train_params/)
-trained_models_path = "/home/antonazzi/myfiles/trained_models"
+trained_models_path = "/home/aislab/trained_models"
 
 deep_doors_2_labelled_dataset_path = '/home/antonazzi/myfiles/deep_doors_2_labelled'
 final_doors_dataset_path = '/home/antonazzi/myfiles/final_doors_dataset/'
 real_final_doors_dataset_path = '/home/antonazzi/myfiles/final_doors_dataset_real'
-igibson_doors_dataset_path = '/media/michele/Elements/dataset2'
+igibson_doors_dataset_path = '/home/aislab/igibson_dataset'
 
 
 def get_deep_doors_2_labelled_sets():
