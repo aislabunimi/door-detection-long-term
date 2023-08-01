@@ -29,12 +29,14 @@ class DatasetsCreatorBBoxes:
             'gt_bboxes': [],
             'bboxes': [],
             'bboxes_matched': [],
+            'gt_bboxes_matched': []
         }
         self._test_bboxes = {
             'images': [],
             'gt_bboxes': [],
             'bboxes': [],
             'bboxes_matched': [],
+            'gt_bboxes_matched': []
         }
 
     def visualize_bboxes(self, show_filtered: bool = False, bboxes_type: ExampleType = ExampleType.TRAINING):
@@ -76,9 +78,12 @@ class DatasetsCreatorBBoxes:
             cv2.imshow('show', show_image)
             cv2.waitKey()
 
-    def _match_detected_bboxes(self, dataset_dict, iou_threshold_matching):
+    def _match_detected_bboxes(self, dataset_dict, iou_threshold_matching, print_stats=False):
+        gt_matching_images = []
         matching_images = []
         for detected_bboxes_image, gt_bboxes_image in zip(dataset_dict['bboxes'], dataset_dict['gt_bboxes']):
+            gts = []
+            gt_matching=[]
             matching = []
             for detected_bbox in detected_bboxes_image:
                 matched_gt = None
@@ -89,8 +94,33 @@ class DatasetsCreatorBBoxes:
                         matched_gt = gt_bbox
                         match_iou = iou
                 matching.append((detected_bbox, matched_gt))
+                if matched_gt is not None:
+                    if matched_gt not in gts:
+                        gts.append(matched_gt)
+                        gt_matching.append((matched_gt, []))
+                    for gt, l in gt_matching:
+                        if gt == matched_gt:
+                            l.append(detected_bbox)
+                            break
             matching_images.append(matching)
+            gt_matching_images.append(gt_matching)
         dataset_dict['bboxes_matched'] = matching_images
+        dataset_dict['gt_bboxes_matched'] = gt_matching_images
+        if print_stats:
+            confs = []
+            lens = []
+            poorly_matched_gt = []
+            for i in gt_matching_images:
+
+                for gt_box, matched_bboxes in i:
+                    lens.append(len(matched_bboxes))
+                    confs.append(sum([b.get_confidence() for b in matched_bboxes]) / len(matched_bboxes))
+                    if len(matched_bboxes) < 3:
+                        poorly_matched_gt.append(1)
+            if len(lens) > 0:
+                print(f'Il numero medio di match per GT = {sum(lens) / len(lens)}')
+                print(f'Il confidence media dei detected matched = {sum(confs) / len(confs)}')
+                print(f'I gt matchati con pochi bboxes è = {sum(poorly_matched_gt)}')
 
     def select_n_bounding_boxes(self, num_bboxes: int):
         for i, bboxes in enumerate(self._training_bboxes['bboxes']):
@@ -99,9 +129,9 @@ class DatasetsCreatorBBoxes:
         for i, bboxes in enumerate(self._test_bboxes['bboxes']):
             self._test_bboxes['bboxes'][i] = sorted(bboxes, key=lambda x: x.get_confidence(), reverse=True)[:num_bboxes]
 
-    def match_bboxes_with_gt(self, iou_threshold_matching: float = 0.5):
-        self._match_detected_bboxes(self._training_bboxes, iou_threshold_matching)
-        self._match_detected_bboxes(self._test_bboxes, iou_threshold_matching)
+    def match_bboxes_with_gt(self, iou_threshold_matching: float = 0.5, print_stats=False):
+        self._match_detected_bboxes(self._training_bboxes, iou_threshold_matching, print_stats=print_stats)
+        self._match_detected_bboxes(self._test_bboxes, iou_threshold_matching, print_stats=print_stats)
 
     def create_datasets(self, shuffle_boxes: bool = False, apply_transforms_to_train: bool = False, random_state: int = 42):
         return (TorchDatasetBBoxes(bboxes_dict=self._training_bboxes, set_type=TRAIN_SET if apply_transforms_to_train else TEST_SET, shuffle=shuffle_boxes),

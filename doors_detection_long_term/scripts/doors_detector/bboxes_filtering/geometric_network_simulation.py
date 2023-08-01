@@ -20,7 +20,7 @@ from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering im
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-num_bboxes = 20
+num_bboxes = 50
 
 iou_threshold_matching = 0.5
 confidence_threshold = 0.75
@@ -107,8 +107,8 @@ dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=iou_threshold
 
 train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=False)
 
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=64, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
-test_dataset_bboxes = DataLoader(test_bboxes, batch_size=64, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
+test_dataset_bboxes = DataLoader(test_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
 
 
 # Calculate Metrics in real worlds
@@ -119,7 +119,7 @@ labels = None
 for house in houses:
     _, test, l, _ = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25)
     labels = l
-    data_loader_test = DataLoader(test, batch_size=2, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
+    data_loader_test = DataLoader(test, batch_size=32, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
     data_loaders_real_word[house] = data_loader_test
 
 yolo_gd = YOLOv5Model(model_name=YOLOv5, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=globals()[f'EXP_GENERAL_DETECTOR_GIBSON_60_EPOCHS'.upper()])
@@ -362,7 +362,7 @@ for epoch in range(60):
             temp['TPm'].append(values['TPm'])
             temp['FPiou'].append(values['FPiou'])
 
-    performances_in_real_worlds_bbox_filtering['AP']['0'].append(sum(temp['AP']['0']) / len(temp['AP']['0']))
+    #performances_in_real_worlds_bbox_filtering['AP']['0'].append(sum(temp['AP']['0']) / len(temp['AP']['0']))
     performances_in_real_worlds_bbox_filtering['AP']['1'].append(sum(temp['AP']['1']) / len(temp['AP']['1']))
     performances_in_real_worlds_bbox_filtering['TP'].append(sum(temp['TP']))
     performances_in_real_worlds_bbox_filtering['FP'].append(sum(temp['FP']))
