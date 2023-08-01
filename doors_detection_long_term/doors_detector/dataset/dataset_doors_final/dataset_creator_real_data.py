@@ -21,7 +21,7 @@ class DatasetsCreatorRealData:
     def get_labels(self):
         return DOOR_LABELS
 
-    def create_datasets(self, folder_name: str, train_size: float, random_state: int = 42):
+    def create_datasets(self, folder_name: str, train_size: float, transform_train=True, random_state: int = 42):
         assert train_size == 0.15 or train_size == 0.25 or train_size == 0.5 or train_size == 0.75
 
         self._dataframe = self._dataframe[(self._dataframe.label == 1) & (self._dataframe.folder_name == folder_name)]
@@ -53,6 +53,6 @@ class DatasetsCreatorRealData:
             print_information(d)
 
         return (
-            DatasetDoorsFinalRealData(self._dataset_path, train_dataframe, TRAIN_SET, std_size=256, max_size=800, scales=[256 + i * 32 for i in range(11)]),
+            DatasetDoorsFinalRealData(self._dataset_path, train_dataframe, TRAIN_SET if transform_train else TEST_SET, std_size=256, max_size=800, scales=[256 + i * 32 for i in range(11)]),
             DatasetDoorsFinalRealData(self._dataset_path, test_dataframe, TEST_SET, std_size=256, max_size=800, scales=[480 + i * 32 for i in range(11)])
         )
