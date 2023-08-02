@@ -35,13 +35,13 @@ class BboxFilterNetworkGeometric(GenericModel):
         self.resnet = ResNet(BasicBlock, [3, 4, 6, 3])
         state_dict = load_state_dict_from_url('https://download.pytorch.org/models/resnet34-333f7ec4.pth', progress=True)
         self.resnet.load_state_dict(state_dict)
-        self.resnet.fc = nn.Linear(512, 512, bias=True)
+        self.resnet.fc = nn.Linear(512, 1024, bias=True)
 
         self.shared_mlp_1 = SharedMLP(channels=[initial_channels, 16, 32, 64])
-        self.shared_mlp_2 = SharedMLP(channels=[64, 128, 256, 512])
+        self.shared_mlp_2 = SharedMLP(channels=[64, 128, 256, 512, 1024])
         self.shared_mlp_3 = SharedMLP(channels=[512, 512, 1024])
 
-        self.shared_mlp_4 = SharedMLP(channels=[64 + 512 + 512, 512, 256, 128, 64])
+        self.shared_mlp_4 = SharedMLP(channels=[64 + 1024 + 1024, 512, 256, 128, 64])
 
         self.shared_mlp_5 = SharedMLP(channels=[64, 32, 16, 1], last_activation=nn.Sigmoid())
 
@@ -103,7 +103,7 @@ class BboxFilterNetworkGeometricLabelLoss(nn.Module):
 
     def forward(self, preds, label_targets):
         scores_features, labels_features = preds
-        labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[0.15, 0.7, 0.15]], device=label_targets.device)
+        labels_loss = torch.log(labels_features) * label_targets * torch.tensor([[0.5, 0.25, 0.25]], device=label_targets.device)
         labels_loss = torch.mean(torch.sum(torch.sum(labels_loss, 2) * -1, 1))
 
         return labels_loss
@@ -216,8 +216,8 @@ bbox_model.to('cuda')
 criterion_label = BboxFilterNetworkGeometricLabelLoss(reduction_image='sum', reduction_global='mean')
 criterion_confidence = BboxFilterNetworkGeometricConfidenceLoss()
 
-optimizer = optim.Adam(bbox_model.parameters(), lr=0.001)
-scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
+optimizer = optim.Adam(bbox_model.parameters(), lr=0.01)
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.5)
 criterion_label.to('cuda')
 criterion_confidence.to('cuda')
 #for n, p in bbox_model.named_parameters():
@@ -246,7 +246,7 @@ test_accuracy = {0: [], 1: [], 2: []}
 performances_in_real_worlds_bbox_filtering = {'AP': {'0': [], '1': []},
                                'TP': [], 'FP': [], 'TPm': [], 'FPiou': []}
 for epoch in range(60):
-    #scheduler.step()
+    scheduler.step()
     bbox_model.train()
     criterion_label.train()
     optimizer.zero_grad()
