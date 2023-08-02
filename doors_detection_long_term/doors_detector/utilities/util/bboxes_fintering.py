@@ -104,7 +104,6 @@ def bounding_box_filtering_yolo(predictions, max_detections, iou_threshold=0.5, 
         conf, labels = conf.max(1, keepdim=True)
         conf = torch.squeeze(conf)
         labels = torch.squeeze(labels)
-
         if apply_nms:
             i = torchvision.ops.nms(coords, conf, iou_threshold=iou_threshold)
             i = i[:max_detections]
@@ -127,13 +126,11 @@ def bounding_box_filtering_after_network(detected_bboxes, preds, image_size, iou
     bboxes = []
     new_confidences = []
     new_labels = []
-    detected_bboxes = detected_bboxes.transpose(1, 2)
-    for bboxes_image, confidences, labels in zip(detected_bboxes, preds[0], preds[1]):
+    for bboxes_image, original_bboxes_image, confidences, labels in zip(detected_bboxes.transpose(1, 2).clone().detach(), detected_bboxes.transpose(1, 2), preds[0], preds[1]):
         bboxes_image[:, :4] *= torch.tensor([image_size + image_size], device=bboxes_image.device)
         coords = xywh2xyxy(torch.round(bboxes_image[:, :4]))
-
         i = torchvision.ops.nms(coords, confidences, iou_threshold=iou_threshold)
-        bboxes.append(bboxes_image[i].transpose(0, 1))
+        bboxes.append(original_bboxes_image[i].transpose(0, 1))
         new_confidences.append(confidences[i])
         new_labels.append(labels[i])
 
