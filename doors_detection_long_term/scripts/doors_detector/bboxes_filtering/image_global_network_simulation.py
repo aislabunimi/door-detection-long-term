@@ -19,7 +19,7 @@ from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
 from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_yolov5, collate_fn_bboxes
 from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering import bounding_box_filtering_yolo, \
-    check_bbox_dataset, plot_results
+    check_bbox_dataset, plot_results, bounding_box_nms, bounding_box_filtering_after_network
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
@@ -362,7 +362,8 @@ for epoch in range(60):
 
             plot_results(epoch=epoch, count=c, env=house, images=images, bboxes=detected_bboxes, preds=preds, targets=target_boxes, confidence_threshold = confidence_threshold)
 
-            evaluator.add_predictions_bboxes_filtering(detected_bboxes, preds, target_boxes, img_size=images.size()[2:][::-1])
+            filtered_bboxes, filtered_preds = bounding_box_filtering_after_network(detected_bboxes, preds, image_size=images.size()[2:][::-1], iou_threshold=iou_threshold_matching)
+            evaluator.add_predictions_bboxes_filtering(filtered_bboxes, filtered_preds, target_boxes, img_size=images.size()[2:][::-1])
             evaluator_complete_metric.add_predictions_bboxes_filtering(detected_bboxes, preds, target_boxes, img_size=images.size()[2:][::-1])
 
         metric = evaluator.get_metrics(iou_threshold=iou_threshold_matching, confidence_threshold=confidence_threshold)
@@ -386,8 +387,10 @@ for epoch in range(60):
 
     # Plot evaluation in real worlds
     fig = plt.figure()
-    plt.axhline(y=performances_in_real_worlds['AP']['0'], color = 'r', linestyle = '--', label='closed doors')
-    plt.axhline(y=performances_in_real_worlds['AP']['1'], color = 'g', linestyle = '--', label='open doors')
+    plt.axhline(y=performances_in_real_worlds['AP']['0'], color = 'r', linestyle = '--', label='Limit closed doors')
+    plt.axhline(y=performances_in_real_worlds['AP']['1'], color = 'g', linestyle = '--', label='Limit open doors')
+    plt.plot([i for i in range(len(performances_in_real_worlds['AP']['0']))], performances_in_real_worlds['AP']['0'], label='AP Closed doors')
+    plt.plot([i for i in range(len(performances_in_real_worlds['AP']['1']))], performances_in_real_worlds['AP']['1'], label='AP Open doors')
     plt.title('AP')
     plt.legend()
     plt.savefig('AP.svg')

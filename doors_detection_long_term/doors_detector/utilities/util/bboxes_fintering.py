@@ -74,13 +74,14 @@ def plot_results(epoch, count, env, images, bboxes, preds, targets, confidence_t
         image = image + torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
         image_detected = cv2.cvtColor(np.transpose(np.array(image), (1, 2, 0)), cv2.COLOR_RGB2BGR)
         target_image = image_detected.copy()
-        for (cx, cy, w, h), confidence, (back, closed, open) in zip(bboxes_image[:, :4].tolist(), confidences.tolist(), labels.tolist()):
+        for (cx, cy, w, h), confidence, classes in zip(bboxes_image[:, :4].tolist(), confidences.tolist(), labels.tolist()):
             #print(cx, cy, w, h)
             x, y, x2, y2 = np.array([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2]) * np.array([w_image, h_image, w_image, h_image])
             x, y, x2, y2 = round(x), round(y), round(x2), round(y2)
-            if back == 1 or confidence < confidence_threshold:
+            label = classes.index(max(classes))
+            if label == 0 or confidence < confidence_threshold:
                 continue
-            label = 0 if closed == 1 else 1
+            label -= 1
             image_detected = cv2.rectangle(image_detected, (x, y),
                                                (x2, y2), colors[label], 2)
 
@@ -122,3 +123,18 @@ def bounding_box_filtering_yolo(predictions, max_detections, iou_threshold=0.5, 
         bboxes.append(torch.cat([coords, conf.unsqueeze(1), labels.unsqueeze(1)], dim=1))
     return bboxes
 
+def bounding_box_filtering_after_network(detected_bboxes, preds, image_size, iou_threshold=0.5):
+    bboxes = []
+    new_confidences = []
+    new_labels = []
+    detected_bboxes = detected_bboxes.transpose(1, 2)
+    for bboxes_image, confidences, labels in zip(detected_bboxes, preds[0], preds[1]):
+        bboxes_image[:, :4] *= torch.tensor([image_size + image_size], device=bboxes_image.device)
+        coords = xywh2xyxy(torch.round(bboxes_image[:, :4]))
+
+        i = torchvision.ops.nms(coords, confidences, iou_threshold=iou_threshold)
+        bboxes.append(bboxes_image[i].transpose(0, 1))
+        new_confidences.append(confidences[i])
+        new_labels.append(labels[i])
+
+    return bboxes, (new_confidences, new_labels)
