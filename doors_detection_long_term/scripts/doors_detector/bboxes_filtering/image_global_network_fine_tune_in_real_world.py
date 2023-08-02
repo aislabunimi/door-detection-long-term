@@ -13,13 +13,13 @@ from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCrea
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
-from doors_detection_long_term.doors_detector.models.bbox_filter_network import SharedMLP
+from doors_detection_long_term.doors_detector.models.bbox_filter_network import SharedMLP, TEST_IMAGE_GLOBAL_NETWORK
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, BBOX_FILTER_NETWORK_GEOMETRIC
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
 from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_yolov5, collate_fn_bboxes
 from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering import bounding_box_filtering_yolo, \
-    check_bbox_dataset, plot_results
+    check_bbox_dataset, plot_results, bounding_box_filtering_after_network
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
@@ -97,7 +97,7 @@ class BboxFilterNetworkGeometricLabelLoss(nn.Module):
 
     def forward(self, preds, label_targets):
         scores_features, labels_features = preds
-        labels_loss = torch.log(labels_features) * label_targets * torch.tensor([[0.5, 0.25, 0.25]], device=label_targets.device)
+        labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[0.5, 0.25, 0.25]], device=label_targets.device)
         labels_loss = torch.mean(torch.sum(torch.sum(labels_loss, 2) * -1, 1))
 
         return labels_loss
@@ -117,7 +117,7 @@ data_loaders_real_word_test = {}
 
 labels = None
 for house in houses:
-    train, test, l, _ = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25, transform_train=False)
+    train, test, l, _ = get_final_doors_dataset_real_data(folder_name=house, train_size=0.75, transform_train=False)
     labels = l
     data_loader_train = DataLoader(train, batch_size=32, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
     data_loaders_real_word_train[house] = data_loader_train
@@ -174,8 +174,8 @@ with torch.no_grad():
         dataset_creator_bboxes_real_world.match_bboxes_with_gt(iou_threshold_matching=iou_threshold_matching)
 
         #dataset_creator_bboxes_real_world.visualize_bboxes(bboxes_type=ExampleType.TEST)
-        train_bboxes, test_bboxes = dataset_creator_bboxes_real_world.create_datasets(shuffle_boxes=False, apply_transforms_to_train=False)
-        datasets_real_worlds_test[house] = DataLoader(test_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=False)
+        train_bboxes, test_bboxes = dataset_creator_bboxes_real_world.create_datasets(shuffle_boxes=True, apply_transforms_to_train=False)
+        datasets_real_worlds_test[house] = DataLoader(test_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
         datasets_real_worlds_train[house] = DataLoader(train_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=False)
 
 
@@ -207,7 +207,8 @@ plt.legend()
 plt.savefig('complete_metric.svg')
 
 #check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold)
-bbox_model = BboxFilterNetworkGeometric(initial_channels=7, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST)
+bbox_model = BboxFilterNetworkGeometric(initial_channels=7, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=TEST)
+bbox_model.set_description(TEST_IMAGE_GLOBAL_NETWORK)
 bbox_model.to('cuda')
 
 criterion_label = BboxFilterNetworkGeometricLabelLoss(reduction_image='sum', reduction_global='mean')
@@ -359,7 +360,9 @@ for epoch in range(60):
 
             plot_results(epoch=epoch, count=c, env=house, images=images, bboxes=detected_bboxes, preds=preds, targets=target_boxes, confidence_threshold = confidence_threshold)
 
-            evaluator.add_predictions_bboxes_filtering(detected_bboxes, preds, target_boxes, img_size=images.size()[2:][::-1])
+            filtered_bboxes, filtered_preds = bounding_box_filtering_after_network(detected_bboxes.clone().detach(), preds, image_size=images.size()[2:][::-1], iou_threshold=iou_threshold_matching)
+
+            evaluator.add_predictions_bboxes_filtering(filtered_bboxes, filtered_preds, target_boxes, img_size=images.size()[2:][::-1])
             evaluator_complete_metric.add_predictions_bboxes_filtering(detected_bboxes, preds, target_boxes, img_size=images.size()[2:][::-1])
 
         metric = evaluator.get_metrics(iou_threshold=iou_threshold_matching, confidence_threshold=confidence_threshold)
