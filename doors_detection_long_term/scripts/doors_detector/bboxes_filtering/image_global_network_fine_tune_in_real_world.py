@@ -97,7 +97,7 @@ class BboxFilterNetworkGeometricLabelLoss(nn.Module):
 
     def forward(self, preds, label_targets):
         scores_features, labels_features = preds
-        labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[0.5, 0.25, 0.25]], device=label_targets.device)
+        labels_loss = torch.log(labels_features) * label_targets * torch.tensor([[0.5, 0.25, 0.25]], device=label_targets.device)
         labels_loss = torch.mean(torch.sum(torch.sum(labels_loss, 2) * -1, 1))
 
         return labels_loss
@@ -117,7 +117,7 @@ data_loaders_real_word_test = {}
 
 labels = None
 for house in houses:
-    train, test, l, _ = get_final_doors_dataset_real_data(folder_name=house, train_size=0.75, transform_train=False)
+    train, test, l, _ = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25, transform_train=False)
     labels = l
     data_loader_train = DataLoader(train, batch_size=32, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
     data_loaders_real_word_train[house] = data_loader_train
