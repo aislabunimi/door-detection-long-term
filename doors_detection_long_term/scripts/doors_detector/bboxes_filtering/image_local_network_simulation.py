@@ -16,7 +16,7 @@ from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCrea
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
-from doors_detection_long_term.doors_detector.models.bbox_filter_network import SharedMLP
+from doors_detection_long_term.doors_detector.models.bbox_filter_network import SharedMLP, TEST_IMAGE_LOCAL_NETWORK
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, BBOX_FILTER_NETWORK_GEOMETRIC
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
@@ -26,7 +26,7 @@ from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering im
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-num_bboxes = 50
+num_bboxes = 20
 
 iou_threshold_matching = 0.5
 confidence_threshold = 0.75
@@ -65,10 +65,6 @@ class ResNet34FPN(ResNet):
 
         return pyramid_features
 
-resnet = ResNet34FPN()
-x = torch.rand(2, 3, 256, 256)
-resnet(x)
-
 class BboxFilterNetworkImage(GenericModel):
     def __init__(self, fpn_channels:int, model_name: ModelName, pretrained: bool, n_labels: int, dataset_name: DATASET, description: DESCRIPTION):
         super(BboxFilterNetworkImage, self).__init__(model_name, dataset_name, description)
@@ -76,14 +72,34 @@ class BboxFilterNetworkImage(GenericModel):
         self.fpn = ResNet34FPN(channels=fpn_channels)
 
         self.shared_convolution_1 = nn.Sequential(
-            nn.Conv3d(in_channels=fpn_channels, out_channels=64, kernel_size=(3, 3, 1), bias=False, padding=(1, 1, 0)),
+            nn.Conv3d(in_channels=fpn_channels, out_channels=16, kernel_size=(3, 3, 1), bias=False, padding=(1, 1, 0)),
+            nn.BatchNorm3d(num_features=16),
+            nn.Conv3d(in_channels=16, out_channels=32, kernel_size=(1, 1, 1), bias=False),
+            nn.BatchNorm3d(num_features=32),
+            nn.Conv3d(in_channels=32, out_channels=32, kernel_size=(3, 3, 1), bias=False, padding=(1, 1, 0)),
+            nn.BatchNorm3d(num_features=32),
+            nn.ReLU(),
+            nn.MaxPool3d(kernel_size=(2, 2, 1), stride=(2, 2, 1)),
+            nn.BatchNorm3d(num_features=32),
+            nn.Conv3d(in_channels=32, out_channels=32, kernel_size=(3, 3, 1), bias=False, padding=(1, 1, 0)),
+            nn.BatchNorm3d(num_features=32),
+            nn.Conv3d(in_channels=32, out_channels=64, kernel_size=(1, 1, 1), bias=False),
+            nn.BatchNorm3d(num_features=64),
+            nn.Conv3d(in_channels=64, out_channels=64, kernel_size=(3, 3, 1), bias=False, padding=(1, 1, 0)),
+            nn.BatchNorm3d(num_features=64),
+            nn.ReLU(),
+            nn.MaxPool3d(kernel_size=(2, 2, 1), stride=(2, 2, 1)),
+            nn.BatchNorm3d(num_features=64),
+        )
+
+        self.shared_convolution_2 = nn.Sequential(
+            nn.Conv3d(in_channels=64, out_channels=64, kernel_size=(3, 3, 1), bias=False, padding=(1, 1, 0)),
             nn.BatchNorm3d(num_features=64),
             nn.Conv3d(in_channels=64, out_channels=128, kernel_size=(1, 1, 1), bias=False),
             nn.BatchNorm3d(num_features=128),
+            nn.ReLU(),
             nn.Conv3d(in_channels=128, out_channels=128, kernel_size=(3, 3, 1), bias=False, padding=(1, 1, 0)),
             nn.BatchNorm3d(num_features=128),
-            nn.ReLU(),
-            nn.MaxPool3d(kernel_size=(2, 2, 1), stride=(2, 2, 1)),
             nn.Conv3d(in_channels=128, out_channels=128, kernel_size=(3, 3, 1), bias=False, padding=(1, 1, 0)),
             nn.BatchNorm3d(num_features=128),
             nn.Conv3d(in_channels=128, out_channels=256, kernel_size=(1, 1, 1), bias=False),
@@ -93,22 +109,31 @@ class BboxFilterNetworkImage(GenericModel):
             nn.ReLU()
         )
 
-        self.shared_convolution_2 = nn.Sequential(
-            nn.Conv3d(in_channels=256, out_channels=256, kernel_size=(3, 3, 1), bias=False, padding=(1, 1, 0)),
-            nn.BatchNorm3d(num_features=256),
-            nn.Conv3d(in_channels=256, out_channels=512, kernel_size=(1, 1, 1), bias=False),
-            nn.BatchNorm3d(num_features=512),
+        self.shared_convolution_3 = nn.Sequential(
+            nn.Conv3d(in_channels=64 + 256, out_channels=64 + 256, kernel_size=(3, 3, 1), bias=False, padding=(1, 1, 0)),
+            nn.BatchNorm3d(num_features=64 + 256),
+            nn.Conv3d(in_channels=64 + 256, out_channels=128, kernel_size=(1, 1, 1), bias=False),
+            nn.BatchNorm3d(num_features=128),
+            nn.Conv3d(in_channels=128, out_channels=128, kernel_size=(3, 3, 1), bias=False, padding=(1, 1, 0)),
+            nn.BatchNorm3d(num_features=128),
             nn.ReLU(),
-            nn.Conv3d(in_channels=512, out_channels=512, kernel_size=(3, 3, 1), bias=False, padding=(1, 1, 0)),
-            nn.BatchNorm3d(num_features=512),
-            nn.Conv3d(in_channels=512, out_channels=512, kernel_size=(3, 3, 1), bias=False, padding=(1, 1, 0)),
-            nn.BatchNorm3d(num_features=512),
-            nn.Conv3d(in_channels=512, out_channels=1024, kernel_size=(1, 1, 1), bias=False),
-            nn.BatchNorm3d(num_features=1024),
-            nn.Conv3d(in_channels=1024, out_channels=1024, kernel_size=(3, 3, 1), bias=False, padding=(1, 1, 0)),
-            nn.BatchNorm3d(num_features=1024),
-            nn.ReLU()
+            nn.MaxPool3d(kernel_size=(2, 2, 1), stride=(2, 2, 1)),
+            nn.BatchNorm3d(num_features=128),
+            nn.Conv3d(in_channels=128, out_channels=128, kernel_size=(3, 3, 1), bias=False, padding=(1, 1, 0)),
+            nn.BatchNorm3d(num_features=128),
+            nn.Conv3d(in_channels=128, out_channels=64, kernel_size=(1, 1, 1), bias=False),
+            nn.BatchNorm3d(num_features=64),
+            nn.Conv3d(in_channels=64, out_channels=64, kernel_size=(3, 3, 1), bias=False, padding=(1, 1, 0)),
+            nn.BatchNorm3d(num_features=64),
+            nn.ReLU(),
+            nn.MaxPool3d(kernel_size=(2, 2, 1), stride=(2, 2, 1)),
+            nn.BatchNorm3d(num_features=64),
         )
+
+        self.shared_mlp_1 = SharedMLP(channels=[64, 32, 16, 1], last_activation=nn.Sigmoid())
+
+        self.shared_mlp_2 = SharedMLP(channels=[64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
+
 
 
         if pretrained:
@@ -152,23 +177,26 @@ class BboxFilterNetworkImage(GenericModel):
 
         x = x.permute(0, 2, 3, 4, 1)
 
-        print(x.size())
 
         x = self.shared_convolution_1(x)
-        print(x.size())
+
 
         global_features = self.shared_convolution_2(x)
+        global_features = nn.AdaptiveMaxPool3d((1, 1, 1))(global_features).repeat(1, 1, x.size(2), x.size(3), x.size(4))
 
-        print(global_features.size())
+        x = torch.cat([x, global_features], dim=1)
 
-        return x
+        x = self.shared_convolution_3(x)
 
-images = torch.rand(1, 3, 240, 320).to('cuda')
-bboxes = torch.rand(1, 7, 20).to('cuda')
+        x = torch.squeeze(nn.AdaptiveMaxPool3d((1, 1, x.size(-1)))(x), dim=(2, 3))
+        score_features = self.shared_mlp_1(x)
+        label_features = self.shared_mlp_2(x)
 
-bbox_model = BboxFilterNetworkImage(fpn_channels=64, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST)
-bbox_model.to('cuda')
-bbox_model(images, bboxes)
+        score_features = torch.squeeze(score_features, dim=1)
+        label_features = torch.transpose(label_features, 1, 2)
+
+        return score_features, label_features
+
 
 class BboxFilterNetworkGeometricLabelLoss(nn.Module):
 
@@ -203,8 +231,8 @@ dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=iou_threshold
 
 train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=False)
 
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
-test_dataset_bboxes = DataLoader(test_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=False)
+test_dataset_bboxes = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
 
 
 # Calculate Metrics in real worlds
@@ -215,7 +243,7 @@ labels = None
 for house in houses:
     _, test, l, _ = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25)
     labels = l
-    data_loader_test = DataLoader(test, batch_size=32, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
+    data_loader_test = DataLoader(test, batch_size=4, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
     data_loaders_real_word[house] = data_loader_test
 
 yolo_gd = YOLOv5Model(model_name=YOLOv5, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=globals()[f'EXP_GENERAL_DETECTOR_GIBSON_60_EPOCHS'.upper()])
@@ -291,7 +319,7 @@ plt.legend()
 plt.savefig('image_global_net/complete_metric.svg')
 
 #check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold)
-bbox_model = BboxFilterNetworkGeometric(initial_channels=7, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST)
+bbox_model = BboxFilterNetworkImage(fpn_channels=16, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST_IMAGE_LOCAL_NETWORK)
 bbox_model.to('cuda')
 
 criterion_label = BboxFilterNetworkGeometricLabelLoss(reduction_image='sum', reduction_global='mean')

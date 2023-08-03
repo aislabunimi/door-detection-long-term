@@ -18,6 +18,9 @@ from doors_detection_long_term.scripts.doors_detector.dataset_configurator impor
 TEST: DESCRIPTION = 0
 IMAGE_TEST: DESCRIPTION = 1
 TEST_IMAGE_GLOBAL_NETWORK: DESCRIPTION = 2
+TEST_IMAGE_LOCAL_NETWORK: DESCRIPTION = 3
+TEST_IMAGE_LOCAL_NETWORK_FINE_TUNE: DESCRIPTION = 4
+
 
 class SharedMLP(nn.Module):
     def __init__(self, channels, last_activation=nn.ReLU()):
@@ -232,10 +235,5 @@ class BboxFilterNetworkSuppress(nn.Module):
 
         return scores_features, torch.tensor(0)
 
-
-model = BboxFilterNetworkImage(fpn_channels=128, n_labels=3, model_name=BBOX_FILTER_NETWORK_IMAGE, description=IMAGE_TEST, dataset_name=FINAL_DOORS_DATASET, pretrained=False)
-x = torch.rand(2, 3, 240, 320)
-output = model(x, torch.rand(2, 7, 50))
-print(output[0])
 
 
