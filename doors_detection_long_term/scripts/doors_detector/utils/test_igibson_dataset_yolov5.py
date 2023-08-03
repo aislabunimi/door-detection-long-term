@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import matplotlib
-matplotlib.use("TkAgg")
+#matplotlib.use("TkAgg")
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1 import ImageGrid
 from torch.utils.data import DataLoader
@@ -17,7 +17,7 @@ data_loader_train = DataLoader(train, batch_size=4, collate_fn=collate_fn_yolov5
 data_loader_validation = DataLoader(validation, batch_size=4, collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
 
 COLORS = np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
-save_path = "/media/michele/Elements/dataloader_test"
+save_path = "/tmp/dataloader_test"
 
 fig = plt.figure(figsize=(16, 16))
 nrows, ncols = 2, 2
