@@ -10,7 +10,9 @@ from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general i
 #Check the dataset
 def check_bbox_dataset(dataset, confidence_threshold):
     colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-    for data in dataset:
+    for i, data in enumerate(dataset):
+        if i < 2900:
+            continue
         images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes = data
         detected_bboxes = torch.transpose(detected_bboxes, 1, 2)
         images_opencv = []

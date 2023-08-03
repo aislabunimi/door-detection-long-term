@@ -25,9 +25,9 @@ from doors_detection_long_term.doors_detector.utilities.collate_fn_functions imp
 from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering import bounding_box_filtering_yolo, \
     check_bbox_dataset, plot_results
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
-
+torch.autograd.detect_anomaly(True)
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-num_bboxes = 20
+num_bboxes = 40
 
 iou_threshold_matching = 0.5
 confidence_threshold = 0.75
@@ -115,8 +115,10 @@ class BboxFilterNetworkImage(GenericModel):
                                      boxes[:, 1:2, :] + boxes[:, 3:4, :] / 2], dim=1).transpose(1, 2)
 
         converted_boxes = torch.round(converted_boxes * torch.tensor([x.size()[2:][::-1] + x.size()[2:][::-1]], device=x.device))
-        #converted_boxes[:,:,0:1][[converted_boxes[:, :, 0:1] == converted_boxes[:, :, 2:3]]] -= 1
-        #converted_boxes[:,:,1:2][[converted_boxes[:, :, 1:2] == converted_boxes[:, :, 3:4]]] -= 1
+        converted_boxes[:,:,0:1][[converted_boxes[:, :, 0:1] == converted_boxes[:, :, 2:3]]] -= 1
+        converted_boxes[:,:,2:3][[converted_boxes[:, :, 0:1] == converted_boxes[:, :, 2:3]]] += 1
+        converted_boxes[:,:,1:2][[converted_boxes[:, :, 1:2] == converted_boxes[:, :, 3:4]]] -= 1
+        converted_boxes[:,:,3:4][[converted_boxes[:, :, 1:2] == converted_boxes[:, :, 3:4]]] += 1
         converted_boxes[converted_boxes <= 0.0] = 0.0
         converted_boxes[:,:,0:1][[converted_boxes[:, :, 0:1] >= x.size(-1)]] = x.size(-1)
         converted_boxes[:,:,2:3][[converted_boxes[:, :, 2:3] >= x.size(-1)]] = x.size(-1)
@@ -126,7 +128,6 @@ class BboxFilterNetworkImage(GenericModel):
         converted_boxes = converted_boxes.type(torch.int16)
 
         local_features_bboxes_image = []
-
 
 
         for n_batch, bboxes_on_batch in enumerate(converted_boxes):
@@ -207,7 +208,7 @@ train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes
 
 train_dataset_bboxes = DataLoader(train_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=False)
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
-
+#check_bbox_dataset(train_dataset_bboxes, confidence_threshold=confidence_threshold)
 
 # Calculate Metrics in real worlds
 houses = ['floor1', 'floor4', 'chemistry_floor0']
@@ -338,7 +339,10 @@ for epoch in range(60):
     temp_losses_confidence = []
     temp_losses_final = []
 
-    for data in tqdm(train_dataset_bboxes, total=len(train_dataset_bboxes), desc=f'Training epoch {epoch}'):
+    for i, data in tqdm(enumerate(train_dataset_bboxes), total=len(train_dataset_bboxes), desc=f'Training epoch {epoch}'):
+        if i > 2902:
+            print(detected_bboxes)
+
         images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes = data
         images = images.to('cuda')
         detected_bboxes = detected_bboxes.to('cuda')
@@ -351,7 +355,7 @@ for epoch in range(60):
         loss_label = criterion_label(preds, labels_encoded)
         loss_confidence = criterion_confidence(preds, ious)
         final_loss = loss_label + loss_confidence
-        print(final_loss.item())
+
 
         temp_losses_label.append(loss_label.item())
         temp_losses_confidence.append(loss_confidence.item())
