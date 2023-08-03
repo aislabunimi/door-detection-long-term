@@ -187,8 +187,8 @@ dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=iou_threshold
 
 train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=False)
 
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=8, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=False)
-test_dataset_bboxes = DataLoader(test_bboxes, batch_size=8, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=False)
+test_dataset_bboxes = DataLoader(test_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
 
 
 # Calculate Metrics in real worlds
