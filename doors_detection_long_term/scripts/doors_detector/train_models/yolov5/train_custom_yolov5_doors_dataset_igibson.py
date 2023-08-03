@@ -18,14 +18,14 @@ from doors_detection_long_term.doors_detector.utilities.utils import seed_everyt
 
 device = 'cuda'
 
-epochs_general_detector = [40, 60, 80, 100]
-#epochs_qualified_detectors = [20, 40]
-#fine_tune_quantity = [15, 25, 50, 75]
+#epochs_general_detector = [40, 60, 80, 100]
+epochs_general_detector = [10, 20, 30, 40]
 
 # Params
 params = {
     #'epochs': 40,
-    'batch_size': 8,
+    #'batch_size': 8,
+    'batch_size': 48,
     'seed': 0
 }
 
@@ -90,7 +90,7 @@ if __name__ == "__main__":
 
     model, compute_loss, optimizer, scheduler, scaler, start_epoch, nl, nw, nb, amp, nbs, accumulate, lf, logs = \
         prepare_model(
-            description=globals()[f'EXP_2_IGIBSON_ALL_SCENES_REALISTIC_MODE_EPOCHS_{epochs_general_detector[0]}'.upper()],
+            description=globals()[f'EXP_4_IGIBSON_ALL_SCENES_REALISTIC_MODE_HALF_EPOCHS_{epochs_general_detector[0]}'.upper()],
             reload_model=False,
             restart_checkpoint=False,
             epochs=epochs_general_detector[-1]
@@ -207,4 +207,4 @@ if __name__ == "__main__":
         # Change the model description on each epoch step
         if epoch == epochs_general_detector[epoch_count] - 1 and epoch_count < len(epochs_general_detector) -1:
             epoch_count += 1
-            model.set_description(globals()[f'EXP_2_IGIBSON_ALL_SCENES_REALISTIC_MODE_EPOCHS_{epochs_general_detector[epoch_count]}'.upper()])
+            model.set_description(globals()[f'EXP_4_IGIBSON_ALL_SCENES_REALISTIC_MODE_HALF_EPOCHS_{epochs_general_detector[epoch_count]}'.upper()])

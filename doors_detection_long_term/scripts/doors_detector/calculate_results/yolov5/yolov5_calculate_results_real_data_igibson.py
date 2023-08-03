@@ -13,8 +13,7 @@ from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 houses = ['floor1', 'floor4', 'chemistry_floor0']
-datasets = ['gibson', 'deep_doors_2', 'gibson_deep_doors_2']
-epochs_general_detector = [40, 60, 80, 100]
+epochs_general_detector = [10, 20, 30, 40]
 device = 'cuda'
 
 def compute_results(model_name, data_loader_test, description):
@@ -84,7 +83,7 @@ def save_file(results, complete_results, file_name_1, file_name_2):
 if __name__ == "__main__":
     seed_everything(seed=0)
 
-    model_names_general_detectors = [(globals()[f'EXP_2_IGIBSON_ALL_SCENES_REALISTIC_MODE_EPOCHS_{epochs}'.upper()], epochs) for epochs in epochs_general_detector]
+    model_names_general_detectors = [(globals()[f'EXP_4_IGIBSON_ALL_SCENES_REALISTIC_MODE_HALF_EPOCHS_{epochs}'.upper()], epochs) for epochs in epochs_general_detector]
     
     results = []
     results_complete = []

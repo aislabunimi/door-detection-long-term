@@ -43,6 +43,9 @@ class DatasetCreatorAllScenes:
         train_dataframe = shuffled_dataframe.loc[train_index]
         validation_dataframe = shuffled_dataframe.loc[validation_index]
 
+        ## Half size
+        train_dataframe = train_dataframe.iloc[::2]
+
         ## printing infos
         for title, dataset in zip(["Original frame", "Training frame", "Validation frame"], [self._dataframe, train_dataframe, validation_dataframe]):
             print(title)
