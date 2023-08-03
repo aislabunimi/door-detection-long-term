@@ -207,7 +207,7 @@ class BboxFilterNetworkGeometricLabelLoss(nn.Module):
 
     def forward(self, preds, label_targets):
         scores_features, labels_features = preds
-        labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[0.15, 0.7, 0.15]], device=label_targets.device)
+        labels_loss = torch.log(labels_features) * label_targets * torch.tensor([[0.5, 0.25, 0.25]], device=label_targets.device)
         labels_loss = torch.mean(torch.sum(torch.sum(labels_loss, 2) * -1, 1))
 
         return labels_loss

@@ -513,7 +513,7 @@ for epoch in range(60):
 
     plt.title('Complete metric')
     plt.legend()
-    plt.savefig('image_global_net/complete_metric.svg')
+    plt.savefig('image_local_net/complete_metric.svg')
 
     print(performances_in_real_worlds_bbox_filtering)
     print(train_accuracy)
@@ -531,7 +531,7 @@ for epoch in range(60):
     plt.plot([i for i in range(len(test_accuracy[2]))], test_accuracy[2], label='open')
     plt.title('Val accuracy')
     plt.legend()
-    plt.savefig('image_global_net/val_geometric.svg')
+    plt.savefig('image_local_net/val_geometric.svg')
     print(test_accuracy)
     logs['test']['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
     logs['test']['loss_confidence'].append(sum(temp_losses_confidence) / len(temp_losses_confidence))
@@ -543,14 +543,14 @@ for epoch in range(60):
     plt.plot([i for i in range(len(logs['train']['loss_label']))], logs['test']['loss_label'], label='test_loss')
     plt.title('Losses')
     plt.legend()
-    plt.savefig('image_global_net/losses_geometric_label.svg')
+    plt.savefig('image_local_net/losses_geometric_label.svg')
 
     fig = plt.figure()
     plt.plot([i for i in range(len(logs['train']['loss_confidence']))], logs['train']['loss_confidence'], label='train_loss')
     plt.plot([i for i in range(len(logs['train']['loss_confidence']))], logs['test']['loss_confidence'], label='test_loss')
     plt.title('Losses')
     plt.legend()
-    plt.savefig('image_global_net/losses_geometric_confidence.svg')
+    plt.savefig('image_local_net/losses_geometric_confidence.svg')
     bbox_model.save(epoch=epoch, optimizer_state_dict=optimizer.state_dict(), params={}, logs=logs, lr_scheduler_state_dict={})
 
 
