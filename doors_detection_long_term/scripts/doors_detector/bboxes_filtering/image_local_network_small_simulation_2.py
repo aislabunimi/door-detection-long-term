@@ -27,7 +27,7 @@ from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering im
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 torch.autograd.detect_anomaly(True)
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-num_bboxes = 40
+num_bboxes = 20
 
 iou_threshold_matching = 0.5
 confidence_threshold = 0.75
@@ -60,11 +60,11 @@ class ResNet50FPN(ResNet):
         ordered_dict['x3'] = x3
 
         x4 = self.layer4(x3)
-        #ordered_dict['x4'] = x4
+        ordered_dict['x4'] = x4
 
-        #pyramid_features = self.fpn(ordered_dict)
+        pyramid_features = self.fpn(ordered_dict)
 
-        return x2
+        return pyramid_features
 
 class BboxFilterNetworkImage(GenericModel):
     def __init__(self, fpn_channels:int, model_name: ModelName, pretrained: bool, n_labels: int, dataset_name: DATASET, description: DESCRIPTION):
@@ -104,9 +104,9 @@ class BboxFilterNetworkImage(GenericModel):
             self.load_state_dict(torch.load(os.path.join(path, 'model.pth'), map_location=torch.device('cpu')))
 
     def forward(self, images, boxes):
-        x = self.fpn(images)
+        x = self.fpn(images)['x2']
         #print(x.size())
-        x = self.conv_after_backbone(x)
+        #x = self.conv_after_backbone(x)
 
         # Convert boxes from [cx, cy, w, h] to [x1, y1, x2, y2]
         converted_boxes = torch.cat([boxes[:, 0:1, :] - boxes[:, 2:3, :] / 2,
@@ -115,17 +115,18 @@ class BboxFilterNetworkImage(GenericModel):
                                      boxes[:, 1:2, :] + boxes[:, 3:4, :] / 2], dim=1).transpose(1, 2)
 
         converted_boxes = torch.round(converted_boxes * torch.tensor([x.size()[2:][::-1] + x.size()[2:][::-1]], device=x.device))
-        converted_boxes[:,:,0:1][[converted_boxes[:, :, 0:1] == converted_boxes[:, :, 2:3]]] -= 1
-        converted_boxes[:,:,2:3][[converted_boxes[:, :, 0:1] == converted_boxes[:, :, 2:3]]] += 1
-        converted_boxes[:,:,1:2][[converted_boxes[:, :, 1:2] == converted_boxes[:, :, 3:4]]] -= 1
-        converted_boxes[:,:,3:4][[converted_boxes[:, :, 1:2] == converted_boxes[:, :, 3:4]]] += 1
-        converted_boxes[converted_boxes <= 0.0] = 0.0
-        converted_boxes[:,:,0:1][[converted_boxes[:, :, 0:1] >= x.size(-1)]] = x.size(-1)
-        converted_boxes[:,:,2:3][[converted_boxes[:, :, 2:3] >= x.size(-1)]] = x.size(-1)
-        converted_boxes[:,:,1:2][[converted_boxes[:, :, 1:2] >= x.size(-2)]] = x.size(-2)
-        converted_boxes[:,:,3:4][[converted_boxes[:, :, 3:4] >= x.size(-2)]] = x.size(-2)
-
         converted_boxes = converted_boxes.type(torch.int16)
+        converted_boxes[:,:,0:1][converted_boxes[:, :, 0:1] == converted_boxes[:, :, 2:3]] -= 1
+        converted_boxes[:,:,2:3][converted_boxes[:, :, 0:1] == converted_boxes[:, :, 2:3]] += 1
+        converted_boxes[:,:,1:2][converted_boxes[:, :, 1:2] == converted_boxes[:, :, 3:4]] -= 1
+        converted_boxes[:,:,3:4][converted_boxes[:, :, 1:2] == converted_boxes[:, :, 3:4]] += 1
+        converted_boxes[converted_boxes < 0] = 0
+        converted_boxes[:,:,0:1][converted_boxes[:, :, 0:1] >= x.size(-1)] = x.size(-1)
+        converted_boxes[:,:,2:3][converted_boxes[:, :, 2:3] >= x.size(-1)] = x.size(-1)
+        converted_boxes[:,:,1:2][converted_boxes[:, :, 1:2] >= x.size(-2)] = x.size(-2)
+        converted_boxes[:,:,3:4][converted_boxes[:, :, 3:4] >= x.size(-2)] = x.size(-2)
+
+
 
         local_features_bboxes_image = []
 
@@ -133,12 +134,15 @@ class BboxFilterNetworkImage(GenericModel):
         for n_batch, bboxes_on_batch in enumerate(converted_boxes):
             local_features_bboxes_batch = []
             for x1, y1, x2, y2 in bboxes_on_batch:
-                #print(x[n_batch, :, y1: y2, x1: x2].size())
-                pooled = torch.mean(x[n_batch, :, y1: y2, x1: x2].clone(), dim=(1, 2))
+                if x1 == x2:
+                    x2+=1
+                if y1 == y2:
+                    y2+=1
+                pooled = nn.AdaptiveMaxPool2d((1,1))(x[n_batch, :, y1: y2, x1: x2])
                 #print(pooled.size())
                 #pooled[pooled == float('nan')] = 0.0
                 #4print(pooled)
-                local_features_bboxes_batch.append(pooled)
+                local_features_bboxes_batch.append(pooled.squeeze(1, 2))
             local_features_bboxes_image.append(torch.stack(local_features_bboxes_batch))
 
         local_features_bboxes_image = torch.stack(local_features_bboxes_image).transpose(1, 2)
@@ -180,7 +184,7 @@ class BboxFilterNetworkGeometricLabelLoss(nn.Module):
 
     def forward(self, preds, label_targets):
         scores_features, labels_features = preds
-        labels_loss = torch.log(labels_features) * label_targets * torch.tensor([[0.5, 0.25, 0.25]], device=label_targets.device)
+        labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[0.5, 0.25, 0.25]], device=label_targets.device)
         labels_loss = torch.mean(torch.sum(torch.sum(labels_loss, 2) * -1, 1))
 
         return labels_loss
@@ -204,10 +208,10 @@ dataset_creator_bboxes.load_dataset(folder_name='yolov5_simulation_dataset')
 dataset_creator_bboxes.select_n_bounding_boxes(num_bboxes=num_bboxes)
 dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=iou_threshold_matching)
 
-train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=False)
+train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=True)
 
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=False)
-test_dataset_bboxes = DataLoader(test_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
+test_dataset_bboxes = DataLoader(test_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
 #check_bbox_dataset(train_dataset_bboxes, confidence_threshold=confidence_threshold)
 
 # Calculate Metrics in real worlds
@@ -282,7 +286,7 @@ plt.axhline(y=performances_in_real_worlds['AP']['0'], color = 'r', linestyle = '
 plt.axhline(y=performances_in_real_worlds['AP']['1'], color = 'g', linestyle = '--', label='open doors')
 plt.title('AP')
 plt.legend()
-plt.savefig('image_global_net/AP.svg')
+plt.savefig('image_local_net_small/AP.svg')
 
 fig = plt.figure()
 plt.axhline(y=performances_in_real_worlds['TP'], color = 'g', linestyle = '--', label='TP')
@@ -291,7 +295,7 @@ plt.axhline(y=performances_in_real_worlds['TPm'], color = 'forestgreen', linesty
 plt.axhline(y=performances_in_real_worlds['FPiou'], color = 'salmon', linestyle = '--', label='FPiou')
 plt.title('Complete metric')
 plt.legend()
-plt.savefig('image_global_net/complete_metric.svg')
+plt.savefig('image_local_net_small/complete_metric.svg')
 
 #check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold)
 bbox_model = BboxFilterNetworkImage(fpn_channels=32, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST_IMAGE_LOCAL_NETWORK_SMALL)
@@ -340,8 +344,6 @@ for epoch in range(60):
     temp_losses_final = []
 
     for i, data in tqdm(enumerate(train_dataset_bboxes), total=len(train_dataset_bboxes), desc=f'Training epoch {epoch}'):
-        if i > 2902:
-            print(detected_bboxes)
 
         images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes = data
         images = images.to('cuda')
@@ -492,7 +494,7 @@ for epoch in range(60):
 
     plt.title('Complete metric')
     plt.legend()
-    plt.savefig('image_global_net/complete_metric.svg')
+    plt.savefig('image_local_net_small/complete_metric.svg')
 
     print(performances_in_real_worlds_bbox_filtering)
     print(train_accuracy)
@@ -502,7 +504,7 @@ for epoch in range(60):
     plt.plot([i for i in range(len(train_accuracy[2]))], train_accuracy[2], label='open')
     plt.title('Train accuracy')
     plt.legend()
-    plt.savefig('image_global_net/train_geometric.svg')
+    plt.savefig('image_local_net_small/train_geometric.svg')
 
     fig = plt.figure()
     plt.plot([i for i in range(len(test_accuracy[0]))], test_accuracy[0], label='background')
@@ -510,7 +512,7 @@ for epoch in range(60):
     plt.plot([i for i in range(len(test_accuracy[2]))], test_accuracy[2], label='open')
     plt.title('Val accuracy')
     plt.legend()
-    plt.savefig('image_global_net/val_geometric.svg')
+    plt.savefig('image_local_net_small/val_geometric.svg')
     print(test_accuracy)
     logs['test']['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
     logs['test']['loss_confidence'].append(sum(temp_losses_confidence) / len(temp_losses_confidence))
@@ -522,14 +524,14 @@ for epoch in range(60):
     plt.plot([i for i in range(len(logs['train']['loss_label']))], logs['test']['loss_label'], label='test_loss')
     plt.title('Losses')
     plt.legend()
-    plt.savefig('image_global_net/losses_geometric_label.svg')
+    plt.savefig('image_local_net_small/losses_geometric_label.svg')
 
     fig = plt.figure()
     plt.plot([i for i in range(len(logs['train']['loss_confidence']))], logs['train']['loss_confidence'], label='train_loss')
     plt.plot([i for i in range(len(logs['train']['loss_confidence']))], logs['test']['loss_confidence'], label='test_loss')
     plt.title('Losses')
     plt.legend()
-    plt.savefig('image_global_net/losses_geometric_confidence.svg')
+    plt.savefig('image_local_net_small/losses_geometric_confidence.svg')
     bbox_model.save(epoch=epoch, optimizer_state_dict=optimizer.state_dict(), params={}, logs=logs, lr_scheduler_state_dict={})
 
 
