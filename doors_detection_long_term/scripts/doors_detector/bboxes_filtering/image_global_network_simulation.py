@@ -35,13 +35,13 @@ class BboxFilterNetworkGeometric(GenericModel):
         self.resnet = ResNet(BasicBlock, [3, 4, 6, 3])
         state_dict = load_state_dict_from_url('https://download.pytorch.org/models/resnet34-333f7ec4.pth', progress=True)
         self.resnet.load_state_dict(state_dict)
-        self.resnet.fc = nn.Linear(512, 1024, bias=True)
+        self.resnet.fc = nn.Linear(512, 512, bias=False)
 
-        self.shared_mlp_1 = SharedMLP(channels=[initial_channels, 16, 32, 64])
-        self.shared_mlp_2 = SharedMLP(channels=[64, 128, 256, 512, 1024])
+        self.shared_mlp_1 = SharedMLP(channels=[initial_channels, 16, 32, 64, 128])
+        self.shared_mlp_2 = SharedMLP(channels=[128, 128, 256, 512])
         self.shared_mlp_3 = SharedMLP(channels=[512, 512, 1024])
 
-        self.shared_mlp_4 = SharedMLP(channels=[64 + 1024 + 1024, 512, 256, 128, 64])
+        self.shared_mlp_4 = SharedMLP(channels=[128 + 512 + 512, 512, 256, 128, 64])
 
         self.shared_mlp_5 = SharedMLP(channels=[64, 32, 16, 1], last_activation=nn.Sigmoid())
 
