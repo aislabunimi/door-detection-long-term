@@ -104,7 +104,7 @@ class BboxFilterNetworkImage(GenericModel):
             self.load_state_dict(torch.load(os.path.join(path, 'model.pth'), map_location=torch.device('cpu')))
 
     def forward(self, images, boxes):
-        bboxes_features = self.shared_mlp_1(boxes)
+        bboxes_features = self.shared_mlp_geometric_1(boxes)
         x = self.fpn(images)['x2']
         #print(x.size())
         #x = self.conv_after_backbone(x)
@@ -185,7 +185,7 @@ class BboxFilterNetworkGeometricLabelLoss(nn.Module):
 
     def forward(self, preds, label_targets):
         scores_features, labels_features = preds
-        labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[0.5, 0.25, 0.25]], device=label_targets.device)
+        labels_loss = torch.log(labels_features) * label_targets# * torch.tensor([[0.5, 0.25, 0.25]], device=label_targets.device)
         labels_loss = torch.mean(torch.sum(torch.sum(labels_loss, 2) * -1, 1))
 
         return labels_loss
@@ -209,10 +209,10 @@ dataset_creator_bboxes.load_dataset(folder_name='yolov5_simulation_dataset')
 dataset_creator_bboxes.select_n_bounding_boxes(num_bboxes=num_bboxes)
 dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=iou_threshold_matching)
 
-train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=True)
+train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=True, apply_transforms_to_train=True)
 
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
-test_dataset_bboxes = DataLoader(test_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
+test_dataset_bboxes = DataLoader(test_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
 #check_bbox_dataset(train_dataset_bboxes, confidence_threshold=confidence_threshold)
 
 # Calculate Metrics in real worlds
@@ -267,8 +267,8 @@ with torch.no_grad():
         dataset_creator_bboxes_real_world.match_bboxes_with_gt(iou_threshold_matching=iou_threshold_matching)
 
         #dataset_creator_bboxes_real_world.visualize_bboxes(bboxes_type=ExampleType.TEST)
-        _, test_bboxes = dataset_creator_bboxes_real_world.create_datasets(shuffle_boxes=False, apply_transforms_to_train=False)
-        datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=False)
+        _, test_bboxes = dataset_creator_bboxes_real_world.create_datasets(shuffle_boxes=True, apply_transforms_to_train=False)
+        datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
 
 
 performances_in_real_worlds['AP']['0'] = sum(performances_in_real_worlds['AP']['0']) / len(performances_in_real_worlds['AP']['0'])
