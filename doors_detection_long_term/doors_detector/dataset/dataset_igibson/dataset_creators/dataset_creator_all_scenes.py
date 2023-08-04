@@ -28,7 +28,7 @@ class DatasetCreatorAllScenes:
         self._use_negatives = use_negatives
         return self
     
-    def create_datasets(self, doors_config:str = None, random_state: int = 42) -> Tuple[DatasetDoorsIGibson]:
+    def create_datasets(self, doors_config:str = None, half_size:bool = False, random_state: int = 42) -> Tuple[DatasetDoorsIGibson]:
         ## rows with doors
         shuffled_dataframe = shuffle(self._dataframe, random_state=random_state)
         shuffled_dataframe = shuffled_dataframe[shuffled_dataframe.label == 1]
@@ -44,7 +44,8 @@ class DatasetCreatorAllScenes:
         validation_dataframe = shuffled_dataframe.loc[validation_index]
 
         ## Half size
-        train_dataframe = train_dataframe.iloc[::2]
+        if half_size:
+            train_dataframe = train_dataframe.iloc[::2]
 
         ## printing infos
         for title, dataset in zip(["Original frame", "Training frame", "Validation frame"], [self._dataframe, train_dataframe, validation_dataframe]):
