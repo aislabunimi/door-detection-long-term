@@ -116,9 +116,9 @@ def get_final_doors_dataset_real_data_bbox_filter(folder_name: str, train_size: 
 
 ## iGibson datasets
 
-def get_igibson_dataset_all_scenes(doors_config:str = None):
+def get_igibson_dataset_all_scenes(doors_config:str = None, step:int = None):
     dataset_creator = IGibsonDatasetCreatorAllScenes(dataset_path=igibson_doors_dataset_path)
-    train_set, validation_set = dataset_creator.create_datasets(doors_config)
+    train_set, validation_set = dataset_creator.create_datasets(doors_config, step)
     labels = dataset_creator.get_labels()
 
     return train_set, validation_set, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
