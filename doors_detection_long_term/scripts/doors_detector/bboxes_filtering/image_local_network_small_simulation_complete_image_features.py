@@ -72,33 +72,18 @@ class BboxFilterNetworkImage(GenericModel):
 
         self.fpn = ResNet50FPN(channels=fpn_channels)
         self.batch_norm_after_fpn = nn.BatchNorm2d(fpn_channels)
-        self.adaptive_max_pool_2d = nn.AdaptiveMaxPool2d((40, 40))
+        self.adaptive_max_pool_2d = nn.AdaptiveMaxPool2d((20, 20))
 
         self.image_region = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(in_features=64 * 40 * 40, out_features=4096*2),
-            nn.BatchNorm1d(4096 * 2),
-            nn.ReLU(),
-            nn.Linear(in_features=4096 * 2, out_features=4096),
+            nn.Linear(in_features=32 * 20 * 20, out_features=4096),
             nn.BatchNorm1d(4096),
             nn.ReLU(),
-            nn.Linear(in_features=4096, out_features=40 * 40 * 3),
-            nn.BatchNorm1d(40 * 40 * 3),
-            nn.Unflatten(1, (40, 40, 3)),
-            nn.Softmax(3),
+            nn.Linear(in_features=4096, out_features=20 * 20),
+            nn.BatchNorm1d(20 * 20),
+            nn.Unflatten(1, (20, 20)),
+            nn.Sigmoid(),
         )
-
-        self.shared_mlp_1 = SharedMLP(channels=[128, 128, 256])
-        self.shared_mlp_2 = SharedMLP(channels=[256, 512, 1024, 2048])
-        self.shared_mlp_3 = SharedMLP(channels=[512, 512, 1024])
-
-        self.shared_mlp_4 = SharedMLP(channels=[2048 + 256, 512, 256, 128])
-
-        self.shared_mlp_5 = SharedMLP(channels=[128, 64, 32, 16, 1], last_activation=nn.Sigmoid())
-
-        self.shared_mlp_6 = SharedMLP(channels=[128, 64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
-
-        self.shared_mlp_geometric_1 = SharedMLP(channels=[7, 16, 32, 64])
 
         if pretrained:
             if pretrained:
@@ -110,77 +95,17 @@ class BboxFilterNetworkImage(GenericModel):
             self.load_state_dict(torch.load(os.path.join(path, 'model.pth'), map_location=torch.device('cpu')))
 
     def forward(self, images, boxes):
-        bboxes_features = self.shared_mlp_geometric_1(boxes)
+        #bboxes_features = self.shared_mlp_geometric_1(boxes)
         x = self.fpn(images)['x2']
         #print(x.size())
         #x = self.conv_after_backbone(x)
         x = self.adaptive_max_pool_2d(x)
+        #print(x.size())
         image_region_features = self.image_region(x)
-        image_region_features = image_region_features.permute(0,2, 1, 3)
-        print(image_region_features)
+        image_region_features = image_region_features.transpose(1, 2)
+        #print(image_region_features.size())
 
-
-
-        # Convert boxes from [cx, cy, w, h] to [x1, y1, x2, y2]
-        converted_boxes = torch.cat([boxes[:, 0:1, :] - boxes[:, 2:3, :] / 2,
-                                     boxes[:, 1:2, :] - boxes[:, 3:4, :] / 2,
-                                     boxes[:, 0:1, :] + boxes[:, 2:3, :] / 2,
-                                     boxes[:, 1:2, :] + boxes[:, 3:4, :] / 2], dim=1).transpose(1, 2)
-
-        converted_boxes = torch.round(converted_boxes * torch.tensor([x.size()[2:][::-1] + x.size()[2:][::-1]], device=x.device))
-        converted_boxes = converted_boxes.type(torch.int16)
-        converted_boxes[:,:,0:1][converted_boxes[:, :, 0:1] == converted_boxes[:, :, 2:3]] -= 1
-        converted_boxes[:,:,2:3][converted_boxes[:, :, 0:1] == converted_boxes[:, :, 2:3]] += 1
-        converted_boxes[:,:,1:2][converted_boxes[:, :, 1:2] == converted_boxes[:, :, 3:4]] -= 1
-        converted_boxes[:,:,3:4][converted_boxes[:, :, 1:2] == converted_boxes[:, :, 3:4]] += 1
-        converted_boxes[converted_boxes < 0] = 0
-        converted_boxes[:,:,0:1][converted_boxes[:, :, 0:1] >= x.size(-1)] = x.size(-1)
-        converted_boxes[:,:,2:3][converted_boxes[:, :, 2:3] >= x.size(-1)] = x.size(-1)
-        converted_boxes[:,:,1:2][converted_boxes[:, :, 1:2] >= x.size(-2)] = x.size(-2)
-        converted_boxes[:,:,3:4][converted_boxes[:, :, 3:4] >= x.size(-2)] = x.size(-2)
-
-
-
-        local_features_bboxes_image = []
-
-
-        for n_batch, bboxes_on_batch in enumerate(converted_boxes):
-            local_features_bboxes_batch = []
-            for x1, y1, x2, y2 in bboxes_on_batch:
-                if x1 == x2:
-                    x2+=1
-                if y1 == y2:
-                    y2+=1
-                pooled = nn.AdaptiveMaxPool2d((1,1))(x[n_batch, :, y1: y2, x1: x2])
-                #print(pooled.size())
-                #pooled[pooled == float('nan')] = 0.0
-                #4print(pooled)
-                local_features_bboxes_batch.append(pooled.squeeze(1, 2))
-            local_features_bboxes_image.append(torch.stack(local_features_bboxes_batch))
-
-        local_features_bboxes_image = torch.stack(local_features_bboxes_image).transpose(1, 2)
-
-        local_features_1 = self.shared_mlp_1(torch.cat([bboxes_features, local_features_bboxes_image], dim=1))
-        local_features_2 = self.shared_mlp_2(local_features_1)
-        #local_features_3 = self.shared_mlp_3(local_features_2)
-
-        global_features_1 = torch.max(local_features_2, 2, keepdim=True)[0]
-        global_features_1 = global_features_1.repeat(1, 1, local_features_1.size(-1))
-
-        #global_features_2 = torch.max(local_features_3, 2, keepdim=True)[0]
-        #global_features_2 = global_features_2.repeat(1, 1, local_features_1.size(-1))
-
-        mixed_features = torch.cat([local_features_1, global_features_1], 1)
-
-        mixed_features = self.shared_mlp_4(mixed_features)
-
-        score_features = self.shared_mlp_5(mixed_features)
-        label_features = self.shared_mlp_6(mixed_features)
-
-        score_features = torch.squeeze(score_features, dim=1)
-        label_features = torch.transpose(label_features, 1, 2)
-        #print(score_features, label_features)
-        return score_features, label_features, image_region_features
+        return torch.tensor(0), torch.tensor(0), image_region_features
 
 
 class BboxFilterNetworkGeometricLabelLoss(nn.Module):
@@ -210,40 +135,17 @@ class BboxFilterNetworkGeometricConfidenceLoss(nn.Module):
         return confidence_loss
 
 class BboxFilterNetworkGeometricImageFeatures(nn.Module):
-    def forward(self, preds, targets, image_size):
-        image_w, image_h = image_size
+    def forward(self, preds, correct_labels):
+        _, _, image_features = preds
+        correct_labels = correct_labels.to(image_features.device)
+        loss = torch.sum(torch.mean(-(torch.log(image_features) * correct_labels + torch.log(1- image_features) * (1-correct_labels)), dim=(1, 2)))
+        return loss
 
-        scores_features, labels_features, image_features = preds
-        image_region_w, image_region_h = image_features.size()[1:3]
-
-        step_w = image_w / image_region_w
-        step_h = image_h / image_region_h
-
-        targets_x1y1x2y2 = torch.cat([targets[:, :, 0:1] - targets[:, :, 2:3] / 2,
-                            targets[:, :, 1:2] - targets[:, :, 3:4] / 2,
-                            targets[:, :, 0:1] + targets[:, :, 2:3] / 2,
-                            targets[:, :, 1:2] + targets[:, :, 3:4] / 2], dim=1)
-
-        region_max_scores, region_labels = torch.max(image_features, dim=3)
-        correct_labels = torch.zeros(image_features.size())
-        for batch, (image_features_batch, targets_batch) in enumerate(zip(image_features, targets_x1y1x2y2)):
-            targets_batch = targets_batch * torch.tensor(image_size + image_size, device = targets_batch.device)
-            mask = torch.zeros(image_features_batch.size(), device=targets_batch.device).type(torch.int8)
-            mask[:, :, 0] = 1
-            for x1, y1, x2, y2, label in targets_batch:
-                mapped_x1 = int(x1 / step_w) if x1 % step_w < 0.5 else int(x1 / step_w) + 1
-                mapped_x2 = int(x2 / step_w)+1 if x2 % step_w < 0.5 else int(x2 / step_w) + 2
-                mapped_y1 = int(y1 / step_h) if y1 % step_h < 0.5 else int(y1 / step_h) + 1
-                mapped_y2 = int(y2 / step_h)+1 if y2 % step_h < 0.5 else int(y2 / step_h) + 2
-                print(mapped_x1, mapped_x2, mapped_y1, mapped_y2)
-                mask[mapped_x1: mapped_x2, mapped_y1:mapped_y2] = torch.tensor([0 if i != label + 1 else 1 in range(3)], device = targets_batch.device)
-            correct_labels[batch] = mask
-        print(correct_labels, correct_labels.size())
-
-images = torch.rand(32, 3, 240, 320)
-bboxes = torch.rand(32, 7, 20)
+#images = torch.rand(2, 3, 240, 320, device='cuda')
+#bboxes = torch.rand(2, 7, 20, device = 'cuda')
 #bbox_model = BboxFilterNetworkImage(fpn_channels=64, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST_IMAGE_LOCAL_NETWORK_SMALL)
-#BboxFilterNetworkGeometricImageFeatures()(bbox_model(images, bboxes))
+#bbox_model.to('cuda')
+#bbox_model(images, bboxes)
 #crit = BboxFilterNetworkGeometricImageFeatures()
 
 
@@ -254,8 +156,8 @@ dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=iou_threshold
 
 train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=True, apply_transforms_to_train=False)
 
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
-test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
+test_dataset_bboxes = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
 #check_bbox_dataset(train_dataset_bboxes, confidence_threshold=confidence_threshold)
 
 # Calculate Metrics in real worlds
@@ -342,7 +244,7 @@ plt.legend()
 plt.savefig('image_local_net_small/complete_metric.svg')
 
 #check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold)
-bbox_model = BboxFilterNetworkImage(fpn_channels=64, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST_IMAGE_LOCAL_NETWORK_SMALL)
+bbox_model = BboxFilterNetworkImage(fpn_channels=32, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=TEST_IMAGE_LOCAL_NETWORK_SMALL)
 bbox_model.to('cuda')
 
 criterion_label = BboxFilterNetworkGeometricLabelLoss(reduction_image='sum', reduction_global='mean')
@@ -384,8 +286,6 @@ for epoch in range(60):
     criterion_label.train()
     optimizer.zero_grad()
 
-    temp_losses_label = []
-    temp_losses_confidence = []
     temp_losses_final = []
 
     for i, data in tqdm(enumerate(train_dataset_bboxes), total=len(train_dataset_bboxes), desc=f'Training epoch {epoch}'):
@@ -398,25 +298,46 @@ for epoch in range(60):
         ious = ious.to('cuda')
 
         preds = bbox_model(images, detected_bboxes)
-        #print(preds, filtered)
-        #loss_label = criterion_label(preds, labels_encoded)
-        #loss_confidence = criterion_confidence(preds, ious)
-        #final_loss = loss_label + loss_confidence
-        criterion_image_region(preds, targets, images.size()[2:][::-1])
 
-        temp_losses_label.append(loss_label.item())
-        temp_losses_confidence.append(loss_confidence.item())
+        with torch.no_grad():
+            image_size = images.size()[2:][::-1]
+            image_w, image_h = images.size()[2:][::-1]
+            _, _, image_features = preds
+            image_region_w, image_region_h = image_features.size()[1:3]
+
+            step_w = image_w / image_region_w
+            step_h = image_h / image_region_h
+
+            #region_max_scores, region_labels = torch.max(image_features, dim=3)
+            correct_labels = torch.zeros(image_features.size(), requires_grad=False)
+            for batch, (image_features_batch, targets_batch) in enumerate(zip(image_features, target_boxes)):
+
+                targets_x1y1x2y2 = torch.cat([targets_batch[ :, 0:1] - targets_batch[ :, 2:3] / 2,
+                                              targets_batch[:, 1:2] - targets_batch[:, 3:4] / 2,
+                                              targets_batch[:, 0:1] + targets_batch[ :, 2:3] / 2,
+                                              targets_batch[:, 1:2] + targets_batch[ :, 3:4] / 2], dim=1)
+                targets_x1y1x2y2 = targets_x1y1x2y2 * torch.tensor([image_size + image_size], device = targets_batch.device)
+                # print(targets_x1y1x2y2)
+                targets_x1y1x2y2 = torch.cat([targets_x1y1x2y2, targets_batch[:, 4: 5]], dim = 1)
+                for x1, y1, x2, y2, label in targets_x1y1x2y2:
+                    #      print('LABEL', label)
+                    mapped_x1 = int(x1 / step_w) if x1 % step_w < 0.5 else int(x1 / step_w) + 1
+                    mapped_x2 = int(x2 / step_w)+1 if x2 % step_w < 0.5 else int(x2 / step_w) + 2
+                    mapped_y1 = int(y1 / step_h) if y1 % step_h < 0.5 else int(y1 / step_h) + 1
+                    mapped_y2 = int(y2 / step_h)+1 if y2 % step_h < 0.5 else int(y2 / step_h) + 2
+                    #       print(mapped_x1, mapped_x2, mapped_y1, mapped_y2)
+                    #print('label encoded', torch.tensor([0 if i != label + 1 else 1 for i in range(3)], device = targets_batch.device))
+                    correct_labels[batch, mapped_x1: mapped_x2, mapped_y1:mapped_y2] = 1
+
+        final_loss = criterion_image_region(preds, correct_labels)
         temp_losses_final.append(final_loss.item())
         optimizer.zero_grad()
         final_loss.backward()
         #official_loss.backward()
         optimizer.step()
     logs['train']['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
-    logs['train']['loss_confidence'].append(sum(temp_losses_confidence) / len(temp_losses_confidence))
-    logs['train']['loss_label'].append(sum(temp_losses_label) / len(temp_losses_label))
 
-    temp_losses_label = []
-    temp_losses_confidence = []
+
     temp_losses_final = []
 
     with torch.no_grad():
@@ -424,31 +345,6 @@ for epoch in range(60):
         bbox_model.eval()
         criterion_label.eval()
         criterion_confidence.eval()
-
-        temp_accuracy = {0:0, 1:0, 2:0}
-        for data in tqdm(train_dataset_bboxes, total=len(train_dataset_bboxes), desc=f'TEST epoch {epoch}'):
-            images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes = data
-            images = images.to('cuda')
-            detected_bboxes = detected_bboxes.to('cuda')
-            confidences = confidences.to('cuda')
-            labels_encoded = labels_encoded.to('cuda')
-            ious = ious.to('cuda')
-
-            preds = bbox_model(images, detected_bboxes)
-
-            predicted_labels = preds[1]
-
-            for predicted, target in zip(predicted_labels, labels_encoded):
-                values, p_indexes = torch.max(predicted, dim=1)
-                values, gt_indexes = torch.max(target, dim=1)
-                for p_index, gt_index in zip(p_indexes.tolist(), gt_indexes.tolist()):
-                    if gt_index == p_index:
-                        temp_accuracy[int(gt_index)] += 1
-
-        for i in range(3):
-            train_accuracy[i].append(temp_accuracy[i] / train_total[i])
-
-        temp_accuracy = {0:0, 1:0, 2:0}
 
         for data in tqdm(test_dataset_bboxes, total=len(test_dataset_bboxes), desc=f'TEST epoch {epoch}'):
             images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes = data
@@ -459,29 +355,44 @@ for epoch in range(60):
             ious = ious.to('cuda')
 
             preds = bbox_model(images, detected_bboxes)
-            loss_label = criterion_label(preds, labels_encoded)
-            loss_confidence = criterion_confidence(preds, ious)
-            final_loss = loss_label + loss_confidence
+
+            image_size = images.size()[2:][::-1]
+            image_w, image_h = images.size()[2:][::-1]
+            _, _, image_features = preds
+            image_region_w, image_region_h = image_features.size()[1:3]
+
+            step_w = image_w / image_region_w
+            step_h = image_h / image_region_h
+
+            #region_max_scores, region_labels = torch.max(image_features, dim=3)
+            correct_labels = torch.zeros(image_features.size(), requires_grad=False)
+            for batch, (image_features_batch, targets_batch) in enumerate(zip(image_features, target_boxes)):
+
+                targets_x1y1x2y2 = torch.cat([targets_batch[ :, 0:1] - targets_batch[ :, 2:3] / 2,
+                                              targets_batch[:, 1:2] - targets_batch[:, 3:4] / 2,
+                                              targets_batch[:, 0:1] + targets_batch[ :, 2:3] / 2,
+                                              targets_batch[:, 1:2] + targets_batch[ :, 3:4] / 2], dim=1)
+                targets_x1y1x2y2 = targets_x1y1x2y2 * torch.tensor([image_size + image_size], device = targets_batch.device)
+                # print(targets_x1y1x2y2)
+                targets_x1y1x2y2 = torch.cat([targets_x1y1x2y2, targets_batch[:, 4: 5]], dim = 1)
+                for x1, y1, x2, y2, label in targets_x1y1x2y2:
+                    #      print('LABEL', label)
+                    mapped_x1 = int(x1 / step_w) if x1 % step_w < 0.5 else int(x1 / step_w) + 1
+                    mapped_x2 = int(x2 / step_w)+1 if x2 % step_w < 0.5 else int(x2 / step_w) + 2
+                    mapped_y1 = int(y1 / step_h) if y1 % step_h < 0.5 else int(y1 / step_h) + 1
+                    mapped_y2 = int(y2 / step_h)+1 if y2 % step_h < 0.5 else int(y2 / step_h) + 2
+                    #       print(mapped_x1, mapped_x2, mapped_y1, mapped_y2)
+                    #print('label encoded', torch.tensor([0 if i != label + 1 else 1 for i in range(3)], device = targets_batch.device))
+                    correct_labels[batch, mapped_x1: mapped_x2, mapped_y1:mapped_y2] = 1
+
+            final_loss = criterion_image_region(preds, correct_labels)
+            temp_losses_final.append(final_loss.item())
 
             temp_losses_final.append(final_loss.item())
-            temp_losses_confidence.append(loss_confidence.item())
-            temp_losses_label.append(loss_label.item())
-
-            predicted_labels = preds[1]
-
-            for predicted, target in zip(predicted_labels, labels_encoded):
-                values, p_indexes = torch.max(predicted, dim=1)
-                values, gt_indexes = torch.max(target, dim=1)
-                for p_index, gt_index in zip(p_indexes.tolist(), gt_indexes.tolist()):
-                    if gt_index == p_index:
-                        temp_accuracy[int(gt_index)] += 1
-
-        for i in range(3):
-            test_accuracy[i].append(temp_accuracy[i] / test_total[i])
 
     # Test with real world data
 
-    temp = {'AP':{'0':[], '1':[]}, 'TP': [], 'FP': [], 'TPm': [], 'FPiou': []}
+
     for house, dataset_real_world in datasets_real_worlds.items():
         evaluator = MyEvaluator()
         evaluator_complete_metric = MyEvaluatorCompleteMetric()
@@ -495,88 +406,17 @@ for epoch in range(60):
 
             preds = bbox_model(images, detected_bboxes)
 
-            plot_results(epoch=epoch, count=c, env=house, images=images, bboxes=detected_bboxes, preds=preds, targets=target_boxes, confidence_threshold = confidence_threshold)
-
-            evaluator.add_predictions_bboxes_filtering(detected_bboxes, preds, target_boxes, img_size=images.size()[2:][::-1])
-            evaluator_complete_metric.add_predictions_bboxes_filtering(detected_bboxes, preds, target_boxes, img_size=images.size()[2:][::-1])
-
-        metric = evaluator.get_metrics(iou_threshold=iou_threshold_matching, confidence_threshold=confidence_threshold)
-        metric_complete = evaluator_complete_metric.get_metrics(iou_threshold=iou_threshold_matching, confidence_threshold=confidence_threshold)
-
-        for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
-            temp['AP'][label].append(values['AP'])
-
-        for label, values in sorted(metric_complete.items(), key=lambda v: v[0]):
-            temp['TP'].append(values['TP'])
-            temp['FP'].append(values['FP'])
-            temp['TPm'].append(values['TPm'])
-            temp['FPiou'].append(values['FPiou'])
-
-    #performances_in_real_worlds_bbox_filtering['AP']['0'].append(sum(temp['AP']['0']) / len(temp['AP']['0']))
-    performances_in_real_worlds_bbox_filtering['AP']['1'].append(sum(temp['AP']['1']) / len(temp['AP']['1']))
-    performances_in_real_worlds_bbox_filtering['TP'].append(sum(temp['TP']))
-    performances_in_real_worlds_bbox_filtering['FP'].append(sum(temp['FP']))
-    performances_in_real_worlds_bbox_filtering['TPm'].append(sum(temp['TPm']))
-    performances_in_real_worlds_bbox_filtering['FPiou'].append(sum(temp['FPiou']))
-
-    # Plot evaluation in real worlds
-    fig = plt.figure()
-    plt.axhline(y=performances_in_real_worlds['AP']['0'], color = 'r', linestyle = '--', label='closed doors')
-    plt.axhline(y=performances_in_real_worlds['AP']['1'], color = 'g', linestyle = '--', label='open doors')
-    plt.title('AP')
-    plt.legend()
-    plt.savefig('AP.svg')
-
-    fig = plt.figure()
-    plt.axhline(y=performances_in_real_worlds['TP'], color = 'g', linestyle = '--', label='TP')
-    plt.axhline(y=performances_in_real_worlds['FP'], color = 'r', linestyle = '--', label='FP')
-    plt.axhline(y=performances_in_real_worlds['TPm'], color = 'forestgreen', linestyle = '--', label='TPm')
-    plt.axhline(y=performances_in_real_worlds['FPiou'], color = 'salmon', linestyle = '--', label='FPiou')
-    plt.plot([i for i in range(len(performances_in_real_worlds_bbox_filtering['TP']))], performances_in_real_worlds_bbox_filtering['TP'], label='TP')
-    plt.plot([i for i in range(len(performances_in_real_worlds_bbox_filtering['FP']))], performances_in_real_worlds_bbox_filtering['FP'], label='FP')
-    plt.plot([i for i in range(len(performances_in_real_worlds_bbox_filtering['TPm']))], performances_in_real_worlds_bbox_filtering['TPm'], label='TPm')
-    plt.plot([i for i in range(len(performances_in_real_worlds_bbox_filtering['FPiou']))], performances_in_real_worlds_bbox_filtering['FPiou'], label='FPiou')
-
-    plt.title('Complete metric')
-    plt.legend()
-    plt.savefig('image_local_net_small/complete_metric.svg')
-
-    print(performances_in_real_worlds_bbox_filtering)
-    print(train_accuracy)
-    fig = plt.figure()
-    plt.plot([i for i in range(len(train_accuracy[0]))], train_accuracy[0], label='background')
-    plt.plot([i for i in range(len(train_accuracy[1]))], train_accuracy[1], label='closed')
-    plt.plot([i for i in range(len(train_accuracy[2]))], train_accuracy[2], label='open')
-    plt.title('Train accuracy')
-    plt.legend()
-    plt.savefig('image_local_net_small/train_geometric.svg')
-
-    fig = plt.figure()
-    plt.plot([i for i in range(len(test_accuracy[0]))], test_accuracy[0], label='background')
-    plt.plot([i for i in range(len(test_accuracy[1]))], test_accuracy[1], label='closed')
-    plt.plot([i for i in range(len(test_accuracy[2]))], test_accuracy[2], label='open')
-    plt.title('Val accuracy')
-    plt.legend()
-    plt.savefig('image_local_net_small/val_geometric.svg')
-    print(test_accuracy)
     logs['test']['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
-    logs['test']['loss_confidence'].append(sum(temp_losses_confidence) / len(temp_losses_confidence))
-    logs['test']['loss_label'].append(sum(temp_losses_label) / len(temp_losses_label))
+
     print(logs['train'], logs['test'])
 
     fig = plt.figure()
-    plt.plot([i for i in range(len(logs['train']['loss_label']))], logs['train']['loss_label'], label='train_loss')
-    plt.plot([i for i in range(len(logs['train']['loss_label']))], logs['test']['loss_label'], label='test_loss')
+    plt.plot([i for i in range(len(logs['train']['loss_final']))], logs['train']['loss_final'], label='train_loss')
+    plt.plot([i for i in range(len(logs['train']['loss_final']))], logs['test']['loss_final'], label='test_loss')
     plt.title('Losses')
     plt.legend()
-    plt.savefig('image_local_net_small/losses_geometric_label.svg')
+    plt.savefig('image_region/final_loss.svg')
 
-    fig = plt.figure()
-    plt.plot([i for i in range(len(logs['train']['loss_confidence']))], logs['train']['loss_confidence'], label='train_loss')
-    plt.plot([i for i in range(len(logs['train']['loss_confidence']))], logs['test']['loss_confidence'], label='test_loss')
-    plt.title('Losses')
-    plt.legend()
-    plt.savefig('image_local_net_small/losses_geometric_confidence.svg')
     bbox_model.save(epoch=epoch, optimizer_state_dict=optimizer.state_dict(), params={}, logs=logs, lr_scheduler_state_dict={})
 
 
