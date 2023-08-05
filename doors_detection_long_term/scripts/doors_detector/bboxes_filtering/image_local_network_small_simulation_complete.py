@@ -73,26 +73,23 @@ class BboxFilterNetworkImage(GenericModel):
         self.fpn = ResNet50FPN(channels=fpn_channels)
         self.batch_norm_after_fpn = nn.BatchNorm2d(fpn_channels)
         self.conv_after_backbone = nn.Sequential(
-            nn.Conv2d(in_channels=512, out_channels=256, kernel_size=1),
-            nn.BatchNorm2d(256),
-            nn.Conv2d(in_channels=256, out_channels=128, kernel_size=1),
-            nn.BatchNorm2d(128),
-            nn.ReLU(),
-            nn.Conv2d(in_channels=128, out_channels=32, kernel_size=1),
+            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1),
             nn.BatchNorm2d(32),
+            nn.Conv2d(in_channels=32, out_channels=64, kernel_size=1),
+            nn.BatchNorm2d(64),
             nn.ReLU()
         )
-        self.shared_mlp_1 = SharedMLP(channels=[64, 64, 128])
-        self.shared_mlp_2 = SharedMLP(channels=[128, 256, 512, 1024])
+        self.shared_mlp_1 = SharedMLP(channels=[128, 128, 256])
+        self.shared_mlp_2 = SharedMLP(channels=[256, 512, 1024, 2048])
         self.shared_mlp_3 = SharedMLP(channels=[512, 512, 1024])
 
-        self.shared_mlp_4 = SharedMLP(channels=[1024 + 128, 256, 128, 64])
+        self.shared_mlp_4 = SharedMLP(channels=[2048 + 256, 512, 256, 128])
 
-        self.shared_mlp_5 = SharedMLP(channels=[64, 32, 1], last_activation=nn.Sigmoid())
+        self.shared_mlp_5 = SharedMLP(channels=[128, 64, 32, 16, 1], last_activation=nn.Sigmoid())
 
-        self.shared_mlp_6 = SharedMLP(channels=[64, 32, n_labels], last_activation=nn.Softmax(dim=1))
+        self.shared_mlp_6 = SharedMLP(channels=[128, 64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
 
-        self.shared_mlp_geometric_1 = SharedMLP(channels=[7, 16, 32, 32])
+        self.shared_mlp_geometric_1 = SharedMLP(channels=[7, 16, 32, 64])
 
         if pretrained:
             if pretrained:
@@ -107,7 +104,7 @@ class BboxFilterNetworkImage(GenericModel):
         bboxes_features = self.shared_mlp_geometric_1(boxes)
         x = self.fpn(images)['x2']
         #print(x.size())
-        #x = self.conv_after_backbone(x)
+        x = self.conv_after_backbone(x)
 
         # Convert boxes from [cx, cy, w, h] to [x1, y1, x2, y2]
         converted_boxes = torch.cat([boxes[:, 0:1, :] - boxes[:, 2:3, :] / 2,
@@ -185,7 +182,7 @@ class BboxFilterNetworkGeometricLabelLoss(nn.Module):
 
     def forward(self, preds, label_targets):
         scores_features, labels_features = preds
-        labels_loss = torch.log(labels_features) * label_targets# * torch.tensor([[0.5, 0.25, 0.25]], device=label_targets.device)
+        labels_loss = torch.log(labels_features) * label_targets * torch.tensor([[1, 0.5, 0.5]], device=label_targets.device)
         labels_loss = torch.mean(torch.sum(torch.sum(labels_loss, 2) * -1, 1))
 
         return labels_loss
@@ -209,10 +206,10 @@ dataset_creator_bboxes.load_dataset(folder_name='yolov5_simulation_dataset')
 dataset_creator_bboxes.select_n_bounding_boxes(num_bboxes=num_bboxes)
 dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=iou_threshold_matching)
 
-train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=True, apply_transforms_to_train=True)
+train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=True, apply_transforms_to_train=False)
 
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
-test_dataset_bboxes = DataLoader(test_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
+test_dataset_bboxes = DataLoader(test_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
 #check_bbox_dataset(train_dataset_bboxes, confidence_threshold=confidence_threshold)
 
 # Calculate Metrics in real worlds
