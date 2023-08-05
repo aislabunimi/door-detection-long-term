@@ -79,17 +79,17 @@ class BboxFilterNetworkImage(GenericModel):
             nn.BatchNorm2d(64),
             nn.ReLU()
         )
-        self.shared_mlp_1 = SharedMLP(channels=[128, 128, 256])
-        self.shared_mlp_2 = SharedMLP(channels=[256, 512, 1024, 2048])
+        self.shared_mlp_1 = SharedMLP(channels=[64, 64, 128])
+        self.shared_mlp_2 = SharedMLP(channels=[128, 256, 512, 1024])
         self.shared_mlp_3 = SharedMLP(channels=[512, 512, 1024])
 
-        self.shared_mlp_4 = SharedMLP(channels=[2048 + 256, 512, 256, 128])
+        self.shared_mlp_4 = SharedMLP(channels=[1024 + 128, 256, 128])
 
-        self.shared_mlp_5 = SharedMLP(channels=[128, 64, 32, 16, 1], last_activation=nn.Sigmoid())
+        self.shared_mlp_5 = SharedMLP(channels=[128, 64, 32, 1], last_activation=nn.Sigmoid())
 
-        self.shared_mlp_6 = SharedMLP(channels=[128, 64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
+        self.shared_mlp_6 = SharedMLP(channels=[128, 64, 32, n_labels], last_activation=nn.Softmax(dim=1))
 
-        self.shared_mlp_geometric_1 = SharedMLP(channels=[7, 16, 32, 64])
+        self.shared_mlp_geometric_1 = SharedMLP(channels=[7, 16, 32, 32])
 
         if pretrained:
             if pretrained:
@@ -104,7 +104,7 @@ class BboxFilterNetworkImage(GenericModel):
         bboxes_features = self.shared_mlp_geometric_1(boxes)
         x = self.fpn(images)['x2']
         #print(x.size())
-        x = self.conv_after_backbone(x)
+        #x = self.conv_after_backbone(x)
 
         # Convert boxes from [cx, cy, w, h] to [x1, y1, x2, y2]
         converted_boxes = torch.cat([boxes[:, 0:1, :] - boxes[:, 2:3, :] / 2,
@@ -182,7 +182,7 @@ class BboxFilterNetworkGeometricLabelLoss(nn.Module):
 
     def forward(self, preds, label_targets):
         scores_features, labels_features = preds
-        labels_loss = torch.log(labels_features) * label_targets * torch.tensor([[1, 0.5, 0.5]], device=label_targets.device)
+        labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[1, 0.5, 0.5]], device=label_targets.device)
         labels_loss = torch.mean(torch.sum(torch.sum(labels_loss, 2) * -1, 1))
 
         return labels_loss
@@ -206,10 +206,10 @@ dataset_creator_bboxes.load_dataset(folder_name='yolov5_simulation_dataset')
 dataset_creator_bboxes.select_n_bounding_boxes(num_bboxes=num_bboxes)
 dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=iou_threshold_matching)
 
-train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=True, apply_transforms_to_train=False)
+train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=True, apply_transforms_to_train=True)
 
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
-test_dataset_bboxes = DataLoader(test_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
+test_dataset_bboxes = DataLoader(test_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
 #check_bbox_dataset(train_dataset_bboxes, confidence_threshold=confidence_threshold)
 
 # Calculate Metrics in real worlds
