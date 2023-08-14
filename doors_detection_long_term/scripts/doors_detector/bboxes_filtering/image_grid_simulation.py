@@ -167,9 +167,9 @@ for epoch in range(60):
             final_loss = criterion(preds, image_grids)
             temp_losses_final.append(final_loss.item())
 
-            for grid in preds:
+            for grid, gt_grid in zip(preds, image_grids):
                 for label in [0,1]:
-                    temp_accuracy[label] += torch.count_nonzero(grid < 0.5 if label == 0 else grid >= 0.5).item()
+                    temp_accuracy[label] += torch.count_nonzero(torch.logical_and(grid < 0.5 if label == 0 else grid >= 0.5, gt_grid == label)).item()
 
         logs['train']['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
         for label in [0, 1]:
@@ -190,9 +190,9 @@ for epoch in range(60):
 
             final_loss = criterion(preds, image_grids)
             temp_losses_final.append(final_loss.item())
-            for grid in preds:
+            for grid, gt_grid in zip(preds, image_grids):
                 for label in [0,1]:
-                    temp_accuracy[label] += torch.count_nonzero(grid < 0.5 if label == 0 else grid >= 0.5).item()
+                    temp_accuracy[label] += torch.count_nonzero(torch.logical_and(grid < 0.5 if label == 0 else grid >= 0.5, gt_grid == label)).item()
 
         logs['test']['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
         for label in [0, 1]:
@@ -214,9 +214,9 @@ for epoch in range(60):
                 preds = bbox_model(images)
                 final_loss = criterion(preds, image_grids)
                 temp_losses_final.append(final_loss.item())
-                for grid in preds:
+                for grid, gt_grid in zip(preds, image_grids):
                     for label in [0,1]:
-                        temp_accuracy[label] += torch.count_nonzero(grid < 0.5 if label == 0 else grid >= 0.5).item()
+                        temp_accuracy[label] += torch.count_nonzero(torch.logical_and(grid < 0.5 if label == 0 else grid >= 0.5, gt_grid == label)).item()
             for label in [0, 1]:
                 real_world_accuracy[house][label].append(temp_accuracy[label] / real_world_total[house][label])
         logs['test_real_world']['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
