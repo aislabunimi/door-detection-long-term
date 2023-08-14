@@ -87,7 +87,11 @@ criterion.to('cuda')
 #    if p.requires_grad:
 #        print(n)
 
-logs = {'train': {'loss_label':[], 'loss_confidence':[], 'loss_final':[]}, 'test': {'loss_label':[], 'loss_confidence':[], 'loss_final':[], 'test_real_world': {'loss_label':[], 'loss_confidence':[], 'loss_final':[]}}, 'ap': {0: [], 1: []}, 'complete_metric': {'TP': [], 'FP': [], 'BFD': []}}
+logs = {'train': {'loss_label':[], 'loss_confidence':[], 'loss_final':[]},
+        'test': {'loss_label':[], 'loss_confidence':[], 'loss_final':[]},
+        'test_real_world': {'loss_label':[], 'loss_confidence':[], 'loss_final':[]},
+        'ap': {0: [], 1: []},
+        'complete_metric': {'TP': [], 'FP': [], 'BFD': []}}
 
 # compute total labels
 
@@ -136,7 +140,6 @@ for epoch in range(60):
         #ious = ious.to('cuda')
 
         preds = bbox_model(images)
-
         final_loss = criterion(preds, image_grids)
         optimizer.zero_grad()
         final_loss.backward()
@@ -166,11 +169,11 @@ for epoch in range(60):
 
             for grid in preds:
                 for label in [0,1]:
-                    temp_accuracy[label] += torch.count_nonzero(grid==label).item()
+                    temp_accuracy[label] += torch.count_nonzero(grid < 0.5 if label == 0 else grid >= 0.5).item()
 
         logs['train']['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
         for label in [0, 1]:
-            train_accuracy[label].append(temp_accuracy[label])
+            train_accuracy[label].append(temp_accuracy[label] / train_total[label])
 
         temp_losses_final = []
         temp_accuracy = {0: 0, 1: 0}
@@ -189,11 +192,11 @@ for epoch in range(60):
             temp_losses_final.append(final_loss.item())
             for grid in preds:
                 for label in [0,1]:
-                    temp_accuracy[label] += torch.count_nonzero(grid==label).item()
+                    temp_accuracy[label] += torch.count_nonzero(grid < 0.5 if label == 0 else grid >= 0.5).item()
 
         logs['test']['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
         for label in [0, 1]:
-            test_accuracy[label].append(temp_accuracy[label])
+            test_accuracy[label].append(temp_accuracy[label] / test_total[label])
 
         # Test with real world data
         temp_losses_final = []
@@ -213,9 +216,9 @@ for epoch in range(60):
                 temp_losses_final.append(final_loss.item())
                 for grid in preds:
                     for label in [0,1]:
-                        temp_accuracy[label] += torch.count_nonzero(grid==label).item()
+                        temp_accuracy[label] += torch.count_nonzero(grid < 0.5 if label == 0 else grid >= 0.5).item()
             for label in [0, 1]:
-                real_world_accuracy[house][label].append(temp_accuracy[label])
+                real_world_accuracy[house][label].append(temp_accuracy[label] / real_world_total[house][label])
         logs['test_real_world']['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
 
     print(logs['train'], logs['test'])

@@ -115,7 +115,7 @@ class ImageGridNetwork(GenericModel):
 
 class ImageGridNetworkLoss(nn.Module):
     def forward(self, predictions, image_grids):
-        loss = torch.sum(torch.mean(-(torch.log(predictions) * image_grids + torch.log(1-image_grids) * (1-predictions)), dim=(1, 2)))
+        loss = torch.sum(torch.mean(-(torch.log(predictions) * image_grids + torch.log(1-predictions) * (1-image_grids)), dim=(1, 2)))
         return loss
 
 

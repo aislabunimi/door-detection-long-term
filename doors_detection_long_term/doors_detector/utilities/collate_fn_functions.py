@@ -197,8 +197,9 @@ def collate_fn_bboxes(image_grid_dimensions: Tuple[int, int] = (20, 20), use_con
                     mapped_x2 += 1
                 if mapped_y1 == mapped_y2:
                     mapped_y2 += 1
-                #       print(mapped_x1, mapped_x2, mapped_y1, mapped_y2)
-                #print('label encoded', torch.tensor([0 if i != label + 1 else 1 for i in range(3)], device = targets_batch.device))
+
+                if mapped_x1 < 0 or mapped_x1 > 21 or mapped_x2 < 0 or mapped_x2 > 21 or mapped_y1 < 0 or mapped_y1 > 21 or mapped_y2 < 0 or mapped_y2 > 21:
+                    print('ERROR', mapped_x1, mapped_y1, mapped_x2, mapped_y2)
                 grid[mapped_x1: mapped_x2, mapped_y1:mapped_y2] = 1
 
             # COnverted detected bboxes in grid
