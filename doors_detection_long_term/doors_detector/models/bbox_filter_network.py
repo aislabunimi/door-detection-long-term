@@ -1,5 +1,6 @@
 import os
 from collections import OrderedDict
+from typing import Tuple
 
 import torch
 import torchvision.models
@@ -21,6 +22,7 @@ TEST_IMAGE_GLOBAL_NETWORK: DESCRIPTION = 2
 TEST_IMAGE_LOCAL_NETWORK: DESCRIPTION = 3
 TEST_IMAGE_LOCAL_NETWORK_FINE_TUNE: DESCRIPTION = 4
 TEST_IMAGE_LOCAL_NETWORK_SMALL: DESCRIPTION = 5
+IMAGE_GRID_NETWORK: DESCRIPTION = 6
 
 
 class SharedMLP(nn.Module):
@@ -38,53 +40,6 @@ class SharedMLP(nn.Module):
     def forward(self, input):
         return self.shared_mlp(input)
 
-class BboxFilterNetworkGeometric(GenericModel):
-    def __init__(self, model_name: ModelName, pretrained: bool, initial_channels: int, n_labels: int, dataset_name: DATASET, description: DESCRIPTION):
-        super(BboxFilterNetworkGeometric, self).__init__(model_name, dataset_name, description)
-        self._initial_channels = initial_channels
-
-        self.shared_mlp_1 = SharedMLP(channels=[initial_channels, 16, 32])
-        self.shared_mlp_2 = SharedMLP(channels=[32, 64, 128])
-        self.shared_mlp_3 = SharedMLP(channels=[512, 512, 1024])
-
-        self.shared_mlp_4 = SharedMLP(channels=[32 + 128, 128, 64])
-
-        self.shared_mlp_5 = SharedMLP(channels=[64, 32, 16, 1], last_activation=nn.Sigmoid())
-
-        self.shared_mlp_6 = SharedMLP(channels=[64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
-
-
-        if pretrained:
-            if pretrained:
-                path = os.path.join('train_params', self._model_name + '_' + str(self._description), str(self._dataset_name))
-            if trained_models_path == "":
-                path = os.path.join(os.path.dirname(__file__), path)
-            else:
-                path = os.path.join(trained_models_path, path)
-            self.load_state_dict(torch.load(os.path.join(path, 'model.pth'), map_location=torch.device('cpu')))
-
-    def forward(self, images, bboxes):
-        local_features_1 = self.shared_mlp_1(bboxes)
-        local_features_2 = self.shared_mlp_2(local_features_1)
-        #local_features_3 = self.shared_mlp_3(local_features_2)
-
-        global_features_1 = torch.max(local_features_2, 2, keepdim=True)[0]
-        global_features_1 = global_features_1.repeat(1, 1, local_features_1.size(-1))
-
-        #global_features_2 = torch.max(local_features_3, 2, keepdim=True)[0]
-        #global_features_2 = global_features_2.repeat(1, 1, local_features_1.size(-1))
-
-        mixed_features = torch.cat([local_features_1, global_features_1], 1)
-
-        mixed_features = self.shared_mlp_4(mixed_features)
-
-        score_features = self.shared_mlp_5(mixed_features)
-        label_features = self.shared_mlp_6(mixed_features)
-
-        score_features = torch.squeeze(score_features)
-        label_features = torch.transpose(label_features, 1, 2)
-
-        return score_features, label_features
 
 class ResNet50FPN(ResNet):
     def __init__(self, channels=256):
@@ -121,21 +76,24 @@ class ResNet50FPN(ResNet):
         return pyramid_features
 
 
-class BboxFilterNetworkImage(GenericModel):
-    def __init__(self, fpn_channels:int, model_name: ModelName, pretrained: bool, n_labels: int, dataset_name: DATASET, description: DESCRIPTION):
-        super(BboxFilterNetworkImage, self).__init__(model_name, dataset_name, description)
+class ImageGridNetwork(GenericModel):
+    def __init__(self, fpn_channels: int, image_grid_dimensions: Tuple[int, int], model_name: ModelName, pretrained: bool, n_labels: int, dataset_name: DATASET, description: DESCRIPTION):
+        super(ImageGridNetwork, self).__init__(model_name, dataset_name, description)
 
         self.fpn = ResNet50FPN(channels=fpn_channels)
+        self.batch_norm_after_fpn = nn.BatchNorm2d(fpn_channels)
+        self.adaptive_max_pool_2d = nn.AdaptiveMaxPool2d(image_grid_dimensions)
 
-        self.shared_mlp_1 = SharedMLP(channels=[fpn_channels, 256])
-        self.shared_mlp_2 = SharedMLP(channels=[256, 512, 1024])
-        #self.shared_mlp_3 = SharedMLP(channels=[256, 256, 512, 1024])
-
-        self.shared_mlp_4 = SharedMLP(channels=[1024 + 256, 1024, 512, 256, 128])
-
-        self.shared_mlp_5 = SharedMLP(channels=[128, 64, 32, 16, 1], last_activation=nn.Sigmoid())
-
-        self.shared_mlp_6 = SharedMLP(channels=[128, 64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
+        self.image_region = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(in_features=fpn_channels * image_grid_dimensions[0] * image_grid_dimensions[1], out_features=4096),
+            nn.BatchNorm1d(4096),
+            nn.ReLU(),
+            nn.Linear(in_features=4096, out_features=image_grid_dimensions[0] * image_grid_dimensions[1]),
+            nn.BatchNorm1d(image_grid_dimensions[0] * image_grid_dimensions[1]),
+            nn.Unflatten(1, image_grid_dimensions),
+            nn.Sigmoid(),
+        )
 
         if pretrained:
             if pretrained:
@@ -146,95 +104,19 @@ class BboxFilterNetworkImage(GenericModel):
                 path = os.path.join(trained_models_path, path)
             self.load_state_dict(torch.load(os.path.join(path, 'model.pth'), map_location=torch.device('cpu')))
 
-    def forward(self, images, boxes):
-        x = self.fpn(images)
-        x = x['x1']
+    def forward(self, images):
+        x = self.fpn(images)['x2']
+        x = self.adaptive_max_pool_2d(x)
+        image_region_features = self.image_region(x)
+        image_region_features = image_region_features.transpose(1, 2)
+
+        return image_region_features
 
 
-        # Convert boxes from [cx, cy, w, h] to [x1, y1, x2, y2]
-        converted_boxes = torch.cat([boxes[:, 0:1, :] - boxes[:, 2:3, :] / 2,
-                                     boxes[:, 1:2, :] - boxes[:, 3:4, :] / 2,
-                                     boxes[:, 0:1, :] + boxes[:, 2:3, :] / 2,
-                                     boxes[:, 1:2, :] + boxes[:, 3:4, :] / 2], dim=1).transpose(1, 2)
-
-        converted_boxes = torch.round(converted_boxes * torch.tensor([x.size()[2:][::-1] + x.size()[2:][::-1]], device=x.device))
-        converted_boxes[converted_boxes <= 0.0] = 0.0
-        converted_boxes[converted_boxes[:, :, 0] >= x.size(-1)] = x.size(-1)
-        converted_boxes[converted_boxes[:, :, 2] >= x.size(-1)] = x.size(-1)
-        converted_boxes[converted_boxes[:, :, 1] >= x.size(-2)] = x.size(-2)
-        converted_boxes[converted_boxes[:, :, 3] >= x.size(-2)] = x.size(-2)
-
-        converted_boxes = converted_boxes.type(torch.int32)
-
-        #print(converted_boxes)
-
-        boxes_features = []
-
-        for n_batch, batch in enumerate(converted_boxes):
-            boxes_features_batch = []
-            for n_box, (x1, y1, x2, y2) in enumerate(batch):
-                mask = torch.zeros(x.size()[1:], device=x.device, requires_grad=False)
-                mask[:, y1 : y2, x1 : x2] = 1.0
-                box_features = x[n_batch] * mask
-                box_features = torch.max(torch.max(box_features, dim=2)[0], dim=1)[0].unsqueeze(0)
-                boxes_features_batch.append(box_features)
-            boxes_features.append(torch.cat(boxes_features_batch, dim=0).unsqueeze(0))
-
-        x = torch.cat(boxes_features, dim=0).transpose(1, 2)
-
-
-
-        local_features_1 = self.shared_mlp_1(x)
-        local_features_2 = self.shared_mlp_2(local_features_1)
-        #local_features_3 = self.shared_mlp_3(local_features_2)
-
-        global_features_1 = torch.max(local_features_2, 2, keepdim=True)[0]
-        global_features_1 = global_features_1.repeat(1, 1, local_features_1.size(-1))
-
-        #global_features_2 = nn.MaxPool1d(local_features_3.size(-1))(local_features_3)
-        #global_features_2 = global_features_2.repeat(1, 1, local_features_1.size(-1))
-
-        mixed_features = torch.cat([local_features_1, global_features_1], 1)
-
-        mixed_features = self.shared_mlp_4(mixed_features)
-
-        score_features = self.shared_mlp_5(mixed_features)
-        label_features = self.shared_mlp_6(mixed_features)
-        score_features = torch.squeeze(score_features, dim=1)
-        label_features = torch.transpose(label_features, 1, 2)
-        return score_features, label_features
-
-
-class BboxFilterNetworkGeometricLoss(nn.Module):
-
-    def __init__(self, weight=1.0, reduction_image='sum', reduction_global='mean'):
-        super(BboxFilterNetworkGeometricLoss, self).__init__()
-        self._weight = weight
-        if not (reduction_image == 'sum' or reduction_image == 'mean'):
-            raise Exception('Parameter "reduction_image" must be mean|sum')
-        if not (reduction_global == 'sum' or reduction_global == 'mean'):
-            raise Exception('Parameter "reduction_global" must be mean|sum')
-        self._reduction_image = reduction_image
-        self._reduction_global = reduction_global
-
-    def forward(self, preds, confidences, label_targets):
-        scores_features, labels_features = preds
-        labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[0.25, 0.5, 0.20]], device=label_targets.device)
-        labels_loss = torch.mean(torch.mean(torch.sum(labels_loss, 2) * -1, 1))
-
-        return torch.tensor(0), labels_loss
-
-class BboxFilterNetworkSuppress(nn.Module):
-
-    def __init__(self):
-        super(BboxFilterNetworkSuppress, self).__init__()
-
-    def forward(self, preds, confidences, label_targets):
-        scores_features, labels_features = preds
-        scores_features = -(confidences * torch.log(scores_features) + ((1 - confidences) * torch.log(1-scores_features)))
-        scores_features = torch.mean(scores_features, (1, 0))
-
-        return scores_features, torch.tensor(0)
+class ImageGridNetworkLoss(nn.Module):
+    def forward(self, predictions, image_grids):
+        loss = torch.sum(torch.mean(-(torch.log(predictions) * image_grids + torch.log(1-image_grids) * (1-predictions)), dim=(1, 2)))
+        return loss
 
 
 
