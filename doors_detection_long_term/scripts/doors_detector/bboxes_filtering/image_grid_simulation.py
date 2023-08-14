@@ -23,7 +23,7 @@ from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
 from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_yolov5, collate_fn_bboxes
 from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering import bounding_box_filtering_yolo, \
-    check_bbox_dataset, plot_results
+    check_bbox_dataset, plot_results, plot_grid_dataset
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 torch.autograd.detect_anomaly(True)
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
@@ -40,7 +40,7 @@ dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=iou_threshold
 train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=True, apply_transforms_to_train=True)
 
 train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
-test_dataset_bboxes = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
+test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
 #check_bbox_dataset(train_dataset_bboxes, confidence_threshold=confidence_threshold)
 
 # Calculate Metrics in real worlds
@@ -72,7 +72,7 @@ with torch.no_grad():
         dataset_creator_bboxes_real_world.match_bboxes_with_gt(iou_threshold_matching=iou_threshold_matching)
 
         _, test_bboxes = dataset_creator_bboxes_real_world.create_datasets(shuffle_boxes=True, apply_transforms_to_train=False)
-        datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
+        datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
 
 #check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold)
 bbox_model = ImageGridNetwork(fpn_channels=32, image_grid_dimensions=(20,20), n_labels=3, model_name=IMAGE_GRID_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
@@ -177,7 +177,7 @@ for epoch in range(60):
 
         temp_losses_final = []
         temp_accuracy = {0: 0, 1: 0}
-        for data in tqdm(test_dataset_bboxes, total=len(test_dataset_bboxes), desc=f'TEST epoch {epoch}'):
+        for i, data in tqdm(enumerate(test_dataset_bboxes), total=len(test_dataset_bboxes), desc=f'TEST epoch {epoch}'):
             images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, detected_boxes_grid = data
             images = images.to('cuda')
             image_grids = image_grids.to('cuda')
@@ -188,8 +188,12 @@ for epoch in range(60):
 
             preds = bbox_model(images)
 
+
             final_loss = criterion(preds, image_grids)
             temp_losses_final.append(final_loss.item())
+
+            plot_grid_dataset(epoch=epoch, count=i, env='simulation', images=images, grid_targets=image_grids, target_boxes=target_boxes, preds=preds)
+
             for grid, gt_grid in zip(preds, image_grids):
                 for label in [0,1]:
                     temp_accuracy[label] += torch.count_nonzero(torch.logical_and(grid < 0.5 if label == 0 else grid >= 0.5, gt_grid == label)).item()
@@ -202,7 +206,7 @@ for epoch in range(60):
         temp_losses_final = []
         for house, dataset_real_world in datasets_real_worlds.items():
             temp_accuracy = {0: 0, 1: 0}
-            for c, data in tqdm(enumerate(dataset_real_world), total=len(dataset_real_world), desc=f'TEST in {house}, epoch {epoch}'):
+            for i, data in tqdm(enumerate(dataset_real_world), total=len(dataset_real_world), desc=f'TEST in {house}, epoch {epoch}'):
                 images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, detected_boxes_grid = data
                 images = images.to('cuda')
                 image_grids = image_grids.to('cuda')
@@ -217,8 +221,11 @@ for epoch in range(60):
                 for grid, gt_grid in zip(preds, image_grids):
                     for label in [0,1]:
                         temp_accuracy[label] += torch.count_nonzero(torch.logical_and(grid < 0.5 if label == 0 else grid >= 0.5, gt_grid == label)).item()
+
+                plot_grid_dataset(epoch=epoch, count=i, env=house, images=images, grid_targets=image_grids, target_boxes=target_boxes, preds=preds)
+
             for label in [0, 1]:
-                real_world_accuracy[house][label].append(temp_accuracy[label] / real_world_total[house][label])
+                    real_world_accuracy[house][label].append(temp_accuracy[label] / real_world_total[house][label])
         logs['test_real_world']['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
 
     print(logs['train'], logs['test'])

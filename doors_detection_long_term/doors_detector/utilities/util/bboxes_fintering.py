@@ -94,17 +94,59 @@ def plot_results(epoch, count, env, images, bboxes, preds, targets, confidence_t
                 continue
             label -= 1
             image_detected = cv2.rectangle(image_detected, (x, y),
-                                               (x2, y2), colors[label], 2)
+                                           (x2, y2), colors[label], 2)
 
         for cx, cy, w, h, label in target.tolist():
             x, y, x2, y2 = np.array([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2]) * np.array([w_image, h_image, w_image, h_image])
             x, y, x2, y2 = round(x), round(y), round(x2), round(y2)
             label = int(label)
             target_image = cv2.rectangle(target_image, (x, y),
-                                             (x2, y2), colors[label], 2)
+                                         (x2, y2), colors[label], 2)
 
         image = cv2.hconcat([target_image, image_detected])
         cv2.imwrite('/home/antonazzi/myfiles/bbox_filtering/'+str(epoch) + f'/{env}'+f"/{count}.png", (image*255).astype(np.uint8))
+
+
+
+def plot_grid_dataset(epoch, count, env, images, grid_targets, target_boxes, preds):
+    if not os.path.exists('/home/antonazzi/myfiles/image_grid/'+str(epoch)):
+        os.makedirs('/home/antonazzi/myfiles/image_grid/'+str(epoch))
+    if not os.path.exists('/home/antonazzi/myfiles/image_grid/'+str(epoch) + f'/{env}'):
+        os.makedirs('/home/antonazzi/myfiles/image_grid/'+str(epoch) + f'/{env}')
+    colors = {0: (0, 0, 1), 1: (0, 1, 0)}
+
+    for image, grid_target, boxes, grid in zip(images,  grid_targets.tolist(), target_boxes, preds.tolist()):
+        w_image, h_image = image.size()[1:][::-1]
+        image = image.to('cpu')
+        image = image * torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
+        image = image + torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
+        image_target = cv2.cvtColor(np.transpose(np.array(image), (1, 2, 0)), cv2.COLOR_RGB2BGR)
+        image_predicted = image_target.copy()
+
+        for cx, cy, w, h, label in boxes:
+            x, y, x2, y2 = np.array([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2]) * np.array([w_image, h_image, w_image, h_image])
+            x, y, x2, y2 = round(x), round(y), round(x2), round(y2)
+            label = int(label)
+            image_target = cv2.rectangle(image_target, (x, y),
+                                         (x2, y2), colors[label], 2)
+
+        # Design grid
+        step_w = w_image / len(grid)
+        step_h = h_image / len(grid[0])
+        for w in range(len(grid)):
+            for h in range(len(grid[0])):
+                if grid[w][h] >= 0.5:
+                    image_predicted = cv2.rectangle(image_predicted, (round(step_w*w), round(step_h*h)),
+                                                   (round(step_w*(w+1)), round(step_h*(h+1))), (1, 0, 1), 2)
+
+        for w in range(len(grid)):
+            for h in range(len(grid[0])):
+                if grid_target[w][h] != 0:
+                    image_target = cv2.rectangle(image_target, (round(step_w*w), round(step_h*h)),
+                                                    (round(step_w*(w+1)), round(step_h*(h+1))), (1, 0, 0), 2)
+
+        image = cv2.hconcat([image_target, image_predicted])
+        cv2.imwrite('/home/antonazzi/myfiles/image_grid/'+str(epoch) + f'/{env}'+f"/{count}.png", (image*255).astype(np.uint8))
 
 
 def bounding_box_filtering_yolo(predictions, max_detections, iou_threshold=0.5, confidence_threshold=0.01, apply_nms: bool = False):
