@@ -1,5 +1,6 @@
 import os
 import random
+from typing import Tuple
 
 import numpy as np
 import torch
@@ -119,7 +120,7 @@ def collate_fn_faster_rcnn(batch):
 
     return images, targets, new_targets
 
-def collate_fn_bboxes(use_confidence: bool = True):
+def collate_fn_bboxes(image_grid_dimensions: Tuple[int, int] = (20, 20), use_confidence: bool = True):
     def _collate_fn_bboxes(batch_data):
         """
         The bounding boxes come encoded as [cx, cy, w, h]
@@ -134,10 +135,13 @@ def collate_fn_bboxes(use_confidence: bool = True):
         labels_encoded: the ground truth labels of the bounding boxes [background, closed, open]
         ious: the iou with the target bbox. It is 0 if the bbox is background
         target_boxes: the target bounding boxes encoded as [cx, cy, w, h, label]
+        image_grid: the grid of the image
+        detected_boxes_grid: the coordinates of the detected boxes in the image grid, encoded as [x1, y1, x2, y2]
+
         """
         images, targets = collate_fn(batch_data)
 
-        batch_size_width, batch_size_height = images.size()[2], images.size()[3]
+        batch_size_width, batch_size_height = images.size()[3], images.size()[2]
 
         target_boxes = []
         fixed_boxes = []
@@ -145,6 +149,8 @@ def collate_fn_bboxes(use_confidence: bool = True):
         confidences = []
         labels_encoded = []
         ious = []
+        image_grids = []
+        detected_boxes_grid = []
         for i, target in enumerate(targets):
 
             # Rescale bboxes according to the batch global size
@@ -170,6 +176,41 @@ def collate_fn_bboxes(use_confidence: bool = True):
                                target['original_labels']], dim=1)
                 )
 
+            # Grid computation
+            step_w = (real_size_width / image_grid_dimensions[0]).item()
+            step_h = (real_size_height / image_grid_dimensions[1]).item()
+            grid = torch.zeros(image_grid_dimensions)
+            targets_x1y1x2y2 = torch.cat([target['target_boxes'][:, 0:1] - target['target_boxes'][:, 2:3] / 2,
+                                          target['target_boxes'][:, 1:2] - target['target_boxes'][:, 3:4] / 2,
+                                          target['target_boxes'][:, 0:1] + target['target_boxes'][:, 2:3] / 2,
+                                          target['target_boxes'][:, 1:2] + target['target_boxes'][:, 3:4] / 2], dim=1)
+            targets_x1y1x2y2 = targets_x1y1x2y2 * torch.tensor([real_size_width, real_size_height, real_size_width, real_size_height])
+            # print(targets_x1y1x2y2)
+            targets_x1y1x2y2 = torch.cat([targets_x1y1x2y2, target['target_boxes'][:, 4: 5]], dim=1)
+            for x1, y1, x2, y2, label in targets_x1y1x2y2.tolist():
+                #      print('LABEL', label)
+                mapped_x1 = round(x1 / step_w)
+                mapped_x2 = round(x2 / step_w)
+                mapped_y1 = round(y1 / step_h)
+                mapped_y2 = round(y2 / step_h)
+                if mapped_x1 == mapped_x2:
+                    mapped_x2 += 1
+                if mapped_y1 == mapped_y2:
+                    mapped_y2 += 1
+                #       print(mapped_x1, mapped_x2, mapped_y1, mapped_y2)
+                #print('label encoded', torch.tensor([0 if i != label + 1 else 1 for i in range(3)], device = targets_batch.device))
+                grid[mapped_x1: mapped_x2, mapped_y1:mapped_y2] = 1
+
+            # COnverted detected bboxes in grid
+            detected_x1y1x2y2 = torch.cat([target['detected_boxes'][:, 0:1] - target['detected_boxes'][:, 2:3] / 2,
+                                          target['detected_boxes'][:, 1:2] - target['detected_boxes'][:, 3:4] / 2,
+                                          target['detected_boxes'][:, 0:1] + target['detected_boxes'][:, 2:3] / 2,
+                                          target['detected_boxes'][:, 1:2] + target['detected_boxes'][:, 3:4] / 2], dim=1)
+            detected_x1y1x2y2 = detected_x1y1x2y2 * torch.tensor([real_size_width, real_size_height, real_size_width, real_size_height])
+            detected_x1y1x2y2 = detected_x1y1x2y2 / torch.tensor([step_w, step_h, step_w, step_h])
+            detected_x1y1x2y2 = torch.round(detected_x1y1x2y2).type(torch.int32)
+            detected_boxes_grid.append(detected_x1y1x2y2)
+            image_grids.append(grid)
             confidences.append(target['confidences'])
             labels_encoded.append(target['labels_encoded'])
             ious.append(target['ious'])
@@ -179,8 +220,10 @@ def collate_fn_bboxes(use_confidence: bool = True):
         confidences = torch.stack(confidences, dim=0)
         labels_encoded = torch.stack(labels_encoded, dim=0)
         ious = torch.stack(ious, dim=0)
+        image_grids = torch.stack(image_grids, dim=0)
+        detected_boxes_grid = torch.stack(detected_boxes_grid, dim=0)
 
-        return images, torch.transpose(detected_boxes, 1, 2), fixed_bboxes, confidences, labels_encoded, ious, target_boxes
+        return images, torch.transpose(detected_boxes, 1, 2), fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, detected_boxes_grid
     return _collate_fn_bboxes
 
 
