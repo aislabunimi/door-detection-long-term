@@ -24,7 +24,7 @@ params = {
     'seed': 0
 }
 
-path = '/media/antonazzi/hdd/classifications/dataset_gd'
+path = '/mnt/54685f13-5e79-4e84-b2a6-bf3a0eba4d7f/classifications/dataset_gd'
 
 if __name__ == '__main__':
 
@@ -49,6 +49,23 @@ if __name__ == '__main__':
 
 
     total = 0
-    for data in data_loader_train:
-        images, targets = data
-        print(targets)
+    for c, data in enumerate(train + test):
+        _, _, door_example = data
+        image = door_example.get_bgr_image()
+        bboxes = door_example.get_bounding_boxes()
+
+        for label, x1, y1, w, h in bboxes:
+
+            x2, y2 = x1+w, y1+h
+            if x1 == 0:
+                x1+=1
+            if y1 == 0:
+                y1+=1
+            if x2 == image.shape[1]:
+                x2 -= 2
+            if y2 == image.shape[0]:
+                y2-=2
+
+            image = cv2.rectangle(image, (x1, y1), (x2 , y2), (0,255,0) if label == 1 else (0, 0, 255), 2)
+
+        cv2.imwrite(path + f"/{c}.png", image)
