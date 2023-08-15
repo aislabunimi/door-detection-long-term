@@ -114,8 +114,31 @@ class ImageGridNetwork(GenericModel):
 
 
 class ImageGridNetworkLoss(nn.Module):
-    def forward(self, predictions, image_grids):
-        loss = torch.sum(torch.mean(-(torch.log(predictions) * image_grids + torch.log(1-predictions) * (1-image_grids)), dim=(1, 2)))
+    def forward(self, predictions, image_grids, target_boxes_grid):
+
+        loss_boxes = []
+        for batch, targets in enumerate(target_boxes_grid):
+            mean_boxes_batch = []
+            for x1, y1, x2, y2 in targets:
+                mean_boxes_batch.append(predictions[batch, x1:x2, y1:y2].mean())
+            mean_boxes_batch = torch.cat(mean_boxes_batch)
+            mean_boxes_batch = torch.sum(torch.square(torch.log(mean_boxes_batch)))
+            loss_boxes.append(mean_boxes_batch)
+
+        loss_boxes = torch.cat(loss_boxes)
+
+        loss_background = []
+        for pred, grid in zip(predictions, image_grids):
+            image_background_loss = pred[grid == 0].mean()
+            image_background_loss = torch.square(torch.log(1-image_background_loss))
+            loss_background.append(image_background_loss)
+
+        loss_background = torch.cat(loss_background)
+
+        loss = loss_boxes + loss_background
+        loss = torch.mean(loss)
+
+        #loss = torch.sum(torch.mean(-(torch.log(predictions) * image_grids + torch.log(1-predictions) * (1-image_grids)), dim=(1, 2)))
         return loss
 
 

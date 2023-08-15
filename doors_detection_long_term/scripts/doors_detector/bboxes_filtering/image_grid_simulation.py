@@ -131,7 +131,7 @@ for epoch in range(60):
 
     for i, data in tqdm(enumerate(train_dataset_bboxes), total=len(train_dataset_bboxes), desc=f'Training epoch {epoch}'):
 
-        images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, detected_boxes_grid = data
+        images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
         images = images.to('cuda')
         image_grids = image_grids.to('cuda')
         #detected_bboxes = detected_bboxes.to('cuda')
@@ -154,7 +154,7 @@ for epoch in range(60):
         temp_accuracy = {0: 0, 1: 0}
         for i, data in tqdm(enumerate(train_dataset_bboxes), total=len(train_dataset_bboxes), desc=f'Training epoch {epoch}'):
 
-            images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, detected_boxes_grid = data
+            images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
             images = images.to('cuda')
             image_grids = image_grids.to('cuda')
             #detected_bboxes = detected_bboxes.to('cuda')
@@ -164,7 +164,7 @@ for epoch in range(60):
 
             preds = bbox_model(images)
 
-            final_loss = criterion(preds, image_grids)
+            final_loss = criterion(preds, image_grids, target_boxes_grid)
             temp_losses_final.append(final_loss.item())
 
             for grid, gt_grid in zip(preds, image_grids):
@@ -178,7 +178,7 @@ for epoch in range(60):
         temp_losses_final = []
         temp_accuracy = {0: 0, 1: 0}
         for i, data in tqdm(enumerate(test_dataset_bboxes), total=len(test_dataset_bboxes), desc=f'TEST epoch {epoch}'):
-            images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, detected_boxes_grid = data
+            images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
             images = images.to('cuda')
             image_grids = image_grids.to('cuda')
             #detected_bboxes = detected_bboxes.to('cuda')
@@ -188,8 +188,7 @@ for epoch in range(60):
 
             preds = bbox_model(images)
 
-
-            final_loss = criterion(preds, image_grids)
+            final_loss = criterion(preds, image_grids, target_boxes_grid)
             temp_losses_final.append(final_loss.item())
 
             plot_grid_dataset(epoch=epoch, count=i, env='simulation', images=images, grid_targets=image_grids, target_boxes=target_boxes, preds=preds)
@@ -207,7 +206,7 @@ for epoch in range(60):
         for house, dataset_real_world in datasets_real_worlds.items():
             temp_accuracy = {0: 0, 1: 0}
             for i, data in tqdm(enumerate(dataset_real_world), total=len(dataset_real_world), desc=f'TEST in {house}, epoch {epoch}'):
-                images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, detected_boxes_grid = data
+                images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
                 images = images.to('cuda')
                 image_grids = image_grids.to('cuda')
                 #detected_bboxes = detected_bboxes.to('cuda')
@@ -216,7 +215,7 @@ for epoch in range(60):
                 #ious = ious.to('cuda')
 
                 preds = bbox_model(images)
-                final_loss = criterion(preds, image_grids)
+                final_loss = criterion(preds, image_grids, target_boxes_grid)
                 temp_losses_final.append(final_loss.item())
                 for grid, gt_grid in zip(preds, image_grids):
                     for label in [0,1]:

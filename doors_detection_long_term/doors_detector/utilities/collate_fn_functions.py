@@ -136,6 +136,7 @@ def collate_fn_bboxes(image_grid_dimensions: Tuple[int, int] = (20, 20), use_con
         ious: the iou with the target bbox. It is 0 if the bbox is background
         target_boxes: the target bounding boxes encoded as [cx, cy, w, h, label]
         image_grid: the grid of the image
+        target_boxes_grid: the coordinates of the target boxes in the image grid, encoded as [x1, y1, x2, y2]
         detected_boxes_grid: the coordinates of the detected boxes in the image grid, encoded as [x1, y1, x2, y2]
 
         """
@@ -150,6 +151,7 @@ def collate_fn_bboxes(image_grid_dimensions: Tuple[int, int] = (20, 20), use_con
         labels_encoded = []
         ious = []
         image_grids = []
+        target_boxes_grid = []
         detected_boxes_grid = []
         for i, target in enumerate(targets):
 
@@ -187,6 +189,9 @@ def collate_fn_bboxes(image_grid_dimensions: Tuple[int, int] = (20, 20), use_con
             targets_x1y1x2y2 = targets_x1y1x2y2 * torch.tensor([real_size_width, real_size_height, real_size_width, real_size_height])
             # print(targets_x1y1x2y2)
             targets_x1y1x2y2 = torch.cat([targets_x1y1x2y2, target['target_boxes'][:, 4: 5]], dim=1)
+
+            targets_boxes_grid_coords = []
+
             for x1, y1, x2, y2, label in targets_x1y1x2y2.tolist():
                 #      print('LABEL', label)
                 mapped_x1 = round(x1 / step_w)
@@ -201,6 +206,7 @@ def collate_fn_bboxes(image_grid_dimensions: Tuple[int, int] = (20, 20), use_con
                 if mapped_x1 < 0 or mapped_x1 > 21 or mapped_x2 < 0 or mapped_x2 > 21 or mapped_y1 < 0 or mapped_y1 > 21 or mapped_y2 < 0 or mapped_y2 > 21:
                     print('ERROR', mapped_x1, mapped_y1, mapped_x2, mapped_y2)
                 grid[mapped_x1: mapped_x2, mapped_y1:mapped_y2] = 1
+                targets_boxes_grid_coords.append([mapped_x1, mapped_y1, mapped_x2, mapped_y2])
 
             # COnverted detected bboxes in grid
             detected_x1y1x2y2 = torch.cat([target['detected_boxes'][:, 0:1] - target['detected_boxes'][:, 2:3] / 2,
@@ -215,6 +221,7 @@ def collate_fn_bboxes(image_grid_dimensions: Tuple[int, int] = (20, 20), use_con
             confidences.append(target['confidences'])
             labels_encoded.append(target['labels_encoded'])
             ious.append(target['ious'])
+            target_boxes_grid.append(targets_boxes_grid_coords)
 
         fixed_bboxes = torch.stack(fixed_boxes, dim=0)
         detected_boxes = torch.stack(detected_boxes, dim=0)
@@ -224,7 +231,7 @@ def collate_fn_bboxes(image_grid_dimensions: Tuple[int, int] = (20, 20), use_con
         image_grids = torch.stack(image_grids, dim=0)
         detected_boxes_grid = torch.stack(detected_boxes_grid, dim=0)
 
-        return images, torch.transpose(detected_boxes, 1, 2), fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, detected_boxes_grid
+        return images, torch.transpose(detected_boxes, 1, 2), fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid
     return _collate_fn_bboxes
 
 
