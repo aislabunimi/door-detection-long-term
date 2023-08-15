@@ -37,11 +37,11 @@ dataset_creator_bboxes.load_dataset(folder_name='yolov5_simulation_dataset')
 dataset_creator_bboxes.select_n_bounding_boxes(num_bboxes=num_bboxes)
 dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=iou_threshold_matching)
 
-train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=True, apply_transforms_to_train=True)
+train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=True, apply_transforms_to_train=False)
 
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
-test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
-check_bbox_dataset(train_dataset_bboxes, confidence_threshold=confidence_threshold)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=False)
+test_dataset_bboxes = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
+#check_bbox_dataset(train_dataset_bboxes, confidence_threshold=confidence_threshold)
 
 # Calculate Metrics in real worlds
 houses = ['floor1', 'floor4', 'chemistry_floor0']
@@ -72,7 +72,7 @@ with torch.no_grad():
         dataset_creator_bboxes_real_world.match_bboxes_with_gt(iou_threshold_matching=iou_threshold_matching)
 
         _, test_bboxes = dataset_creator_bboxes_real_world.create_datasets(shuffle_boxes=True, apply_transforms_to_train=False)
-        datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
+        datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
 
 #check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold)
 bbox_model = ImageGridNetwork(fpn_channels=32, image_grid_dimensions=(20,20), n_labels=3, model_name=IMAGE_GRID_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
@@ -80,7 +80,7 @@ bbox_model.to('cuda')
 
 criterion = ImageGridNetworkLoss()
 
-optimizer = optim.Adam(bbox_model.parameters(), lr=0.001)
+optimizer = optim.Adam(bbox_model.parameters(), lr=0.01)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
 criterion.to('cuda')
 #for n, p in bbox_model.named_parameters():
@@ -100,20 +100,20 @@ test_total = {0:0, 1:0}
 real_world_total = {h:{0:0, 1:0} for h in houses}
 
 for data in train_dataset_bboxes:
-    images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, detected_boxes_grid = data
+    images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
     for grid in image_grids:
         for label in [0, 1]:
             train_total[label] += torch.count_nonzero(grid == label).item()
 
 for data in test_dataset_bboxes:
-    images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, detected_boxes_grid = data
+    images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
     for grid in image_grids:
         for label in [0, 1]:
             test_total[label] += torch.count_nonzero(grid == label).item()
 
 for house, dataset_real_world in datasets_real_worlds.items():
     for data in dataset_real_world:
-        images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, detected_boxes_grid = data
+        images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
         for grid in image_grids:
             for label in [0, 1]:
                 real_world_total[house][label] += torch.count_nonzero(grid == label).item()
@@ -140,7 +140,8 @@ for epoch in range(60):
         #ious = ious.to('cuda')
 
         preds = bbox_model(images)
-        final_loss = criterion(preds, image_grids)
+        final_loss = criterion(preds, image_grids, target_boxes_grid)
+        #print(final_loss.item())
         optimizer.zero_grad()
         final_loss.backward()
         optimizer.step()

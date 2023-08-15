@@ -80,7 +80,7 @@ def plot_results(epoch, count, env, images, bboxes, preds, targets, confidence_t
         os.makedirs('/home/antonazzi/myfiles/bbox_filtering/'+str(epoch) + f'/{env}')
     colors = {0: (0, 0, 1), 1: (0, 1, 0)}
 
-    for image, bboxes_image, confidences, labels, target in zip(images, bboxes, preds[0], preds[1], targets):
+    for c_batch, (image, bboxes_image, confidences, labels, target) in enumerate(zip(images, bboxes, preds[0], preds[1], targets)):
         bboxes_image = bboxes_image.transpose(0, 1)
         w_image, h_image = image.size()[1:][::-1]
         image = image.to('cpu')
@@ -107,7 +107,7 @@ def plot_results(epoch, count, env, images, bboxes, preds, targets, confidence_t
                                          (x2, y2), colors[label], 2)
 
         image = cv2.hconcat([target_image, image_detected])
-        cv2.imwrite('/home/antonazzi/myfiles/bbox_filtering/'+str(epoch) + f'/{env}'+f"/{count}.png", (image*255).astype(np.uint8))
+        cv2.imwrite('/home/antonazzi/myfiles/bbox_filtering/'+str(epoch) + f'/{env}'+f"/{count}_{c_batch}.png", (image*255).astype(np.uint8))
 
 
 
@@ -118,7 +118,7 @@ def plot_grid_dataset(epoch, count, env, images, grid_targets, target_boxes, pre
         os.makedirs('/home/antonazzi/myfiles/image_grid/'+str(epoch) + f'/{env}')
     colors = {0: (0, 0, 1), 1: (0, 1, 0)}
 
-    for image, grid_target, boxes, grid in zip(images,  grid_targets.tolist(), target_boxes, preds.tolist()):
+    for c_batch, (image, grid_target, boxes, grid) in enumerate(zip(images,  grid_targets.tolist(), target_boxes, preds.tolist())):
         w_image, h_image = image.size()[1:][::-1]
         image = image.to('cpu')
         image = image * torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
@@ -149,7 +149,7 @@ def plot_grid_dataset(epoch, count, env, images, grid_targets, target_boxes, pre
                                                     (round(step_w*(w+1)), round(step_h*(h+1))), (1, 0, 0), 2)
 
         image = cv2.hconcat([image_target, image_predicted])
-        cv2.imwrite('/home/antonazzi/myfiles/image_grid/'+str(epoch) + f'/{env}'+f"/{count}.png", (image*255).astype(np.uint8))
+        cv2.imwrite('/home/antonazzi/myfiles/image_grid/'+str(epoch) + f'/{env}'+f"/{count}_{c_batch}.png", (image*255).astype(np.uint8))
 
 
 def bounding_box_filtering_yolo(predictions, max_detections, iou_threshold=0.5, confidence_threshold=0.01, apply_nms: bool = False):

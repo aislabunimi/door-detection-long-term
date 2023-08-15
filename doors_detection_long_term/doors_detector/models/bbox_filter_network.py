@@ -121,22 +121,25 @@ class ImageGridNetworkLoss(nn.Module):
             mean_boxes_batch = []
             for x1, y1, x2, y2 in targets:
                 mean_boxes_batch.append(predictions[batch, x1:x2, y1:y2].mean())
-            mean_boxes_batch = torch.cat(mean_boxes_batch)
-            mean_boxes_batch = torch.sum(torch.square(torch.log(mean_boxes_batch)))
+            mean_boxes_batch = torch.stack(mean_boxes_batch)
+            mean_boxes_batch = torch.sum(-torch.log(mean_boxes_batch))
+
             loss_boxes.append(mean_boxes_batch)
-
-        loss_boxes = torch.cat(loss_boxes)
-
+        loss_boxes = torch.stack(loss_boxes)
+        if torch.count_nonzero(torch.isnan(loss_boxes)) > 0:
+            print('ERRORE')
         loss_background = []
         for pred, grid in zip(predictions, image_grids):
             image_background_loss = pred[grid == 0].mean()
-            image_background_loss = torch.square(torch.log(1-image_background_loss))
+            #print(image_background_loss, torch.log(1-image_background_loss.mean()), torch.square(torch.log(1-image_background_loss.mean())))
+            image_background_loss = -torch.log(1-image_background_loss)
             loss_background.append(image_background_loss)
 
-        loss_background = torch.cat(loss_background)
-
+        loss_background = torch.nan_to_num(torch.stack(loss_background))
+        if torch.count_nonzero(torch.isnan(loss_background)) > 0:
+            print('ERRORE')
         loss = loss_boxes + loss_background
-        loss = torch.mean(loss)
+        loss = torch.sum(loss)
 
         #loss = torch.sum(torch.mean(-(torch.log(predictions) * image_grids + torch.log(1-predictions) * (1-image_grids)), dim=(1, 2)))
         return loss
