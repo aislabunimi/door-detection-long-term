@@ -41,7 +41,7 @@ train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes
 
 train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4)
-#check_bbox_dataset(train_dataset_bboxes, confidence_threshold=confidence_threshold)
+check_bbox_dataset(train_dataset_bboxes, confidence_threshold=confidence_threshold)
 
 # Calculate Metrics in real worlds
 houses = ['floor1', 'floor4', 'chemistry_floor0']

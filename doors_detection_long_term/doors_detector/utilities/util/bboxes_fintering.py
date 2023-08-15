@@ -11,11 +11,11 @@ from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general i
 def check_bbox_dataset(dataset, confidence_threshold):
     colors = {0: (0, 0, 255), 1: (0, 255, 0)}
     for i, data in enumerate(dataset):
-        images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, grids, detected_bboxes_grid = data
+        images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, grids, target_boxes_grid, detected_bboxes_grid = data
         detected_bboxes = torch.transpose(detected_bboxes, 1, 2)
         images_opencv = []
         w_image, h_image = images.size()[2:][::-1]
-        for image, detected_list, fixed_list, confidences_list, labels_list, ious_list, target_boxes_list, grid, detected_bboxes_grid_list in zip(images, detected_bboxes.tolist(), fixed_bboxes.tolist(), confidences.tolist(), labels_encoded.tolist(), ious.tolist(), target_boxes, grids.tolist(), detected_bboxes_grid.tolist()):
+        for image, detected_list, fixed_list, confidences_list, labels_list, ious_list, target_boxes_list, grid, target_bboxes_grid_list, detected_bboxes_grid_list in zip(images, detected_bboxes.tolist(), fixed_bboxes.tolist(), confidences.tolist(), labels_encoded.tolist(), ious.tolist(), target_boxes, grids.tolist(), target_boxes_grid, detected_bboxes_grid.tolist()):
             image = image.to('cpu')
             image = image * torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
             image = image + torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
@@ -60,6 +60,9 @@ def check_bbox_dataset(dataset, confidence_threshold):
                     if grid[w][h] != 0:
                         image_grid = cv2.rectangle(image_grid, (round(step_w*w), round(step_h*h)),
                                                    (round(step_w*(w+1)), round(step_h*(h+1))), (255, 0, 0), 2)
+            for x1, y1, x2, y2 in target_bboxes_grid_list:
+                image_grid = cv2.rectangle(image_grid, (round(step_w*x1), round(step_h*y1)),
+                                           (round(step_w*x2), round(step_h*y2)), (255, 255, 255), 2)
             image_detected_grid = image_grid.copy()
             for x1, y1, x2, y2 in detected_bboxes_grid_list:
                 image_detected_grid = cv2.rectangle(image_detected_grid, (round(x1*step_w), round(y1*step_h)),
