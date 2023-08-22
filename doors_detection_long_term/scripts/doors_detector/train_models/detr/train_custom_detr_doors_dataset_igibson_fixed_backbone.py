@@ -104,7 +104,7 @@ if __name__ == '__main__':
     data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_fn=collate_fn, shuffle=False, num_workers=4)
     data_loader_validation = DataLoader(validation, batch_size=params['batch_size'], collate_fn=collate_fn, drop_last=False, num_workers=4)
 
-    model, criterion, lr_scheduler, optimizer, logs = prepare_model(globals()[f'EXP_2_IGIBSON_FIXED_BACKBONE_ALL_SCENES_REALISTIC_MODE_EPOCHS_{epochs_general_detector[0]}'.upper()], reload_model=False, restart_checkpoint=False)
+    model, criterion, lr_scheduler, optimizer, logs = prepare_model(globals()[f'EXP_3_IGIBSON_FIXED_BACKBONE_ALL_SCENES_REALISTIC_MODE_QUARTER_EPOCHS_{epochs_general_detector[0]}'.upper()], reload_model=False, restart_checkpoint=False)
     print_logs_every = 10
 
     start_time = time.time()
@@ -292,13 +292,13 @@ if __name__ == '__main__':
         #plot_losses(logs)
 
         model.save(epoch=epoch,
-                optimizer_state_dict=optimizer.state_dict(),
-                lr_scheduler_state_dict=lr_scheduler.state_dict(),
-                params=params,
-                logs=logs,
-                )
+            optimizer_state_dict=optimizer.state_dict(),
+            lr_scheduler_state_dict=lr_scheduler.state_dict(),
+            params=params,
+            logs=logs,
+        )
 
         # Change the model description on each epoch step
         if epoch == epochs_general_detector[epoch_count] - 1 and epoch_count < len(epochs_general_detector) -1:
             epoch_count += 1
-            model.set_description(globals()[f'EXP_2_IGIBSON_FIXED_BACKBONE_ALL_SCENES_REALISTIC_MODE_EPOCHS_{epochs_general_detector[epoch_count]}'.upper()])
+            model.set_description(globals()[f'EXP_3_IGIBSON_FIXED_BACKBONE_ALL_SCENES_REALISTIC_MODE_QUARTER_EPOCHS_{epochs_general_detector[epoch_count]}'.upper()])
