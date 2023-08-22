@@ -13,7 +13,7 @@ from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
 houses = ['floor1', 'floor4', 'chemistry_floor0']
-epochs_general_detector = [10, 20, 30, 40]
+epochs_general_detector = [60, 80, 100]
 device = 'cuda'
 
 def compute_results(model_name, data_loader_test, description):
@@ -42,8 +42,8 @@ def compute_results(model_name, data_loader_test, description):
 
     complete_metrics = {}
     metrics = {}
-    for iou_threshold in np.arange(0.001, 0.96, 0.05):#np.arange(0.5, 0.96, 0.05):
-        for confidence_threshold in np.arange(0.001, 0.96, 0.05): #np.arange(0.5, 0.96, 0.05):
+    for iou_threshold in np.arange(0.5, 0.96, 0.05): #np.arange(0.001, 0.96, 0.05):
+        for confidence_threshold in np.arange(0.5, 0.96, 0.05): #np.arange(0.001, 0.96, 0.05):
             iou_threshold = round(iou_threshold, 2)
             confidence_threshold = round(confidence_threshold, 2)
             metrics[(iou_threshold, confidence_threshold)] = evaluator.get_metrics(iou_threshold=iou_threshold, confidence_threshold=confidence_threshold, door_no_door_task=False, plot_curves=False)
@@ -83,7 +83,7 @@ def save_file(results, complete_results, file_name_1, file_name_2):
 if __name__ == "__main__":
     seed_everything(seed=0)
 
-    model_names_general_detectors = [(globals()[f'EXP_4_IGIBSON_ALL_SCENES_REALISTIC_MODE_HALF_EPOCHS_{epochs}'.upper()], epochs) for epochs in epochs_general_detector]
+    model_names_general_detectors = [(globals()[f'EXP_2_IGIBSON_ALL_SCENES_REALISTIC_MODE_EPOCHS_{epochs}'.upper()], epochs) for epochs in epochs_general_detector]
     
     results = []
     results_complete = []
@@ -93,8 +93,8 @@ if __name__ == "__main__":
         print(model_name)
 
         for house in houses:
-            _, test, _, _ = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25)
-            #_, test, _, _ = get_igibson_dataset_all_scenes(doors_config='realistic')
+            #_, test, _, _ = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25)
+            _, test, _, _ = get_igibson_dataset_all_scenes(doors_config='realistic')
             data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 
             metrics, complete_metrics = compute_results(model_name, data_loader_test, f'Test on {house}, GD trained on iGibson - Epochs GD: {epochs}')
