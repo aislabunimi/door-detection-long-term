@@ -24,7 +24,7 @@ params = {
     'seed': 0
 }
 
-path = '/mnt/54685f13-5e79-4e84-b2a6-bf3a0eba4d7f/classifications/dataset_gd'
+path = '/mnt/54685f13-5e79-4e84-b2a6-bf3a0eba4d7f/classifications/dataset_gd_chemistry'
 
 if __name__ == '__main__':
 
@@ -38,7 +38,7 @@ if __name__ == '__main__':
     #train, test, labels, COLORS = get_deep_doors_2_labelled_sets()
     #train, test, labels, COLORS = get_final_doors_dataset(2, 'house1', train_size=0.25, use_negatives=False)
     #train, validation, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=1, folder_name='house1', train_size=0.75, use_negatives=True)
-    train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name='floor4', train_size=0.75)
+    train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name='chemistry_floor0', train_size=0.75)
 
     print(f'Train set size: {len(train)}', f'Test set size: {len(test)}')
 
