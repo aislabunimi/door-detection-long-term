@@ -13,7 +13,7 @@ params = {
     'seed': 0
 }
 
-path = '/home/antonazzi/Downloads/detr_gd'
+path = '/home/antonazzi/Downloads/chemistry_gd'
 
 if __name__ == '__main__':
 
@@ -26,12 +26,12 @@ if __name__ == '__main__':
 
     #train, test, labels, COLORS = get_deep_doors_2_labelled_sets()
     #train, test, labels, COLORS = get_final_doors_dataset(2, 'house1', train_size=0.25, use_negatives=False)
-    train, validation, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=2, folder_name='house21', train_size=0.75, use_negatives=False)
-    #train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name='floor1', train_size=0.25)
+    #train, validation, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=2, folder_name='house21', train_size=0.75, use_negatives=False)
+    train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name='chemistry_floor0', train_size=0.25)
 
     print(f'Train set size: {len(train)}', f'Test set size: {len(test)}')
 
-    model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_1_HOUSE_21_2_LAYERS_BACKBONE_60_EPOCHS)
+    model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_GENERAL_DETECTOR_2_LAYERS_BACKBONE_GIBSON_60_EPOCHS)
     model.eval()
 
     for i in range(len(test)):
@@ -51,7 +51,6 @@ if __name__ == '__main__':
 
         for image_data in processed_data:
             # keep only predictions with 0.7+ confidence
-
             keep = image_data['scores'] > 0.75
 
             # Show image with bboxes
