@@ -1,3 +1,5 @@
+import time
+
 import pycuda.autoinit
 import numpy as np
 import onnx
@@ -111,11 +113,11 @@ if __name__ == '__main__':
     evaluator = MyEvaluator()
     evaluator_complete_metric = MyEvaluatorCompleteMetric()
 
-
+    total_time = 0
     stream = cuda.Stream()
     for images, targets, converted_boxes in tqdm(data_loader_test, total=len(data_loader_test), desc='Inference Tensorrt'):
 
-
+        start = time.time()
         cuda.memcpy_htod_async(device_input_buffer, images.numpy(), stream)
 
         context.execute_async_v2([int(device_input_buffer)] + [int(i) for i in device_output_buffers], stream.handle, None)
@@ -124,7 +126,7 @@ if __name__ == '__main__':
             cuda.memcpy_dtoh_async(host_buffer, device_buffer, stream)
 
         stream.synchronize()
-
+        total_time += time.time() - start
         preds = non_max_suppression(torch.from_numpy(host_output_buffers[-1]),
                                     0.75,
                                     0.45,
@@ -133,8 +135,8 @@ if __name__ == '__main__':
                                     agnostic=True,
                                     max_det=300)
 
-        evaluator.add_predictions_yolo(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
-        evaluator_complete_metric.add_predictions_yolo(targets=targets, predictions=preds, imgs_size=[images.size()[2], images.size()[3]])
+        evaluator.add_predictions_yolo(targets=targets, predictions=preds, img_size=images.size()[2:][::-1])
+        evaluator_complete_metric.add_predictions_yolo(targets=targets, predictions=preds, img_size=images.size()[2:][::-1])
 
     metrics = evaluator.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False)
     complete_metrics = evaluator_complete_metric.get_metrics(iou_threshold=0.75, confidence_threshold=0.75, door_no_door_task=False, plot_curves=False)
@@ -146,3 +148,4 @@ if __name__ == '__main__':
         print(f'\tLabel {label} -> AP = {values["AP"]}, Total positives = {values["total_positives"]}, TP = {values["TP"]}, FP = {values["FP"]}')
         #print(f'\t\tPositives = {values["TP"] / values["total_positives"] * 100:.2f}%, False positives = {values["FP"] / (values["TP"] + values["FP"]) * 100:.2f}%')
     #print(f'\tmAP = {mAP / len(metrics["per_bbox"].keys())}')
+    print(f'FPS = {1/(total_time / len(data_loader_test))}')
