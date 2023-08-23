@@ -16,12 +16,12 @@ from doors_detection_long_term.doors_detector.utilities.utils import seed_everyt
 
 
 device = 'cuda'
-epochs_general_detector = [10, 20, 30, 40]
+epochs_general_detector = [20, 40, 60]
 
 # Params
 params = {
     'epochs': 40,
-    'batch_size': 8, # or 1
+    'batch_size': 1,
     'seed': 0,
     'lr': 1e-5,
     'weight_decay': 1e-4,
@@ -99,12 +99,12 @@ if __name__ == '__main__':
 
     # Train the general detector with multiple epochs
     epoch_count = 0
-    train, validation, labels, _ = get_igibson_dataset_all_scenes(doors_config='realistic', step=4)
+    train, validation, labels, _ = get_mixed_gibson_igibson_dataset(split=0.5, max_samples=10000, doors_config='realistic')
     print(f'Train set size: {len(train)}', f'Validation set size: {len(validation)}')
     data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_fn=collate_fn, shuffle=False, num_workers=4)
     data_loader_validation = DataLoader(validation, batch_size=params['batch_size'], collate_fn=collate_fn, drop_last=False, num_workers=4)
 
-    model, criterion, lr_scheduler, optimizer, logs = prepare_model(globals()[f'EXP_3_IGIBSON_FIXED_BACKBONE_ALL_SCENES_REALISTIC_MODE_QUARTER_EPOCHS_{epochs_general_detector[0]}'.upper()], reload_model=False, restart_checkpoint=False)
+    model, criterion, lr_scheduler, optimizer, logs = prepare_model(globals()[f'EXP_4_IGIBSON_FIXED_BACKBONE_MIXED_SIMULATED_EPOCHS_{epochs_general_detector[0]}'.upper()], reload_model=False, restart_checkpoint=False)
     print_logs_every = 10
 
     start_time = time.time()
@@ -301,4 +301,4 @@ if __name__ == '__main__':
         # Change the model description on each epoch step
         if epoch == epochs_general_detector[epoch_count] - 1 and epoch_count < len(epochs_general_detector) -1:
             epoch_count += 1
-            model.set_description(globals()[f'EXP_3_IGIBSON_FIXED_BACKBONE_ALL_SCENES_REALISTIC_MODE_QUARTER_EPOCHS_{epochs_general_detector[epoch_count]}'.upper()])
+            model.set_description(globals()[f'EXP_4_IGIBSON_FIXED_BACKBONE_MIXED_SIMULATED_EPOCHS_{epochs_general_detector[epoch_count]}'.upper()])
