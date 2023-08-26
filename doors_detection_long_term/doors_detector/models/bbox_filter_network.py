@@ -85,6 +85,40 @@ class ImageGridNetwork(GenericModel):
         self.adaptive_max_pool_2d = nn.AdaptiveMaxPool2d(image_grid_dimensions)
 
         self.image_region = nn.Sequential(
+            nn.Conv2d(in_channels=fpn_channels, out_channels=256, kernel_size=5, padding=2),
+            nn.BatchNorm2d(256),
+            nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, padding=1),
+            nn.BatchNorm2d(256),
+            nn.Conv2d(in_channels=256, out_channels=128, kernel_size=1, padding=0),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+
+            nn.Conv2d(in_channels=128, out_channels=128, kernel_size=5, padding=2),
+            nn.BatchNorm2d(128),
+            nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, padding=1),
+            nn.BatchNorm2d(128),
+            nn.Conv2d(in_channels=128, out_channels=64, kernel_size=1, padding=0),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+
+            nn.Conv2d(in_channels=64, out_channels=64, kernel_size=5, padding=2),
+            nn.BatchNorm2d(64),
+            nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.Conv2d(in_channels=64, out_channels=32, kernel_size=1, padding=0),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+
+            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=5, padding=2),
+            nn.BatchNorm2d(32),
+            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1),
+            nn.BatchNorm2d(32),
+            nn.Conv2d(in_channels=32, out_channels=1, kernel_size=1, padding=0),
+            nn.BatchNorm2d(1),
+            nn.Sigmoid(),
+        )
+
+        """nn.Sequential(
             nn.Flatten(),
             nn.Linear(in_features=fpn_channels * image_grid_dimensions[0] * image_grid_dimensions[1], out_features=4096),
             nn.BatchNorm1d(4096),
@@ -93,7 +127,7 @@ class ImageGridNetwork(GenericModel):
             nn.BatchNorm1d(image_grid_dimensions[0] * image_grid_dimensions[1]),
             nn.Unflatten(1, image_grid_dimensions),
             nn.Sigmoid(),
-        )
+        )"""
 
         if pretrained:
             if pretrained:
@@ -107,7 +141,7 @@ class ImageGridNetwork(GenericModel):
     def forward(self, images):
         x = self.fpn(images)['x2']
         x = self.adaptive_max_pool_2d(x)
-        image_region_features = self.image_region(x)
+        image_region_features = self.image_region(x).squeeze(1)
         image_region_features = image_region_features.transpose(1, 2)
 
         return image_region_features
@@ -115,8 +149,9 @@ class ImageGridNetwork(GenericModel):
 
 class ImageGridNetworkLoss(nn.Module):
     def forward(self, predictions, image_grids, target_boxes_grid):
-
+        """
         loss_boxes = []
+
         for batch, targets in enumerate(target_boxes_grid):
             mean_boxes_batch = []
             for x1, y1, x2, y2 in targets:
@@ -142,7 +177,24 @@ class ImageGridNetworkLoss(nn.Module):
         loss = torch.sum(loss)
 
         #loss = torch.sum(torch.mean(-(torch.log(predictions) * image_grids + torch.log(1-predictions) * (1-image_grids)), dim=(1, 2)))
+        """
+        loss_background = []
+        loss_target = []
+        for prediction, image_grid in zip(predictions, image_grids):
+            loss_target.append(-torch.log(torch.mean(prediction[image_grid.bool()])))
+            loss_background.append(-torch.log(1-torch.mean(prediction[~image_grid.bool()])))
+
+        loss_background = torch.stack(loss_background)
+        loss_target = torch.stack(loss_target)
+
+        loss = torch.mean(loss_background, dim=0) + torch.mean(loss_target, dim=0)
         return loss
+
+#image = torch.rand(4, 3, 240, 320)
+
+#bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=(20,20), n_labels=3, model_name=IMAGE_GRID_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
+#i = bbox_model(image)
+#print(i.size())
 
 
 

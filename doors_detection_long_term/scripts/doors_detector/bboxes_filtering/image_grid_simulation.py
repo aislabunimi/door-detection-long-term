@@ -75,12 +75,12 @@ with torch.no_grad():
         datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True), num_workers=4, shuffle=True)
 
 #check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold)
-bbox_model = ImageGridNetwork(fpn_channels=32, image_grid_dimensions=(20,20), n_labels=3, model_name=IMAGE_GRID_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
+bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=(20,20), n_labels=3, model_name=IMAGE_GRID_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
 bbox_model.to('cuda')
 
 criterion = ImageGridNetworkLoss()
 
-optimizer = optim.Adam(bbox_model.parameters(), lr=0.01)
+optimizer = optim.Adam(bbox_model.parameters(), lr=0.001)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
 criterion.to('cuda')
 #for n, p in bbox_model.named_parameters():
