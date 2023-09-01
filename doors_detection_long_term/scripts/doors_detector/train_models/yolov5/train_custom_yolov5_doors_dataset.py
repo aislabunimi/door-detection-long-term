@@ -1,4 +1,5 @@
 import random
+import re
 import time
 
 from torch.optim import lr_scheduler
@@ -27,6 +28,7 @@ epochs_general_detector = [40, 60]
 epochs_qualified_detectors = [20, 40]
 fine_tune_quantity = [15, 25, 50, 75]
 
+frozen_layers = 5
 
 # Params
 params = {
@@ -36,7 +38,11 @@ params = {
 }
 def prepare_model(description, reload_model, restart_checkpoint, epochs):
     model = YOLOv5Model(model_name=YOLOv5, n_labels=len(labels.keys()), pretrained=reload_model, dataset_name=FINAL_DOORS_DATASET, description=description)
-
+    for n, p in model.named_parameters():
+        p.requires_grad = True
+        if int(re.findall(r'\d+', n)[0]) <= frozen_layers:
+            p.requires_grad = False
+            print(n)
     logs = {'train': [], 'train_after_backpropagation': [], 'validation': [], 'test': [], 'time': []}
     optimizer_state_dict = {}
     lr_scheduler_state_dict = {}
