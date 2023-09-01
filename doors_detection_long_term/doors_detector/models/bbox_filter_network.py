@@ -79,10 +79,12 @@ class ResNet50FPN(ResNet):
 class ImageGridNetwork(GenericModel):
     def __init__(self, fpn_channels: int, image_grid_dimensions: Tuple[int, int], model_name: ModelName, pretrained: bool, n_labels: int, dataset_name: DATASET, description: DESCRIPTION):
         super(ImageGridNetwork, self).__init__(model_name, dataset_name, description)
-
+        self._image_grid_dimensions = image_grid_dimensions
         self.fpn = ResNet50FPN(channels=fpn_channels)
         self.batch_norm_after_fpn = nn.BatchNorm2d(fpn_channels)
-        self.adaptive_max_pool_2d = nn.AdaptiveMaxPool2d(image_grid_dimensions)
+
+        if image_grid_dimensions is not None:
+            self.adaptive_max_pool_2d = nn.AdaptiveMaxPool2d(image_grid_dimensions)
 
         self.image_region = nn.Sequential(
             nn.Conv2d(in_channels=fpn_channels, out_channels=256, kernel_size=5, padding=2),
@@ -140,7 +142,8 @@ class ImageGridNetwork(GenericModel):
 
     def forward(self, images):
         x = self.fpn(images)['x2']
-        x = self.adaptive_max_pool_2d(x)
+        if self._image_grid_dimensions is not None:
+            x = self.adaptive_max_pool_2d(x)
         image_region_features = self.image_region(x).squeeze(1)
         image_region_features = image_region_features.transpose(1, 2)
 
@@ -180,9 +183,9 @@ class ImageGridNetworkLoss(nn.Module):
         """
         loss_background = []
         loss_target = []
-        for prediction, image_grid in zip(predictions, image_grids):
+        for prediction, image_grid in zip(predictions, image_grids[tuple(predictions.size()[1:])]):
             loss_target.append(-torch.log(torch.mean(prediction[image_grid.bool()])))
-            loss_background.append(-torch.log(1-torch.mean(prediction[~image_grid.bool()])))
+            loss_background.append(torch.nan_to_num(-torch.log(1-torch.mean(prediction[~image_grid.bool()]))))
 
         loss_background = torch.stack(loss_background)
         loss_target = torch.stack(loss_target)

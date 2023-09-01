@@ -1,5 +1,6 @@
 import os
 import random
+from collections import OrderedDict
 from typing import Tuple
 
 import numpy as np
@@ -120,7 +121,7 @@ def collate_fn_faster_rcnn(batch):
 
     return images, targets, new_targets
 
-def collate_fn_bboxes(image_grid_dimensions: Tuple[int, int] = (20, 20), use_confidence: bool = True):
+def collate_fn_bboxes(image_grid_dimensions: Tuple[int, int] = None, use_confidence: bool = True):
     def _collate_fn_bboxes(batch_data):
         """
         The bounding boxes come encoded as [cx, cy, w, h]
@@ -135,9 +136,9 @@ def collate_fn_bboxes(image_grid_dimensions: Tuple[int, int] = (20, 20), use_con
         labels_encoded: the ground truth labels of the bounding boxes [background, closed, open]
         ious: the iou with the target bbox. It is 0 if the bbox is background
         target_boxes: the target bounding boxes encoded as [cx, cy, w, h, label]
-        image_grid: the grid of the image
-        target_boxes_grid: the coordinates of the target boxes in the image grid, encoded as [x1, y1, x2, y2]
-        detected_boxes_grid: the coordinates of the detected boxes in the image grid, encoded as [x1, y1, x2, y2]
+        image_grid: a list of dictionaries containing the image grids at different scales (1/4, 1/8, 1/16, 1/32), with also the image grid dimension if not none
+        target_boxes_grid: a list of dictionaries containing the coordinates of the target boxes in the image grid, encoded as [x1, y1, x2, y2] at different scales (1/4, 1/8, 1/16, 1/32)
+        detected_boxes_grid: a list of dictionaries containing the coordinates of the detected boxes in the image grid, encoded as [x1, y1, x2, y2], at different scales (1/4, 1/8, 1/16, 1/32)
 
         """
         images, targets = collate_fn(batch_data)
@@ -150,9 +151,19 @@ def collate_fn_bboxes(image_grid_dimensions: Tuple[int, int] = (20, 20), use_con
         confidences = []
         labels_encoded = []
         ious = []
-        image_grids = []
-        target_boxes_grid = []
-        detected_boxes_grid = []
+
+        grid_dimensions = [(batch_size_width // 2**i, batch_size_height // 2**i) for i in range(1, 6)]
+        if image_grid_dimensions is not None:
+            grid_dimensions.append(image_grid_dimensions)
+
+        image_grids = OrderedDict()
+        target_boxes_grid = OrderedDict()
+        detected_boxes_grid = OrderedDict()
+        for dim in grid_dimensions:
+            image_grids[dim] = []
+            target_boxes_grid[dim] = []
+            detected_boxes_grid[dim] = []
+
         for i, target in enumerate(targets):
 
             # Rescale bboxes according to the batch global size
@@ -178,58 +189,67 @@ def collate_fn_bboxes(image_grid_dimensions: Tuple[int, int] = (20, 20), use_con
                                target['original_labels']], dim=1)
                 )
 
-            # Grid computation
-            step_w = (real_size_width / image_grid_dimensions[0]).item()
-            step_h = (real_size_height / image_grid_dimensions[1]).item()
-            grid = torch.zeros(image_grid_dimensions)
-            targets_x1y1x2y2 = torch.cat([target['target_boxes'][:, 0:1] - target['target_boxes'][:, 2:3] / 2,
-                                          target['target_boxes'][:, 1:2] - target['target_boxes'][:, 3:4] / 2,
-                                          target['target_boxes'][:, 0:1] + target['target_boxes'][:, 2:3] / 2,
-                                          target['target_boxes'][:, 1:2] + target['target_boxes'][:, 3:4] / 2], dim=1)
-            targets_x1y1x2y2 = targets_x1y1x2y2 * torch.tensor([real_size_width, real_size_height, real_size_width, real_size_height])
-            # print(targets_x1y1x2y2)
-            targets_x1y1x2y2 = torch.cat([targets_x1y1x2y2, target['target_boxes'][:, 4: 5]], dim=1)
 
-            targets_boxes_grid_coords = []
+            for grid_w, grid_h in grid_dimensions:
+                # Grid computation
+                step_w = (real_size_width / grid_w).item()
+                step_h = (real_size_height / grid_h).item()
+                grid = torch.zeros(grid_w, grid_h)
+                targets_x1y1x2y2 = torch.cat([target['target_boxes'][:, 0:1] - target['target_boxes'][:, 2:3] / 2,
+                                              target['target_boxes'][:, 1:2] - target['target_boxes'][:, 3:4] / 2,
+                                              target['target_boxes'][:, 0:1] + target['target_boxes'][:, 2:3] / 2,
+                                              target['target_boxes'][:, 1:2] + target['target_boxes'][:, 3:4] / 2], dim=1)
+                targets_x1y1x2y2 = targets_x1y1x2y2 * torch.tensor([real_size_width, real_size_height, real_size_width, real_size_height])
+                # print(targets_x1y1x2y2)
+                targets_x1y1x2y2 = torch.cat([targets_x1y1x2y2, target['target_boxes'][:, 4: 5]], dim=1)
 
-            for x1, y1, x2, y2, label in targets_x1y1x2y2.tolist():
-                #      print('LABEL', label)
-                mapped_x1 = round(x1 / step_w)
-                mapped_x2 = round(x2 / step_w)
-                mapped_y1 = round(y1 / step_h)
-                mapped_y2 = round(y2 / step_h)
-                if mapped_x1 == mapped_x2:
-                    mapped_x2 += 1
-                if mapped_y1 == mapped_y2:
-                    mapped_y2 += 1
+                targets_boxes_grid_coords = []
 
-                if mapped_x1 < 0 or mapped_x1 > 21 or mapped_x2 < 0 or mapped_x2 > 21 or mapped_y1 < 0 or mapped_y1 > 21 or mapped_y2 < 0 or mapped_y2 > 21:
-                    print('ERROR', mapped_x1, mapped_y1, mapped_x2, mapped_y2)
-                grid[mapped_x1: mapped_x2, mapped_y1:mapped_y2] = 1
-                targets_boxes_grid_coords.append([mapped_x1, mapped_y1, mapped_x2, mapped_y2])
+                for x1, y1, x2, y2, label in targets_x1y1x2y2.tolist():
+                    #      print('LABEL', label)
+                    mapped_x1 = round(x1 / step_w)
+                    mapped_x2 = round(x2 / step_w)
+                    mapped_y1 = round(y1 / step_h)
+                    mapped_y2 = round(y2 / step_h)
+                    if mapped_x1 == mapped_x2:
+                        mapped_x2 += 1
+                    if mapped_y1 == mapped_y2:
+                        mapped_y2 += 1
 
-            # COnverted detected bboxes in grid
-            detected_x1y1x2y2 = torch.cat([target['detected_boxes'][:, 0:1] - target['detected_boxes'][:, 2:3] / 2,
-                                          target['detected_boxes'][:, 1:2] - target['detected_boxes'][:, 3:4] / 2,
-                                          target['detected_boxes'][:, 0:1] + target['detected_boxes'][:, 2:3] / 2,
-                                          target['detected_boxes'][:, 1:2] + target['detected_boxes'][:, 3:4] / 2], dim=1)
-            detected_x1y1x2y2 = detected_x1y1x2y2 * torch.tensor([real_size_width, real_size_height, real_size_width, real_size_height])
-            detected_x1y1x2y2 = detected_x1y1x2y2 / torch.tensor([step_w, step_h, step_w, step_h])
-            detected_x1y1x2y2 = torch.round(detected_x1y1x2y2).type(torch.int32)
-            detected_boxes_grid.append(detected_x1y1x2y2)
-            image_grids.append(grid)
+                    if mapped_x1 < 0 or mapped_x1 > grid_w + 2 or mapped_x2 < 0 or mapped_x2 > grid_w + 2 or mapped_y1 < 0 or mapped_y1 > grid_h + 2 or mapped_y2 < 0 or mapped_y2 > grid_h + 2:
+                        print('ERROR', mapped_x1, mapped_y1, mapped_x2, mapped_y2)
+                    grid[mapped_x1: mapped_x2, mapped_y1:mapped_y2] = 1
+                    targets_boxes_grid_coords.append([mapped_x1, mapped_y1, mapped_x2, mapped_y2])
+
+                # Converted detected bboxes in grid
+                detected_x1y1x2y2 = torch.cat([target['detected_boxes'][:, 0:1] - target['detected_boxes'][:, 2:3] / 2,
+                                                  target['detected_boxes'][:, 1:2] - target['detected_boxes'][:, 3:4] / 2,
+                                                  target['detected_boxes'][:, 0:1] + target['detected_boxes'][:, 2:3] / 2,
+                                                  target['detected_boxes'][:, 1:2] + target['detected_boxes'][:, 3:4] / 2], dim=1)
+                detected_x1y1x2y2 = detected_x1y1x2y2 * torch.tensor([real_size_width, real_size_height, real_size_width, real_size_height])
+                detected_x1y1x2y2 = detected_x1y1x2y2 / torch.tensor([step_w, step_h, step_w, step_h])
+                detected_x1y1x2y2 = torch.round(detected_x1y1x2y2).type(torch.int32)
+
+                image_grids[(grid_w, grid_h)].append(grid)
+                target_boxes_grid[(grid_w, grid_h)].append(targets_boxes_grid_coords)
+                detected_boxes_grid[(grid_w, grid_h)].append(detected_x1y1x2y2)
+
+
             confidences.append(target['confidences'])
             labels_encoded.append(target['labels_encoded'])
             ious.append(target['ious'])
-            target_boxes_grid.append(targets_boxes_grid_coords)
 
         fixed_bboxes = torch.stack(fixed_boxes, dim=0)
         detected_boxes = torch.stack(detected_boxes, dim=0)
         confidences = torch.stack(confidences, dim=0)
         labels_encoded = torch.stack(labels_encoded, dim=0)
         ious = torch.stack(ious, dim=0)
-        image_grids = torch.stack(image_grids, dim=0)
-        detected_boxes_grid = torch.stack(detected_boxes_grid, dim=0)
+
+        for k, v in image_grids.items():
+            image_grids[k] = torch.stack(v, dim=0)
+
+        for k, v in detected_boxes_grid.items():
+            detected_boxes_grid[k] = torch.stack(v, dim=0)
 
         return images, torch.transpose(detected_boxes, 1, 2), fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid
     return _collate_fn_bboxes
