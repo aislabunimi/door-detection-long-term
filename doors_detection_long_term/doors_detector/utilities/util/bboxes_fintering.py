@@ -8,14 +8,15 @@ import torchvision
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import xywh2xyxy
 
 #Check the dataset
-def check_bbox_dataset(dataset, confidence_threshold):
+def check_bbox_dataset(dataset, confidence_threshold, scale_number):
     colors = {0: (0, 0, 255), 1: (0, 255, 0)}
     for i, data in enumerate(dataset):
         images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, grids, target_boxes_grid, detected_bboxes_grid = data
         detected_bboxes = torch.transpose(detected_bboxes, 1, 2)
         images_opencv = []
         w_image, h_image = images.size()[2:][::-1]
-        for image, detected_list, fixed_list, confidences_list, labels_list, ious_list, target_boxes_list, grid, target_bboxes_grid_list, detected_bboxes_grid_list in zip(images, detected_bboxes.tolist(), fixed_bboxes.tolist(), confidences.tolist(), labels_encoded.tolist(), ious.tolist(), target_boxes, grids.tolist(), target_boxes_grid, detected_bboxes_grid.tolist()):
+        scale = list(grids.keys())[scale_number]
+        for image, detected_list, fixed_list, confidences_list, labels_list, ious_list, target_boxes_list, grid, target_bboxes_grid_list, detected_bboxes_grid_list in zip(images, detected_bboxes.tolist(), fixed_bboxes.tolist(), confidences.tolist(), labels_encoded.tolist(), ious.tolist(), target_boxes, grids[scale].tolist(), target_boxes_grid[scale], detected_bboxes_grid[scale].tolist()):
             image = image.to('cpu')
             image = image * torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
             image = image + torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
@@ -118,7 +119,7 @@ def plot_grid_dataset(epoch, count, env, images, grid_targets, target_boxes, pre
         os.makedirs('/home/antonazzi/myfiles/image_grid/'+str(epoch) + f'/{env}')
     colors = {0: (0, 0, 1), 1: (0, 1, 0)}
 
-    for c_batch, (image, grid_target, boxes, grid) in enumerate(zip(images,  grid_targets.tolist(), target_boxes, preds.tolist())):
+    for c_batch, (image, grid_target, boxes, grid) in enumerate(zip(images,  grid_targets[tuple(preds.size()[1:])].tolist(), target_boxes, preds.tolist())):
         w_image, h_image = image.size()[1:][::-1]
         image = image.to('cpu')
         image = image * torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
