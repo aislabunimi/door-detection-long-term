@@ -28,7 +28,7 @@ epochs_general_detector = [60]
 epochs_qualified_detectors = [40]
 fine_tune_quantity = [15, 25, 50, 75]
 
-frozen_layers = 5
+frozen_layers = 4
 
 
 # Params
@@ -214,7 +214,7 @@ if __name__ == '__main__':
         data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
         data_loader_test = DataLoader(test, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 
-        model, compute_loss, optimizer, scheduler, scaler, start_epoch, nl, nw, nb, amp, nbs, accumulate, lf, logs = prepare_model(globals()[f'EXP_GENERAL_DETECTOR_{gd_dataset}_{epochs_general}_EPOCHS'.upper()], reload_model=True, restart_checkpoint=False, epochs=epochs_general_detector[-1], fix_backbone=False)
+        model, compute_loss, optimizer, scheduler, scaler, start_epoch, nl, nw, nb, amp, nbs, accumulate, lf, logs = prepare_model(globals()[f'EXP_GENERAL_DETECTOR_{gd_dataset}_{epochs_general}_EPOCHS'.upper()], reload_model=True, restart_checkpoint=False, epochs=epochs_general_detector[-1], fix_backbone=True)
         print_logs_every = 10
         last_opt_step = -1
         model.to('cuda')
