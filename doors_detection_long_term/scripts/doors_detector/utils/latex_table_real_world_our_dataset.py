@@ -3,7 +3,7 @@ import pandas as pd
 from matplotlib import pyplot as plt, font_manager
 from matplotlib.pyplot import subplots
 from pandas import CategoricalDtype
-iou_threshold = 0.5
+iou_threshold = 0.75
 confidence_threshold = 0.75
 houses = pd.read_excel('./../../results/faster_rcnn_ap_real_data.xlsx')
 houses['AP'] = houses['AP'].astype(np.float64)
