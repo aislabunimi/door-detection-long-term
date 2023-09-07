@@ -37,11 +37,12 @@ params = {
     'batch_size': 4,
     'seed': 0
 }
-def prepare_model(description, reload_model, restart_checkpoint, epochs):
+def prepare_model(description, reload_model, restart_checkpoint, epochs, fix_backbone=True):
     model = YOLOv5Model(model_name=YOLOv5, n_labels=len(labels.keys()), pretrained=reload_model, dataset_name=FINAL_DOORS_DATASET, description=description)
+
     for n, p in model.named_parameters():
         p.requires_grad = True
-        if int(re.findall(r'\d+', n)[0]) <= frozen_layers:
+        if fix_backbone and int(re.findall(r'\d+', n)[0]) < frozen_layers:
             p.requires_grad = False
             print(n)
     logs = {'train': [], 'train_after_backpropagation': [], 'validation': [], 'time': []}
@@ -203,7 +204,7 @@ if __name__ == '__main__':
                 epoch_count += 1
                 model.set_description(globals()[f'EXP_GENERAL_DETECTOR_{name}_{epochs_general_detector[epoch_count]}_EPOCHS'.upper()])
 
-
+    
     # Qualify the general detectors trained before
     for house, gd_dataset, epochs_general, quantity in [(h, eg, e, q) for h in houses for eg in ['gibson', 'deep_doors_2', 'gibson_deep_doors_2'] for e in epochs_general_detector for q in fine_tune_quantity]:
         epoch_count = 0
@@ -213,7 +214,7 @@ if __name__ == '__main__':
         data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
         data_loader_test = DataLoader(test, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
 
-        model, compute_loss, optimizer, scheduler, scaler, start_epoch, nl, nw, nb, amp, nbs, accumulate, lf, logs = prepare_model(globals()[f'EXP_GENERAL_DETECTOR_{gd_dataset}_{epochs_general}_EPOCHS'.upper()], reload_model=True, restart_checkpoint=False, epochs=epochs_general_detector[-1])
+        model, compute_loss, optimizer, scheduler, scaler, start_epoch, nl, nw, nb, amp, nbs, accumulate, lf, logs = prepare_model(globals()[f'EXP_GENERAL_DETECTOR_{gd_dataset}_{epochs_general}_EPOCHS'.upper()], reload_model=True, restart_checkpoint=False, epochs=epochs_general_detector[-1], fix_backbone=False)
         print_logs_every = 10
         last_opt_step = -1
         model.to('cuda')
