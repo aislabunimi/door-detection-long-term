@@ -74,10 +74,10 @@ def get_final_doors_dataset_all_envs():
 
     return train, validation, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
 
-def get_deep_doors_2_relabelled_dataset_for_gd():
+def get_deep_doors_2_relabelled_dataset_for_gd(fixed_scale=False):
     dataset_creator = DatasetsCreatorDeepDoors2LabelledGD(dataset_path=deep_doors_2_labelled_dataset_path)
 
-    train, validation = dataset_creator.creates_dataset()
+    train, validation = dataset_creator.creates_dataset(fixed_scale=fixed_scale)
     labels = dataset_creator.get_labels()
 
     return train, validation, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
