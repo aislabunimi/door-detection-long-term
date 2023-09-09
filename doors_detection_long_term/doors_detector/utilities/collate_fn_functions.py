@@ -1,7 +1,7 @@
 import os
 import random
 from collections import OrderedDict
-from typing import Tuple
+from typing import Tuple, List
 
 import numpy as np
 import torch
@@ -121,7 +121,7 @@ def collate_fn_faster_rcnn(batch):
 
     return images, targets, new_targets
 
-def collate_fn_bboxes(image_grid_dimensions: Tuple[int, int] = None, use_confidence: bool = True):
+def collate_fn_bboxes(image_grid_dimensions: List[Tuple[int, int]] = None, use_confidence: bool = True):
     def _collate_fn_bboxes(batch_data):
         """
         The bounding boxes come encoded as [cx, cy, w, h]
@@ -152,9 +152,10 @@ def collate_fn_bboxes(image_grid_dimensions: Tuple[int, int] = None, use_confide
         labels_encoded = []
         ious = []
 
-        grid_dimensions = [(batch_size_width // 2**i, batch_size_height // 2**i) for i in range(1, 6)]
+        grid_dimensions = set([(batch_size_width // 2**i, batch_size_height // 2**i) for i in range(1, 6)])
         if image_grid_dimensions is not None:
-            grid_dimensions.append(image_grid_dimensions)
+            for v in image_grid_dimensions:
+                grid_dimensions.add(v)
 
         image_grids = OrderedDict()
         target_boxes_grid = OrderedDict()
