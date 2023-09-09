@@ -29,7 +29,7 @@ torch.autograd.detect_anomaly(True)
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 num_bboxes = 20
 
-grid_dim = None
+grid_dim = (64, 64)
 
 iou_threshold_matching = 0.5
 confidence_threshold = 0.75
@@ -39,11 +39,11 @@ dataset_creator_bboxes.load_dataset(folder_name='yolov5_simulation_dataset')
 dataset_creator_bboxes.select_n_bounding_boxes(num_bboxes=num_bboxes)
 dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=iou_threshold_matching)
 
-train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=True, apply_transforms_to_train=False)
-
+train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=True, apply_transforms_to_train=True)
+print(len(train_bboxes), len(test_bboxes))
 train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
-#check_bbox_dataset(train_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=3)
+#check_bbox_dataset(train_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=5)
 
 # Calculate Metrics in real worlds
 houses = ['floor1', 'floor4', 'chemistry_floor0']
@@ -77,7 +77,7 @@ with torch.no_grad():
         datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=True)
 
 #check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold)
-bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=grid_dim, n_labels=3, model_name=IMAGE_GRID_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
+bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=[(2**i, 2**i) for i in range(3, 7)][::-1], n_labels=3, model_name=IMAGE_GRID_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
 bbox_model.to('cuda')
 
 criterion = ImageGridNetworkLoss()

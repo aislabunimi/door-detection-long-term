@@ -1,6 +1,6 @@
 import os
 from collections import OrderedDict
-from typing import Tuple
+from typing import Tuple, List
 
 import torch
 import torchvision.models
@@ -50,7 +50,7 @@ class ResNet50FPN(ResNet):
 
         self.fpn = FeaturePyramidNetwork(in_channels_list=[64, 256, 512, 1024, 2048], out_channels=channels)
 
-    def _forward_impl(self, x: torch.Tensor) -> list:
+    def _forward_impl(self, x: torch.Tensor) -> tuple:
         ordered_dict = OrderedDict()
 
         x = self.conv1(x)
@@ -71,11 +71,11 @@ class ResNet50FPN(ResNet):
         x4 = self.layer4(x3)
         ordered_dict['x4'] = x4
 
-        pyramid_features = self.fpn(ordered_dict)
+        #pyramid_features = self.fpn(ordered_dict)
 
-        return pyramid_features
+        return ordered_dict
 
-
+"""
 class ImageGridNetwork(GenericModel):
     def __init__(self, fpn_channels: int, image_grid_dimensions: Tuple[int, int], model_name: ModelName, pretrained: bool, n_labels: int, dataset_name: DATASET, description: DESCRIPTION):
         super(ImageGridNetwork, self).__init__(model_name, dataset_name, description)
@@ -120,17 +120,6 @@ class ImageGridNetwork(GenericModel):
             nn.Sigmoid(),
         )
 
-        """nn.Sequential(
-            nn.Flatten(),
-            nn.Linear(in_features=fpn_channels * image_grid_dimensions[0] * image_grid_dimensions[1], out_features=4096),
-            nn.BatchNorm1d(4096),
-            nn.ReLU(),
-            nn.Linear(in_features=4096, out_features=image_grid_dimensions[0] * image_grid_dimensions[1]),
-            nn.BatchNorm1d(image_grid_dimensions[0] * image_grid_dimensions[1]),
-            nn.Unflatten(1, image_grid_dimensions),
-            nn.Sigmoid(),
-        )"""
-
         if pretrained:
             if pretrained:
                 path = os.path.join('train_params', self._model_name + '_' + str(self._description), str(self._dataset_name))
@@ -149,40 +138,124 @@ class ImageGridNetwork(GenericModel):
 
         return image_region_features
 
+"""
+
+class MultipleConvolutions(nn.Module):
+    def __init__(self, original_size: int, start_size: int, end_size: int):
+        super(MultipleConvolutions, self).__init__()
+
+        modules = [
+            nn.Conv2d(in_channels=original_size, out_channels=start_size, kernel_size=1),
+            nn.BatchNorm2d(num_features=start_size),
+            nn.ReLU()
+        ]
+
+        while start_size > end_size:
+            modules += [
+                nn.Conv2d(in_channels=start_size, out_channels=start_size, kernel_size=5, padding=2),
+                nn.BatchNorm2d(start_size),
+                nn.Conv2d(in_channels=start_size, out_channels=start_size, kernel_size=3, padding=1),
+                nn.BatchNorm2d(start_size),
+                nn.Conv2d(in_channels=start_size, out_channels=start_size // 2, kernel_size=1, padding=0),
+                nn.BatchNorm2d(start_size // 2),
+                nn.ReLU(),
+            ]
+            start_size //= 2
+
+        self.convolutions = nn.Sequential(*modules)
+
+    def forward(self, x):
+        return self.convolutions(x)
+
+
+class ImageGridNetwork(GenericModel):
+    def __init__(self, fpn_channels: int, image_grid_dimensions: List[Tuple[int, int]], model_name: ModelName, pretrained: bool, n_labels: int, dataset_name: DATASET, description: DESCRIPTION):
+        super(ImageGridNetwork, self).__init__(model_name, dataset_name, description)
+        self._image_grid_dimensions = image_grid_dimensions
+        self.fpn = ResNet50FPN(channels=fpn_channels)
+
+        self.conv_x1 = nn.Sequential(
+            nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[0]),
+            MultipleConvolutions(original_size=256, start_size=256, end_size=64)
+        )
+        self.conv_x2 = nn.Sequential(
+            nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[1]),
+            MultipleConvolutions(original_size=512, start_size=256, end_size=64),
+            nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
+        )
+        self.conv_x3 = nn.Sequential(
+            nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[2]),
+            MultipleConvolutions(original_size=1024, start_size=256, end_size=64),
+            nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
+        )
+        self.conv_x4 = nn.Sequential(
+            nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[3]),
+            MultipleConvolutions(original_size=2048, start_size=256, end_size=64),
+            nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
+        )
+
+        self.final_convolution = nn.Sequential(
+            nn.Conv2d(in_channels=256, out_channels=256, kernel_size=5, padding=2),
+            nn.BatchNorm2d(256),
+            nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, padding=1),
+            nn.BatchNorm2d(256),
+            nn.Conv2d(in_channels=256, out_channels=128, kernel_size=1, padding=0),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+
+            nn.Conv2d(in_channels=128, out_channels=128, kernel_size=5, padding=2),
+            nn.BatchNorm2d(128),
+            nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, padding=1),
+            nn.BatchNorm2d(128),
+            nn.Conv2d(in_channels=128, out_channels=64, kernel_size=1, padding=0),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+
+            nn.Conv2d(in_channels=64, out_channels=64, kernel_size=5, padding=2),
+            nn.BatchNorm2d(64),
+            nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.Conv2d(in_channels=64, out_channels=32, kernel_size=1, padding=0),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+
+            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=5, padding=2),
+            nn.BatchNorm2d(32),
+            nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1),
+            nn.BatchNorm2d(32),
+            nn.Conv2d(in_channels=32, out_channels=1, kernel_size=1, padding=0),
+            nn.BatchNorm2d(1),
+            nn.Sigmoid(),
+        )
+
+        if pretrained:
+            if pretrained:
+                path = os.path.join('train_params', self._model_name + '_' + str(self._description), str(self._dataset_name))
+            if trained_models_path == "":
+                path = os.path.join(os.path.dirname(__file__), path)
+            else:
+                path = os.path.join(trained_models_path, path)
+            self.load_state_dict(torch.load(os.path.join(path, 'model.pth'), map_location=torch.device('cpu')))
+
+    def forward(self, images):
+        multi_scales_maps = self.fpn(images)
+        x1 = self.conv_x1(multi_scales_maps['x1'])
+        x2 = self.conv_x2(multi_scales_maps['x2'])
+        x3 = self.conv_x3(multi_scales_maps['x3'])
+        x4 = self.conv_x4(multi_scales_maps['x4'])
+
+        x = torch.cat([x1, x2, x3, x4], dim=1)
+        image_region_features = self.final_convolution(x).squeeze(1)
+        image_region_features = image_region_features.transpose(1, 2)
+
+        return image_region_features
 
 class ImageGridNetworkLoss(nn.Module):
     def forward(self, predictions, image_grids, target_boxes_grid):
-        """
-        loss_boxes = []
 
-        for batch, targets in enumerate(target_boxes_grid):
-            mean_boxes_batch = []
-            for x1, y1, x2, y2 in targets:
-                mean_boxes_batch.append(predictions[batch, x1:x2, y1:y2].mean())
-            mean_boxes_batch = torch.stack(mean_boxes_batch)
-            mean_boxes_batch = torch.sum(-torch.log(mean_boxes_batch))
-
-            loss_boxes.append(mean_boxes_batch)
-        loss_boxes = torch.stack(loss_boxes)
-        if torch.count_nonzero(torch.isnan(loss_boxes)) > 0:
-            print('ERRORE')
-        loss_background = []
-        for pred, grid in zip(predictions, image_grids):
-            image_background_loss = pred[grid == 0].mean()
-            #print(image_background_loss, torch.log(1-image_background_loss.mean()), torch.square(torch.log(1-image_background_loss.mean())))
-            image_background_loss = -torch.log(1-image_background_loss)
-            loss_background.append(image_background_loss)
-
-        loss_background = torch.nan_to_num(torch.stack(loss_background))
-        if torch.count_nonzero(torch.isnan(loss_background)) > 0:
-            print('ERRORE')
-        loss = loss_boxes + loss_background
-        loss = torch.sum(loss)
-
-        #loss = torch.sum(torch.mean(-(torch.log(predictions) * image_grids + torch.log(1-predictions) * (1-image_grids)), dim=(1, 2)))
-        """
         loss_background = []
         loss_target = []
+        #print(tuple(predictions.size()[1:]))
         for prediction, image_grid in zip(predictions, image_grids[tuple(predictions.size()[1:])]):
             loss_target.append(-torch.log(torch.mean(prediction[image_grid.bool()])))
             loss_background.append(torch.nan_to_num(-torch.log(1-torch.mean(prediction[~image_grid.bool()]))))
@@ -192,12 +265,17 @@ class ImageGridNetworkLoss(nn.Module):
 
         loss = torch.mean(loss_background, dim=0) + torch.mean(loss_target, dim=0)
         return loss
+"""
+image = torch.rand(4, 3, 240, 320)
 
-#image = torch.rand(4, 3, 240, 320)
+model = ResNet50FPN()
+#x1, x2, x3, x4 = model(image)
+#print(x1.size(), x2.size(), x3.size(), x4.size())
 
-#bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=(20,20), n_labels=3, model_name=IMAGE_GRID_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
-#i = bbox_model(image)
-#print(i.size())
+bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=[(2**i, 2**i) for i in range(3, 7)][::-1], n_labels=3, model_name=IMAGE_GRID_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
+print(bbox_model)
+i = bbox_model(image)
+print(i.size())
 
-
+"""
 
