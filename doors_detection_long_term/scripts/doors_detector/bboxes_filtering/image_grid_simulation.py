@@ -13,6 +13,7 @@ from tqdm import tqdm
 
 from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCreatorBBoxes import DatasetCreatorBBoxes, \
     ExampleType
+from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetLoaderBBoxes import DatasetLoaderBBoxes
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
@@ -34,16 +35,13 @@ grid_dim = [(2**i, 2**i) for i in range(3, 7)][::-1]
 iou_threshold_matching = 0.5
 confidence_threshold = 0.75
 
-dataset_creator_bboxes = DatasetCreatorBBoxes()
-dataset_creator_bboxes.load_dataset(folder_name='yolov5_general_detector_gibson_deep_doors_2')
-dataset_creator_bboxes.select_n_bounding_boxes(num_bboxes=num_bboxes)
-dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=iou_threshold_matching)
+dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson_deep_doors_2')
+train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
 
-train_bboxes, test_bboxes = dataset_creator_bboxes.create_datasets(shuffle_boxes=True, apply_transforms_to_train=False)
 print(len(train_bboxes), len(test_bboxes))
 train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
-check_bbox_dataset(train_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=(8, 8))
+#check_bbox_dataset(train_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=(8, 8))
 
 # Calculate Metrics in real worlds
 houses = ['floor1', 'floor4', 'chemistry_floor0']
