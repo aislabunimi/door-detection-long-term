@@ -39,6 +39,11 @@ class DatasetsCreatorBBoxes:
             'gt_bboxes_matched': []
         }
 
+        self._last_saved_example_training = 0
+        self._last_saved_example_test = 0
+
+        self._folder_name = ''
+
     def visualize_bboxes(self, show_filtered: bool = False, bboxes_type: ExampleType = ExampleType.TRAINING):
         if bboxes_type == ExampleType.TEST:
             bboxes_dict = self._test_bboxes
@@ -137,20 +142,23 @@ class DatasetsCreatorBBoxes:
         return (TorchDatasetBBoxes(bboxes_dict=self._training_bboxes, set_type=TRAIN_SET if apply_transforms_to_train else TEST_SET, shuffle=shuffle_boxes),
                 TorchDatasetBBoxes(bboxes_dict=self._test_bboxes, set_type=TEST_SET, shuffle=False))
 
-    def export_dataset(self, folder_name: str):
-        dataset_manager = DatasetManager(dataset_path=box_filtering_dataset_path, sample_class=BoxFilteringExample)
-        if folder_name in dataset_manager.get_folder_names():
-            raise Exception('Change folder name')
-        folder_manager = DatasetFolderManager(dataset_path=box_filtering_dataset_path, folder_name=folder_name, sample_class=BoxFilteringExample)
+    def set_folder_name(self, folder_name: str):
+        self._folder_name = folder_name
+
+    def export_dataset(self):
+        if type(self._folder_name) != str or self._folder_name == '':
+            raise Exception('Please, before save dataset set folder name')
+
+        folder_manager = DatasetFolderManager(dataset_path=box_filtering_dataset_path, folder_name=self._folder_name, sample_class=BoxFilteringExample)
 
         def save_dictionary(dataset, example_type):
             for image, gt_boxes, bboxes in zip(dataset['images'], dataset['gt_bboxes'], dataset['bboxes']):
                 example = BoxFilteringExample()
 
-                example.set_label(0) if len(gt_boxes) == 0 else example.set_label(1)
+                example.set_label(0) if example_type == ExampleType.TRAINING else example.set_label(1)
 
                 example.set_bgr_image((image*255).astype(np.uint8))
-                example.set_example_type(float(1 if example_type == ExampleType.TRAINING else 2))
+                #example.set_example_type(float(1 if example_type == ExampleType.TRAINING else 2))
 
                 gt_bboxes_converted = [list(box.get_absolute_bounding_box(BBFormat.XYX2Y2)) + [int(box.get_class_id()), 1.0] for box in gt_boxes]
                 bboxes_converted = [list(box.get_absolute_bounding_box(BBFormat.XYX2Y2)) + [int(box.get_class_id()), box.get_confidence()] for box in bboxes]
@@ -159,8 +167,15 @@ class DatasetsCreatorBBoxes:
                 example.set_detected_bounding_boxes(np.array(bboxes_converted))
                 folder_manager.save_sample(example, use_thread=True)
 
+            # Remove saved examples
+            dataset['images'] = []
+            dataset['gt_bboxes'] = []
+            dataset['bboxes'] = []
+
         save_dictionary(self._training_bboxes, ExampleType.TRAINING)
+
         save_dictionary(self._test_bboxes, ExampleType.TEST)
+
         folder_manager.save_metadata()
 
     def load_dataset(self, folder_name: str):
