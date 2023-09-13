@@ -98,7 +98,10 @@ class TorchDatasetBBoxes(Dataset):
         len_detected_bboxes = len(detected_boxes)
         len_fixed_bboxes = len(fixed_boxes)
 
-        target['boxes'] = torch.tensor(detected_boxes + fixed_boxes + target_boxes[:, :4].tolist(), dtype=torch.float)
+        t = []
+        if target_boxes.size()[0] > 0:
+            t = target_boxes[:, :4].tolist()
+        target['boxes'] = torch.tensor(detected_boxes + fixed_boxes + t, dtype=torch.float)
 
         #target['labels_encoded'] = torch.tensor(labels_encoded, dtype=torch.float)
         #target['confidences'] = torch.tensor(confidences, dtype=torch.float)
@@ -135,7 +138,8 @@ class TorchDatasetBBoxes(Dataset):
         target['ious'] = torch.tensor(ious, dtype=torch.float)
         target['fixed_boxes'] = torch.tensor(fixed_boxes, dtype=torch.float)
         target['detected_boxes'] = torch.tensor(detected_boxes, dtype=torch.float)
-        target_boxes[:, :4] = target_bboxes_modified
+        if target_boxes.size()[0] > 0:
+            target_boxes[:, :4] = target_bboxes_modified
         target['target_boxes'] = target_boxes
         return img, target
 

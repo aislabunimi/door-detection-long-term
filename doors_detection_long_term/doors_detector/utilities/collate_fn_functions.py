@@ -177,7 +177,8 @@ def collate_fn_bboxes(image_grid_dimensions: List[Tuple[int, int]] = None, use_c
                                          real_size_width / batch_size_width, real_size_height / batch_size_height]])
             target['fixed_boxes'] = target['fixed_boxes'] * scale_boxes
             target['detected_boxes'] = target['detected_boxes'] * scale_boxes
-            target['target_boxes'][:, :4] *= scale_boxes
+            if target['target_boxes'].size()[0] > 0:
+                target['target_boxes'][:, :4] *= scale_boxes
 
             fixed_boxes.append(target['fixed_boxes'])
             target_boxes.append(target['target_boxes'])
@@ -200,13 +201,15 @@ def collate_fn_bboxes(image_grid_dimensions: List[Tuple[int, int]] = None, use_c
                 step_w = (real_size_width / grid_w).item()
                 step_h = (real_size_height / grid_h).item()
                 grid = torch.zeros(grid_w, grid_h)
-                targets_x1y1x2y2 = torch.cat([target['target_boxes'][:, 0:1] - target['target_boxes'][:, 2:3] / 2,
+                targets_x1y1x2y2 = torch.tensor([])
+                if target['target_boxes'].size()[0] > 0:
+                    targets_x1y1x2y2 = torch.cat([target['target_boxes'][:, 0:1] - target['target_boxes'][:, 2:3] / 2,
                                               target['target_boxes'][:, 1:2] - target['target_boxes'][:, 3:4] / 2,
                                               target['target_boxes'][:, 0:1] + target['target_boxes'][:, 2:3] / 2,
                                               target['target_boxes'][:, 1:2] + target['target_boxes'][:, 3:4] / 2], dim=1)
-                targets_x1y1x2y2 = targets_x1y1x2y2 * torch.tensor([real_size_width, real_size_height, real_size_width, real_size_height])
+                    targets_x1y1x2y2 = targets_x1y1x2y2 * torch.tensor([real_size_width, real_size_height, real_size_width, real_size_height])
                 # print(targets_x1y1x2y2)
-                targets_x1y1x2y2 = torch.cat([targets_x1y1x2y2, target['target_boxes'][:, 4: 5]], dim=1)
+                    targets_x1y1x2y2 = torch.cat([targets_x1y1x2y2, target['target_boxes'][:, 4: 5]], dim=1)
 
                 targets_boxes_grid_coords = []
 

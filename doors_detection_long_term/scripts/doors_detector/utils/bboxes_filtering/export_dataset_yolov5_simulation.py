@@ -49,5 +49,5 @@ for house in houses:
 
             dataset_creator_bboxes.add_yolo_bboxes(images, targets, preds, ExampleType.TEST)
 
-    dataset_creator_bboxes.export_dataset('yolov5_general_detector_simulation_dataset')
+    dataset_creator_bboxes.export_dataset('yolov5_general_detector_gibson_deep_doors_2')
 
