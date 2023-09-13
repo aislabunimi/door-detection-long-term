@@ -11,7 +11,7 @@ from torchvision.models.resnet import Bottleneck, BasicBlock
 from torchvision.ops import FeaturePyramidNetwork
 from tqdm import tqdm
 
-from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCreatorBBoxes import DatasetsCreatorBBoxes, \
+from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCreatorBBoxes import DatasetCreatorBBoxes, \
     ExampleType
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
@@ -34,7 +34,7 @@ grid_dim = [(2**i, 2**i) for i in range(3, 7)][::-1]
 iou_threshold_matching = 0.5
 confidence_threshold = 0.75
 
-dataset_creator_bboxes = DatasetsCreatorBBoxes()
+dataset_creator_bboxes = DatasetCreatorBBoxes()
 dataset_creator_bboxes.load_dataset(folder_name='yolov5_general_detector_gibson_deep_doors_2')
 dataset_creator_bboxes.select_n_bounding_boxes(num_bboxes=num_bboxes)
 dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=iou_threshold_matching)
@@ -63,7 +63,7 @@ yolo_gd.eval()
 datasets_real_worlds = {}
 with torch.no_grad():
     for house in houses:
-        dataset_creator_bboxes_real_world = DatasetsCreatorBBoxes()
+        dataset_creator_bboxes_real_world = DatasetCreatorBBoxes()
 
         for images, targets, converted_boxes in tqdm(data_loaders_real_word[house], total=len(data_loaders_real_word[house]), desc=f'Evaluating yolo GD in {house}'):
             images = images.to('cuda')

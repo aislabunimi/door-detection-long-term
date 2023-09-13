@@ -11,7 +11,7 @@ from torchvision.models.resnet import Bottleneck, BasicBlock
 from torchvision.ops import FeaturePyramidNetwork
 from tqdm import tqdm
 
-from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCreatorBBoxes import DatasetsCreatorBBoxes, \
+from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCreatorBBoxes import DatasetCreatorBBoxes, \
     ExampleType
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
@@ -94,18 +94,7 @@ class BboxFilterNetworkImage(GenericModel):
                 path = os.path.join(trained_models_path, path)
             self.load_state_dict(torch.load(os.path.join(path, 'model.pth'), map_location=torch.device('cpu')))
 
-    def forward(self, images, boxes):
-        #bboxes_features = self.shared_mlp_geometric_1(boxes)
-        x = self.fpn(images)['x2']
-        #print(x.size())
-        #x = self.conv_after_backbone(x)
-        x = self.adaptive_max_pool_2d(x)
-        #print(x.size())
-        image_region_features = self.image_region(x)
-        image_region_features = image_region_features.transpose(1, 2)
-        #print(image_region_features.size())
 
-        return torch.tensor(0), torch.tensor(0), image_region_features
 
 
 class BboxFilterNetworkGeometricLabelLoss(nn.Module):
@@ -149,7 +138,7 @@ class BboxFilterNetworkGeometricImageFeatures(nn.Module):
 #crit = BboxFilterNetworkGeometricImageFeatures()
 
 
-dataset_creator_bboxes = DatasetsCreatorBBoxes()
+dataset_creator_bboxes = DatasetCreatorBBoxes()
 dataset_creator_bboxes.load_dataset(folder_name='yolov5_simulation_dataset')
 dataset_creator_bboxes.select_n_bounding_boxes(num_bboxes=num_bboxes)
 dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=iou_threshold_matching)
@@ -181,7 +170,7 @@ performances_in_real_worlds = {'AP': {'0': [], '1': []},
 datasets_real_worlds = {}
 with torch.no_grad():
     for house in houses:
-        dataset_creator_bboxes_real_world = DatasetsCreatorBBoxes()
+        dataset_creator_bboxes_real_world = DatasetCreatorBBoxes()
         evaluator = MyEvaluator()
         evaluator_complete_metric = MyEvaluatorCompleteMetric()
         for images, targets, converted_boxes in tqdm(data_loaders_real_word[house], total=len(data_loaders_real_word[house]), desc=f'Evaluating yolo GD in {house}'):
@@ -222,7 +211,6 @@ performances_in_real_worlds['TP'] = sum(performances_in_real_worlds['TP'])
 performances_in_real_worlds['FP'] = sum(performances_in_real_worlds['FP'])
 performances_in_real_worlds['TPm'] = sum(performances_in_real_worlds['TPm'])
 performances_in_real_worlds['FPiou'] = sum(performances_in_real_worlds['FPiou'])
-
 
 print(performances_in_real_worlds)
 

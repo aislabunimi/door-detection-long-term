@@ -68,7 +68,7 @@ def check_bbox_dataset(dataset, confidence_threshold, scale_number):
             for x1, y1, x2, y2 in detected_bboxes_grid_list:
                 image_detected_grid = cv2.rectangle(image_detected_grid, (round(x1*step_w), round(y1*step_h)),
                                            (round(x2*step_w), round(y2*step_h)), (255, 0, 255), 2)
-            images_opencv.append(cv2.hconcat([image_target, image_grid, image_detected_grid, image_detected, image_detected_high_conf, image_correct_label]))
+            images_opencv.append(cv2.hconcat([image_target, image_grid, image_detected_grid, image_detected, image_correct_label]))
         new_image = cv2.vconcat(images_opencv)
         cv2.imshow('show', new_image)
         cv2.waitKey()

@@ -2,7 +2,7 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCreatorBBoxes import DatasetsCreatorBBoxes, \
+from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCreatorBBoxes import DatasetCreatorBBoxes, \
     ExampleType
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
@@ -26,7 +26,7 @@ data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_yolov5, 
 model = YOLOv5Model(model_name=YOLOv5, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_1_HOUSE_1_60_EPOCHS)
 model.to('cuda')
 model.eval()
-dataset_creator_bboxes = DatasetsCreatorBBoxes(num_bboxes=num_bboxes)
+dataset_creator_bboxes = DatasetCreatorBBoxes(num_bboxes=num_bboxes)
 
 with torch.no_grad():
     for images, targets, converted_boxes in tqdm(data_loader_test, total=len(data_loader_test)):

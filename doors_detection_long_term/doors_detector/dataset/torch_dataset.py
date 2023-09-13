@@ -6,6 +6,8 @@ import cv2
 from PIL import Image
 import numpy as np
 import torch
+from generic_dataset.dataset_folder_manager import DatasetFolderManager
+from generic_dataset.dataset_manager import DatasetManager
 from sklearn.utils import shuffle
 from src.bounding_box import BoundingBox
 from src.utils.enumerators import BBType, BBFormat
@@ -27,10 +29,15 @@ BOUNDING_BOX_DATASET: DATASET = 'bounding_box_dataset'
 
 
 class TorchDatasetBBoxes(Dataset):
-    def __init__(self, bboxes_dict: dict, set_type: SET, shuffle: bool = False):
+    def __init__(self, dataset_manager: DatasetManager, folder_name: str,dataframe, set_type, max_bboxes: int, iou_threshold_matching: float, shuffle_boxes: bool = False):
 
-        self._shuffle = shuffle
-        self._bboxes_dict = bboxes_dict
+        self._dataset_manager = dataset_manager
+        self._folder_name = folder_name
+        self._dataframe = dataframe
+        self._shuffle = shuffle_boxes
+        self._max_bboxes = max_bboxes
+        self._iou_threshold_matching = iou_threshold_matching
+
         scales = [256 + i * 32 for i in range(7)]
 
         if set_type == TEST_SET:
@@ -53,10 +60,52 @@ class TorchDatasetBBoxes(Dataset):
             ])
 
     def __len__(self):
-        return len(self._bboxes_dict['images'])
+        return len(self._dataframe.index)
 
     def __getitem__(self, idx):
-        image, bboxes, gt_bboxes, matched_bboxes = self._bboxes_dict['images'][idx], self._bboxes_dict['bboxes'][idx], self._bboxes_dict['gt_bboxes'][idx], self._bboxes_dict['bboxes_matched'][idx]
+        row = self._dataframe.iloc[idx]
+        folder_name, absolute_count = row.folder_name, row.folder_absolute_count
+
+        sample = self._dataset_manager.load_sample(folder_name=folder_name, absolute_count=absolute_count, use_thread=False)
+
+        # Read bboxes
+        gt_bboxes = []
+        for x1, y1, x2, y2, label, conf in sample.get_gt_bounding_boxes():
+            gt_bboxes.append(BoundingBox(
+                image_name='0',
+                class_id=str(int(float(label))),
+                coordinates=(int(x1), int(y1), int(x2), int(y2)),
+                bb_type=BBType.GROUND_TRUTH,
+                format=BBFormat.XYX2Y2,
+            ))
+        print(gt_bboxes)
+        bboxes = []
+        for x1, y1, x2, y2, label, conf in sample.get_detected_bounding_boxes():
+            bboxes.append(BoundingBox(
+                image_name='0',
+                class_id=str(int(float(label))),
+                coordinates=(int(x1), int(y1), int(x2), int(y2)),
+                bb_type=BBType.DETECTED,
+                format=BBFormat.XYX2Y2,
+                confidence=conf
+            ))
+
+        # Select the firsts n bboxes
+        bboxes = sorted(bboxes, key=lambda x: x.get_confidence(), reverse=True)[:self._max_bboxes]
+
+        # Matchong bboxes with gt
+        matched_bboxes = []
+        for detected_bbox in bboxes:
+            matched_gt = None
+            match_iou = -1
+            for gt_bbox in gt_bboxes:
+                iou = BoundingBox.iou(detected_bbox, gt_bbox)
+                if iou >= match_iou and iou >= self._iou_threshold_matching:
+                    matched_gt = gt_bbox
+                    match_iou = iou
+            matched_bboxes.append((detected_bbox, matched_gt))
+
+        image = sample.get_bgr_image()
 
         target = {}
         (h, w, _) = image.shape

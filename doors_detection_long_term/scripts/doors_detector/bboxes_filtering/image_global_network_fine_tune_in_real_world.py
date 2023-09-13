@@ -8,7 +8,7 @@ from torchvision.models import ResNet
 from torchvision.models.resnet import BasicBlock
 from tqdm import tqdm
 
-from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCreatorBBoxes import DatasetsCreatorBBoxes, \
+from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCreatorBBoxes import DatasetCreatorBBoxes, \
     ExampleType
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
@@ -138,7 +138,7 @@ datasets_real_worlds_test = {}
 
 with torch.no_grad():
     for house in houses:
-        dataset_creator_bboxes_real_world = DatasetsCreatorBBoxes()
+        dataset_creator_bboxes_real_world = DatasetCreatorBBoxes()
         evaluator = MyEvaluator()
         evaluator_complete_metric = MyEvaluatorCompleteMetric()
         for images, targets, converted_boxes in tqdm(data_loaders_real_word_test[house], total=len(data_loaders_real_word_test[house]), desc=f'Evaluating yolo GD in {house}'):

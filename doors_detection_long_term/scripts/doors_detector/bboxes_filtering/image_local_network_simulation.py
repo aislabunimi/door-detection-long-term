@@ -11,7 +11,7 @@ from torchvision.models.resnet import Bottleneck, BasicBlock
 from torchvision.ops import FeaturePyramidNetwork
 from tqdm import tqdm
 
-from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCreatorBBoxes import DatasetsCreatorBBoxes, \
+from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCreatorBBoxes import DatasetCreatorBBoxes, \
     ExampleType
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
@@ -224,7 +224,7 @@ class BboxFilterNetworkGeometricConfidenceLoss(nn.Module):
 
         return confidence_loss
 
-dataset_creator_bboxes = DatasetsCreatorBBoxes()
+dataset_creator_bboxes = DatasetCreatorBBoxes()
 dataset_creator_bboxes.load_dataset(folder_name='yolov5_simulation_dataset')
 dataset_creator_bboxes.select_n_bounding_boxes(num_bboxes=num_bboxes)
 dataset_creator_bboxes.match_bboxes_with_gt(iou_threshold_matching=iou_threshold_matching)
@@ -256,7 +256,7 @@ performances_in_real_worlds = {'AP': {'0': [], '1': []},
 datasets_real_worlds = {}
 with torch.no_grad():
     for house in houses:
-        dataset_creator_bboxes_real_world = DatasetsCreatorBBoxes()
+        dataset_creator_bboxes_real_world = DatasetCreatorBBoxes()
         evaluator = MyEvaluator()
         evaluator_complete_metric = MyEvaluatorCompleteMetric()
         for images, targets, converted_boxes in tqdm(data_loaders_real_word[house], total=len(data_loaders_real_word[house]), desc=f'Evaluating yolo GD in {house}'):

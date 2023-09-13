@@ -19,7 +19,7 @@ class ExampleType(Enum):
     TRAINING = 1
     TEST = 2
 
-class DatasetsCreatorBBoxes:
+class DatasetCreatorBBoxes:
     def __init__(self, max_bboxes: int = 200):
         self._colors = {0: (0, 0, 255), 1: (0, 255, 0)}
         self._max_bboxes = max_bboxes
