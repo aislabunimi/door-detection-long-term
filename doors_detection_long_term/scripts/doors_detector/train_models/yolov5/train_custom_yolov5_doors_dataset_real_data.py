@@ -28,7 +28,7 @@ epochs_general_detector = [60]
 epochs_qualified_detectors = [40]
 fine_tune_quantity = [15, 25, 50, 75]
 
-frozen_layers = 5
+frozen_layers = 3
 
 
 # Params
