@@ -23,7 +23,7 @@ class DatasetsCreatorDeepDoors2LabelledGD:
     def get_labels(self):
         return DOOR_LABELS
 
-    def creates_dataset(self, fixed_scale=False, random_state: int = 42):
+    def creates_dataset(self, fixed_scale=None, random_state: int = 42):
 
         shuffled_dataframe = shuffle(self._dataframe, random_state=random_state)
         shuffled_dataframe = shuffled_dataframe[shuffled_dataframe.label == 1]
@@ -44,6 +44,6 @@ class DatasetsCreatorDeepDoors2LabelledGD:
             print_information(d)
 
         return (
-            DatasetDoorsFinalAndDeepDoors2('', self._dataset_path, train_dataframe, TRAIN_SET if not fixed_scale else TEST_SET, std_size=256, max_size=800, scales=[256 + i * 32 for i in range(11)]),
+            DatasetDoorsFinalAndDeepDoors2('', self._dataset_path, train_dataframe, TRAIN_SET, fixed_scale=fixed_scale, std_size=256, max_size=800, scales=[256 + i * 32 for i in range(11)]),
             DatasetDoorsFinalAndDeepDoors2('', self._dataset_path, validation_dataframe, TEST_SET, std_size=256, max_size=800, scales=[256 + i * 32 for i in range(11)])
         )

@@ -194,7 +194,7 @@ class TorchDatasetBBoxes(Dataset):
 
 
 class TorchDataset(Dataset):
-    def __init__(self, dataset_path: str, dataframe: pd.DataFrame, set_type: SET, std_size: int, max_size: int, scales: List[int]):
+    def __init__(self, dataset_path: str, dataframe: pd.DataFrame, set_type: SET, std_size: int, max_size: int, scales: List[int], fixed_scale=None):
         self._dataset_path = dataset_path
         self._dataframe = dataframe
         self._set_type = set_type
@@ -215,6 +215,12 @@ class TorchDataset(Dataset):
                         T.RandomResize(scales, max_size=max_size),
                     ])
                 ),
+                T.ToTensor(),
+                T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            ])
+        if fixed_scale is not None:
+            self._transform = T.Compose([
+                T.RandomResize([fixed_scale], max_size=max_size),
                 T.ToTensor(),
                 T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
             ])

@@ -46,7 +46,8 @@ class DatasetDoorsFinalAndDeepDoors2(TorchDataset):
                  set_type: SET,
                  std_size: int,
                  max_size: int,
-                 scales: List[int]):
+                 scales: List[int],
+                 fixed_scale=None):
 
         super(DatasetDoorsFinalAndDeepDoors2, self).__init__(
             dataset_path=dataset_path_gibson,
@@ -54,7 +55,8 @@ class DatasetDoorsFinalAndDeepDoors2(TorchDataset):
             set_type=set_type,
             std_size=std_size,
             max_size=max_size,
-            scales=scales)
+            scales=scales,
+            fixed_scale=fixed_scale)
 
         if dataset_path_gibson != '':
             self._doors_dataset_gibson = DatasetManager(dataset_path=dataset_path_gibson, sample_class=DoorSampleFinalDoorsDataset)
