@@ -104,9 +104,9 @@ def get_final_doors_dataset_bbox_filter(folder_name: str, train_size_student: fl
 
     return train_student, validation_student, unlabelled_bbox_filter, test, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
 
-def get_final_doors_dataset_bbox_filter_one_house(folder_name: str):
+def get_final_doors_dataset_bbox_filter_one_house(folder_name: str, use_negatives=False):
     dataset_creator = DatasetsCreatorDoorsFinalBBoxFilterOneHouse(dataset_path=final_doors_dataset_path)
-    train, test = dataset_creator.create_datasets(folder_name=folder_name)
+    train, test = dataset_creator.create_datasets(folder_name=folder_name, use_negatives=use_negatives)
     labels = dataset_creator.get_labels()
 
     return train, test, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)

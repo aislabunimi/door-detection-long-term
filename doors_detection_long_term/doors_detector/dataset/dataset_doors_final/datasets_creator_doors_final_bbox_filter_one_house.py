@@ -22,7 +22,7 @@ class DatasetsCreatorDoorsFinalBBoxFilterOneHouse:
     def get_labels(self):
         return DOOR_LABELS
 
-    def create_datasets(self, folder_name: str, random_state: int = 42) -> Tuple[DatasetDoorsFinal, DatasetDoorsFinal]:
+    def create_datasets(self, folder_name: str, use_negatives: bool = False, random_state: int = 42) -> Tuple[DatasetDoorsFinal, DatasetDoorsFinal]:
         """
         Returns D, where D = De(75) U de(25)
         """
@@ -33,6 +33,18 @@ class DatasetsCreatorDoorsFinalBBoxFilterOneHouse:
 
         train_dataframe = qualified_dataframe.loc[fold_1.tolist() + fold_2.tolist() + fold_3.tolist()]
         test_dataframe = qualified_dataframe.loc[fold_4.tolist()]
+
+        if use_negatives:
+            negative_dataframe = shuffled_dataframe[(shuffled_dataframe.folder_name == folder_name) & (shuffled_dataframe.label == 0)]
+            [fold_1, fold_2, fold_3, fold_4] = np.array_split(negative_dataframe.index.to_numpy(), 4)
+
+            train_dataframe_negative = negative_dataframe.loc[fold_1.tolist() + fold_2.tolist() + fold_3.tolist()]
+            train_dataframe = pd.concat([train_dataframe, train_dataframe_negative], ignore_index=True)
+            train_dataframe = shuffle(train_dataframe, random_state=random_state)
+
+            test_negative_dataframe = negative_dataframe.loc[fold_4.tolist()]
+            test_dataframe = pd.concat([test_dataframe, test_negative_dataframe], ignore_index=True)
+            test_dataframe = shuffle(test_dataframe, random_state=random_state)
 
         def print_information(dataframe):
             print(f'    - total samples = {len(dataframe.index)}\n'
