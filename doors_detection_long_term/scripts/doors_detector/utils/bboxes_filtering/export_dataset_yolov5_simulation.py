@@ -10,7 +10,6 @@ from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCrea
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
-from doors_detection_long_term.doors_detector.models.bbox_filter_network import BboxFilterNetworkGeometric, BboxFilterNetworkGeometricLoss
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, BBOX_FILTER_NETWORK_GEOMETRIC
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
@@ -22,10 +21,10 @@ num_bboxes = 20
 
 dataset_creator_bboxes = DatasetsCreatorBBoxes()
 
-houses = ['house_1', 'house_2', 'house_7', 'house_9', 'house_10', 'house_13', 'house_15', 'house_20', 'house_21', 'house_22']
+houses = ['house_1', ]#'house_2', 'house_7', 'house_9', 'house_10', 'house_13', 'house_15', 'house_20', 'house_21', 'house_22']
 
 for house in houses:
-    train, test, labels, _ = get_final_doors_dataset_bbox_filter_one_house(folder_name=house.replace('_', ''))
+    train, test, labels, _ = get_final_doors_dataset_bbox_filter_one_house(folder_name=house.replace('_', ''), use_negatives=True)
 
     data_loader_train = DataLoader(train, batch_size=1, collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
 
@@ -48,8 +47,7 @@ for house in houses:
             images = images.to('cuda')
             preds, train_out = model.model(images)
 
-
             dataset_creator_bboxes.add_yolo_bboxes(images, targets, preds, ExampleType.TEST)
 
-dataset_creator_bboxes.export_dataset('yolov5_simulation_dataset')
+    dataset_creator_bboxes.export_dataset('yolov5_general_detector_simulation_dataset')
 

@@ -146,6 +146,9 @@ class DatasetsCreatorBBoxes:
         def save_dictionary(dataset, example_type):
             for image, gt_boxes, bboxes in zip(dataset['images'], dataset['gt_bboxes'], dataset['bboxes']):
                 example = BoxFilteringExample()
+
+                example.set_label(0) if len(gt_boxes) == 0 else example.set_label(1)
+
                 example.set_bgr_image((image*255).astype(np.uint8))
                 example.set_example_type(float(1 if example_type == ExampleType.TRAINING else 2))
 

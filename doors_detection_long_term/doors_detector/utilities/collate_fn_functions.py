@@ -94,14 +94,18 @@ def collate_fn_yolov5(batch):
         scale_boxes = torch.tensor([[real_size_width / batch_size_width, real_size_height / batch_size_height,
                                      real_size_width / batch_size_width, real_size_height / batch_size_height]])
 
-        converted_boxes.append(torch.cat([
-            torch.tensor([[i] for _ in range(int(list(target['labels'].size())[0]))]),
-            torch.reshape(target['labels'], (target['labels'].size()[0], 1)),
-            target['boxes'] * scale_boxes + torch.tensor([[translate_w, translate_h, 0., 0.]])
-        ], dim=1))
+        if len(target['boxes']) > 0:
+            converted_boxes.append(torch.cat([
+                torch.tensor([[i] for _ in range(int(list(target['labels'].size())[0]))]),
+                torch.reshape(target['labels'], (target['labels'].size()[0], 1)),
+                target['boxes'] * scale_boxes + torch.tensor([[translate_w, translate_h, 0., 0.]])
+            ], dim=1))
+            # Update targets to new images
+            target['boxes'] = target['boxes'] * scale_boxes + torch.tensor([[translate_w, translate_h, 0., 0.]])
+        else:
+            converted_boxes.append(torch.tensor([]))
 
-        # Update targets to new images
-        target['boxes'] = target['boxes'] * scale_boxes + torch.tensor([[translate_w, translate_h, 0., 0.]])
+
 
     converted_boxes = torch.cat(converted_boxes, dim=0)
     return images, targets, converted_boxes
