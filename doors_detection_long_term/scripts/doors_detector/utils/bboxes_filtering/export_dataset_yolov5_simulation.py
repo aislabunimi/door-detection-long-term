@@ -21,7 +21,7 @@ num_bboxes = 20
 
 dataset_creator_bboxes = DatasetsCreatorBBoxes()
 
-houses = ['house_1', ]#'house_2', 'house_7', 'house_9', 'house_10', 'house_13', 'house_15', 'house_20', 'house_21', 'house_22']
+houses = ['house_1', 'house_2', 'house_7', 'house_9', 'house_10', 'house_13', 'house_15', 'house_20', 'house_21', 'house_22']
 
 for house in houses:
     train, test, labels, _ = get_final_doors_dataset_bbox_filter_one_house(folder_name=house.replace('_', ''), use_negatives=True)
@@ -49,5 +49,5 @@ for house in houses:
 
             dataset_creator_bboxes.add_yolo_bboxes(images, targets, preds, ExampleType.TEST)
 
-    dataset_creator_bboxes.export_dataset('yolov5_general_detector_gibson_deep_doors_2')
+dataset_creator_bboxes.export_dataset('yolov5_general_detector_gibson_deep_doors_2')
 
