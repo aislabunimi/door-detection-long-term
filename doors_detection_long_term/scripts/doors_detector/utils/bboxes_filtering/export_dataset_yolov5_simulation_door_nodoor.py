@@ -20,7 +20,7 @@ colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 num_bboxes = 20
 
 dataset_creator_bboxes = DatasetCreatorBBoxes()
-dataset_creator_bboxes.set_folder_name('yolov5_general_detector_gibson')
+dataset_creator_bboxes.set_folder_name('yolov5_general_detector_gibson_door_nodoor')
 houses = ['house_1', 'house_2', 'house_7', 'house_9', 'house_10', 'house_13', 'house_15', 'house_20', 'house_21', 'house_22']
 
 for house in houses:
