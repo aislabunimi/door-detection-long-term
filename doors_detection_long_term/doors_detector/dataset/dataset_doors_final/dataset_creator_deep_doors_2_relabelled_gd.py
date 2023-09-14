@@ -45,5 +45,5 @@ class DatasetsCreatorDeepDoors2LabelledGD:
 
         return (
             DatasetDoorsFinalAndDeepDoors2('', self._dataset_path, train_dataframe, TRAIN_SET, fixed_scale=fixed_scale, std_size=256, max_size=800, scales=[256 + i * 32 for i in range(11)]),
-            DatasetDoorsFinalAndDeepDoors2('', self._dataset_path, validation_dataframe, TEST_SET, std_size=256, max_size=800, scales=[256 + i * 32 for i in range(11)])
+            DatasetDoorsFinalAndDeepDoors2('', self._dataset_path, validation_dataframe, TEST_SET, fixed_scale=fixed_scale, std_size=256, max_size=800, scales=[256 + i * 32 for i in range(11)])
         )
