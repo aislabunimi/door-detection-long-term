@@ -46,35 +46,14 @@ test_dataset_bboxes = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_f
 # Calculate Metrics in real worlds
 houses = ['floor1', 'floor4', 'chemistry_floor0']
 
-data_loaders_real_word = {}
-labels = None
-for house in houses:
-    _, test, l, _ = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25)
-    labels = l
-    data_loader_test = DataLoader(test, batch_size=4, collate_fn=collate_fn_yolov5, drop_last=False, num_workers=4)
-    data_loaders_real_word[house] = data_loader_test
-
-yolo_gd = YOLOv5Model(model_name=YOLOv5, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=globals()[f'EXP_GENERAL_DETECTOR_GIBSON_60_EPOCHS'.upper()])
-yolo_gd.to('cuda')
-yolo_gd.eval()
-
 datasets_real_worlds = {}
 with torch.no_grad():
     for house in houses:
-        dataset_creator_bboxes_real_world = DatasetCreatorBBoxes()
-
-        for images, targets, converted_boxes in tqdm(data_loaders_real_word[house], total=len(data_loaders_real_word[house]), desc=f'Evaluating yolo GD in {house}'):
-            images = images.to('cuda')
-            preds, train_out = yolo_gd.model(images)
-            dataset_creator_bboxes_real_world.add_yolo_bboxes(images=images, targets=targets, preds=preds, bboxes_type=ExampleType.TEST)
-
-        dataset_creator_bboxes_real_world.select_n_bounding_boxes(num_bboxes=num_bboxes)
-        dataset_creator_bboxes_real_world.match_bboxes_with_gt(iou_threshold_matching=iou_threshold_matching)
-
-        _, test_bboxes = dataset_creator_bboxes_real_world.create_datasets(shuffle_boxes=True, apply_transforms_to_train=False)
+        dataset_loader = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson_dd2_' + house)
+        train_bboxes, test_bboxes = dataset_loader.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
         datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=True)
 
-#check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold)
+#check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold, scale_number=(32, 32))
 bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=grid_dim, n_labels=3, model_name=IMAGE_GRID_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
 bbox_model.to('cuda')
 

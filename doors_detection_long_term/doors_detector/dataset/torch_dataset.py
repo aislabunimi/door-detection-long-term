@@ -78,7 +78,7 @@ class TorchDatasetBBoxes(Dataset):
                 bb_type=BBType.GROUND_TRUTH,
                 format=BBFormat.XYX2Y2,
             ))
-        print(gt_bboxes)
+
         bboxes = []
         for x1, y1, x2, y2, label, conf in sample.get_detected_bounding_boxes():
             bboxes.append(BoundingBox(
