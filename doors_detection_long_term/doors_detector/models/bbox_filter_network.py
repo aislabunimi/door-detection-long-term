@@ -258,12 +258,14 @@ class ImageGridNetworkLoss(nn.Module):
         #print(tuple(predictions.size()[1:]))
         for prediction, image_grid in zip(predictions, image_grids[tuple(predictions.size()[1:])]):
             loss_target.append(torch.nan_to_num(-torch.log(torch.mean(prediction[image_grid.bool()]))))
-            loss_background.append(torch.nan_to_num(-torch.log(1-torch.mean(prediction[~image_grid.bool()]))))
+            p = 0.5 if torch.count_nonzero(image_grid.bool()) == 0 else 1.0
+            loss_background.append(p*torch.nan_to_num(-torch.log(1-torch.mean(prediction[~image_grid.bool()]))))
+
 
         loss_background = torch.stack(loss_background)
         loss_target = torch.stack(loss_target)
 
-        loss = 0.5*torch.mean(loss_background, dim=0) + torch.mean(loss_target, dim=0)
+        loss = torch.mean(loss_background, dim=0) + torch.mean(loss_target, dim=0)
         return loss
 """
 image = torch.rand(4, 3, 240, 320)
