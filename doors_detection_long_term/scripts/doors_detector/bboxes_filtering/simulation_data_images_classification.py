@@ -10,7 +10,7 @@ from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCrea
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
-from doors_detection_long_term.doors_detector.models.bbox_filter_network import BboxFilterNetworkGeometric, \
+from doors_detection_long_term.doors_detector.models.background_grid_network import BboxFilterNetworkGeometric, \
     BboxFilterNetworkGeometricLoss, BboxFilterNetworkImage, BboxFilterNetworkSuppress
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, BBOX_FILTER_NETWORK_GEOMETRIC, \
     BBOX_FILTER_NETWORK_IMAGE

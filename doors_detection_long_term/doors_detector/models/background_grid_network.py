@@ -17,28 +17,7 @@ from doors_detection_long_term.doors_detector.models.model_names import *
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import trained_models_path
 
 TEST: DESCRIPTION = 0
-IMAGE_TEST: DESCRIPTION = 1
-TEST_IMAGE_GLOBAL_NETWORK: DESCRIPTION = 2
-TEST_IMAGE_LOCAL_NETWORK: DESCRIPTION = 3
-TEST_IMAGE_LOCAL_NETWORK_FINE_TUNE: DESCRIPTION = 4
-TEST_IMAGE_LOCAL_NETWORK_SMALL: DESCRIPTION = 5
-IMAGE_GRID_NETWORK: DESCRIPTION = 6
-
-
-class SharedMLP(nn.Module):
-    def __init__(self, channels, last_activation=nn.ReLU()):
-        super(SharedMLP, self).__init__()
-        layers = []
-        for in_channels, out_channels in zip(channels[:-1], channels[1:]):
-            layers += [nn.Conv1d(in_channels=in_channels, out_channels=out_channels, kernel_size=1),
-                       #nn.Dropout1d(p=0.8),
-                       nn.BatchNorm1d(num_features=out_channels),
-                       nn.ReLU()]
-        layers[-1] = last_activation
-        self.shared_mlp = nn.Sequential(*layers)
-
-    def forward(self, input):
-        return self.shared_mlp(input)
+IMAGE_GRID_NETWORK: DESCRIPTION = 1
 
 
 class ResNet50FPN(ResNet):
@@ -278,4 +257,6 @@ i = bbox_model(image)
 print(i.size())
 
 """
+
+
 

@@ -1,31 +1,20 @@
 from collections import OrderedDict
 
-import cv2
-import torch.optim
+
 from matplotlib import pyplot as plt
 from torch import optim
-from torch.hub import load_state_dict_from_url
 from torch.utils.data import DataLoader
-from torchvision.models import ResNet
-from torchvision.models.resnet import Bottleneck, BasicBlock
-from torchvision.ops import FeaturePyramidNetwork
 from tqdm import tqdm
-
-from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCreatorBBoxes import DatasetCreatorBBoxes, \
-    ExampleType
 from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetLoaderBBoxes import DatasetLoaderBBoxes
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
-from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
-from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
-from doors_detection_long_term.doors_detector.models.bbox_filter_network import SharedMLP, TEST_IMAGE_LOCAL_NETWORK, \
-    TEST_IMAGE_LOCAL_NETWORK_SMALL, ImageGridNetwork, IMAGE_GRID_NETWORK, ImageGridNetworkLoss
-from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, BBOX_FILTER_NETWORK_GEOMETRIC, IMAGE_GRID_NETWORK
+from doors_detection_long_term.doors_detector.models.background_grid_network import IMAGE_GRID_NETWORK, \
+    ImageGridNetwork, ImageGridNetworkLoss
+from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, BBOX_FILTER_NETWORK_GEOMETRIC, IMAGE_BACKGROUND_NETWORK
 from doors_detection_long_term.doors_detector.models.yolov5 import *
-from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
 from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_yolov5, collate_fn_bboxes
-from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering import bounding_box_filtering_yolo, \
-    check_bbox_dataset, plot_results, plot_grid_dataset
-from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
+from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering import plot_grid_dataset
+
+
 torch.autograd.detect_anomaly(True)
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 num_bboxes = 20
@@ -54,7 +43,7 @@ with torch.no_grad():
         datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=True)
 
 #check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold, scale_number=(32, 32))
-bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=grid_dim, n_labels=3, model_name=IMAGE_GRID_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
+bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=grid_dim, n_labels=3, model_name=IMAGE_BACKGROUND_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
 bbox_model.to('cuda')
 
 criterion = ImageGridNetworkLoss()

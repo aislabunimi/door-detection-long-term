@@ -48,7 +48,6 @@ with torch.no_grad():
         preds = non_max_suppression(preds,
                                     0.01,
                                     0.90,
-
                                     multi_label=True,
                                     agnostic=True,
                                     max_det=300)
@@ -56,7 +55,7 @@ with torch.no_grad():
         print(preds)
         for count, (image, boxes) in enumerate(zip(img, preds)):
             # keep only predictions with 0.7+ confidence
-            save_image =door_sample.get_bgr_image().copy()
+            save_image = door_sample.get_bgr_image().copy()
 
             img_size = save_image.shape
             #save_image =  cv2.copyMakeBorder(save_image, padding_height, padding_height, padding_width, padding_width, cv2.BORDER_CONSTANT, value=[0, 0, 0])
