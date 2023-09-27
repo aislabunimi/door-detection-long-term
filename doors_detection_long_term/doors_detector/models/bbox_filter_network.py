@@ -258,7 +258,7 @@ class ImageGridNetworkLoss(nn.Module):
         #print(tuple(predictions.size()[1:]))
         for prediction, image_grid in zip(predictions, image_grids[tuple(predictions.size()[1:])]):
             loss_target.append(torch.nan_to_num(-torch.log(torch.mean(prediction[image_grid.bool()]))))
-            p = 0.5 if torch.count_nonzero(image_grid.bool()) == 0 else 1.0
+            p = 0.3 if torch.count_nonzero(image_grid.bool()) == 0 else 1.0
             loss_background.append(p*torch.nan_to_num(-torch.log(1-torch.mean(prediction[~image_grid.bool()]))))
 
 
