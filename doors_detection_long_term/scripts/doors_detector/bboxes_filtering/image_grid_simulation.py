@@ -24,7 +24,7 @@ grid_dim = [(2**i, 2**i) for i in range(3, 7)][::-1]
 iou_threshold_matching = 0.5
 confidence_threshold = 0.75
 
-dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson_deep_doors_2')
+dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson_deep_doors_2_door_nodoor')
 train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
 
 print(len(train_bboxes), len(test_bboxes))
@@ -40,7 +40,7 @@ with torch.no_grad():
     for house in houses:
         dataset_loader = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson_dd2_' + house)
         train_bboxes, test_bboxes = dataset_loader.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
-        datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=True)
+        datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
 
 #check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold, scale_number=(32, 32))
 bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=grid_dim, n_labels=3, model_name=IMAGE_BACKGROUND_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
@@ -49,11 +49,12 @@ bbox_model.to('cuda')
 criterion = ImageGridNetworkLoss()
 
 optimizer = optim.Adam(bbox_model.parameters(), lr=0.001)
-scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.5)
 criterion.to('cuda')
-#for n, p in bbox_model.named_parameters():
-#    if p.requires_grad:
-#        print(n)
+for n, p in bbox_model.named_parameters():
+    if any([x in n for x in ['fpn.conv1.weight', 'fpn.bn1.weight', 'fpn.bn1.bias', 'fpn.layer1']]):
+        p.requires_grad = False
+        #print(n)
 
 logs = {'train': {'loss_label':[], 'loss_confidence':[], 'loss_final':[]},
         'test': {'loss_label':[], 'loss_confidence':[], 'loss_final':[]},
@@ -67,7 +68,7 @@ test_accuracy = {0: [], 1: []}
 real_world_accuracy = {h: {0: [], 1: []} for h in houses}
 
 for epoch in range(60):
-    #scheduler.step()
+    scheduler.step()
     bbox_model.train()
     criterion.train()
     optimizer.zero_grad()
@@ -76,7 +77,7 @@ for epoch in range(60):
 
         images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
         images = images.to('cuda')
-
+        #print(images.size())
         for k, v in image_grids.items():
             image_grids[k] = v.to('cuda')
         #detected_bboxes = detected_bboxes.to('cuda')
@@ -85,6 +86,7 @@ for epoch in range(60):
         #ious = ious.to('cuda')
 
         preds = bbox_model(images)
+        #print(preds.size())
         final_loss = criterion(preds, image_grids, target_boxes_grid)
 
         #print(final_loss.item())

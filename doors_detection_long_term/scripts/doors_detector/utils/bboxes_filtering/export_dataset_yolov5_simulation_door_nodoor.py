@@ -20,7 +20,7 @@ colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 num_bboxes = 20
 
 dataset_creator_bboxes = DatasetCreatorBBoxes()
-dataset_creator_bboxes.set_folder_name('yolov5_general_detector_gibson_deep_doors_2_door_nodoor')
+dataset_creator_bboxes.set_folder_name('yolov5_general_detector_gibson_door_nodoor')
 houses = ['house_1', 'house_2', 'house_7', 'house_9', 'house_10', 'house_13', 'house_15', 'house_20', 'house_21', 'house_22']
 
 for house in houses:
@@ -49,26 +49,5 @@ for house in houses:
             preds, train_out = model.model(images)
 
             dataset_creator_bboxes.add_yolo_bboxes(images, targets, preds, ExampleType.TEST if i > c else ExampleType.TRAINING)
-
-    dataset_creator_bboxes.export_dataset()
-
-train, validation, labels, _ = get_deep_doors_2_relabelled_dataset_for_gd(fixed_scale=256)
-data_loader_train = DataLoader(train, batch_size=1, collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
-
-data_loader_test = DataLoader(validation, batch_size=1, collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
-model = YOLOv5Model(model_name=YOLOv5, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_GENERAL_DETECTOR_GIBSON_60_EPOCHS)
-model.to('cuda')
-model.eval()
-with torch.no_grad():
-    for images, targets, converted_boxes in tqdm(data_loader_train, total=len(data_loader_train)):
-        images = images.to('cuda')
-        preds, train_out = model.model(images)
-        dataset_creator_bboxes.add_yolo_bboxes(images, targets, preds, ExampleType.TRAINING)
-
-    for images, targets, converted_boxes in tqdm(data_loader_test, total=len(data_loader_test)):
-        images = images.to('cuda')
-        preds, train_out = model.model(images)
-
-        dataset_creator_bboxes.add_yolo_bboxes(images, targets, preds, ExampleType.TEST)
 
     dataset_creator_bboxes.export_dataset()

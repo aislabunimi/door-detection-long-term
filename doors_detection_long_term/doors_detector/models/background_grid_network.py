@@ -153,24 +153,24 @@ class ImageGridNetwork(GenericModel):
         self._image_grid_dimensions = image_grid_dimensions
         self.fpn = ResNet50FPN(channels=fpn_channels)
 
-        self.conv_x1 = nn.Sequential(
-            nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[0]),
-            MultipleConvolutions(original_size=256, start_size=256, end_size=64)
-        )
+        #self.conv_x1 = nn.Sequential(
+         #   nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[0]),
+          #  MultipleConvolutions(original_size=256, start_size=256, end_size=64)
+        #)
         self.conv_x2 = nn.Sequential(
             nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[1]),
-            MultipleConvolutions(original_size=512, start_size=256, end_size=64),
-            nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
+            MultipleConvolutions(original_size=512, start_size=512, end_size=128),
+            nn.Upsample(size=image_grid_dimensions[1], mode='nearest')
         )
         self.conv_x3 = nn.Sequential(
             nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[2]),
-            MultipleConvolutions(original_size=1024, start_size=256, end_size=64),
-            nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
+            MultipleConvolutions(original_size=1024, start_size=512, end_size=64),
+            nn.Upsample(size=image_grid_dimensions[1], mode='nearest')
         )
         self.conv_x4 = nn.Sequential(
             nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[3]),
-            MultipleConvolutions(original_size=2048, start_size=256, end_size=64),
-            nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
+            MultipleConvolutions(original_size=2048, start_size=512, end_size=64),
+            nn.Upsample(size=image_grid_dimensions[1], mode='nearest')
         )
 
         self.final_convolution = nn.Sequential(
@@ -218,12 +218,12 @@ class ImageGridNetwork(GenericModel):
 
     def forward(self, images):
         multi_scales_maps = self.fpn(images)
-        x1 = self.conv_x1(multi_scales_maps['x1'])
+        #x1 = self.conv_x1(multi_scales_maps['x1'])
         x2 = self.conv_x2(multi_scales_maps['x2'])
         x3 = self.conv_x3(multi_scales_maps['x3'])
         x4 = self.conv_x4(multi_scales_maps['x4'])
 
-        x = torch.cat([x1, x2, x3, x4], dim=1)
+        x = torch.cat([x2, x3, x4], dim=1)
         image_region_features = self.final_convolution(x).squeeze(1)
         image_region_features = image_region_features.transpose(1, 2)
 
@@ -237,7 +237,9 @@ class ImageGridNetworkLoss(nn.Module):
         #print(tuple(predictions.size()[1:]))
         for prediction, image_grid in zip(predictions, image_grids[tuple(predictions.size()[1:])]):
             loss_target.append(torch.nan_to_num(-torch.log(torch.mean(prediction[image_grid.bool()]))))
-            loss_background.append(torch.nan_to_num(-torch.log(1-torch.mean(prediction[~image_grid.bool()]))))
+            p = 0.3 if torch.count_nonzero(image_grid.bool()) == 0 else 1.0
+            loss_background.append(p*torch.nan_to_num(-torch.log(1-torch.mean(prediction[~image_grid.bool()]))))
+
 
         loss_background = torch.stack(loss_background)
         loss_target = torch.stack(loss_target)

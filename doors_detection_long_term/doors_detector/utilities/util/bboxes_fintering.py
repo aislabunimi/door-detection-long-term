@@ -139,9 +139,9 @@ def plot_grid_dataset(epoch, count, env, images, grid_targets, target_boxes, pre
         step_h = h_image / len(grid[0])
         for w in range(len(grid)):
             for h in range(len(grid[0])):
-                if grid[w][h] >= 0.5:
-                    image_predicted = cv2.rectangle(image_predicted, (round(step_w*w), round(step_h*h)),
-                                                   (round(step_w*(w+1)), round(step_h*(h+1))), (1, 0, 1), 2)
+                #if grid[w][h] >= 0.5:
+                image_predicted = cv2.rectangle(image_predicted, (round(step_w*w), round(step_h*h)),
+                                                   (round(step_w*(w+1)), round(step_h*(h+1))), (1-grid[w][h], 1-grid[w][h], 1-grid[w][h]), 2)
 
         for w in range(len(grid)):
             for h in range(len(grid[0])):
