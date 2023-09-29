@@ -4,22 +4,26 @@ from matplotlib import pyplot as plt, font_manager
 from matplotlib.pyplot import subplots
 from pandas import CategoricalDtype
 
+confidence_threshold = 0.75
+iou_threshold = 0.5
+
+
 houses = pd.read_excel('./../../results/faster_rcnn_complete_metric_real_data.xlsx')
-houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60))]
-houses = houses.loc[houses['dataset'] == 'gibson'].drop(['epochs_gd', 'epochs_qd', 'dataset'], axis=1)
+houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) & (houses['iou_threshold'] == iou_threshold) & (houses['confidence_threshold'] == confidence_threshold)]
+houses = houses.loc[houses['dataset'] == 'gibson_deep_doors_2'].drop(['epochs_gd', 'epochs_qd', 'dataset'], axis=1)
 houses_faster_rcnn = houses.groupby(['house', 'detector']).sum()
 
 
 # YOLO
 houses = pd.read_excel('./../../results/yolov5_complete_metric_real_data.xlsx')
-houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60))]
-houses = houses.loc[houses['dataset'] == 'gibson'].drop(['epochs_gd', 'epochs_qd', 'dataset'], axis=1)
+houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) & (houses['iou_threshold'] == iou_threshold) & (houses['confidence_threshold'] == confidence_threshold)]
+houses = houses.loc[houses['dataset'] == 'gibson_deep_doors_2'].drop(['epochs_gd', 'epochs_qd', 'dataset'], axis=1)
 houses_yolo = houses.groupby(['house', 'detector']).sum()
 
 # DETR
 houses = pd.read_excel('./../../results/detr_complete_metrics_real_data.xlsx')
-houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60))]
-houses = houses.loc[houses['dataset'] == 'gibson'.upper()].drop(['epochs_gd', 'epochs_qd', 'dataset'], axis=1)
+houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) & (houses['iou_threshold'] == iou_threshold) & (houses['confidence_threshold'] == confidence_threshold)]
+houses = houses.loc[houses['dataset'] == 'gibson_deep_doors_2'.upper()].drop(['epochs_gd', 'epochs_qd', 'dataset'], axis=1)
 houses_detr = houses.groupby(['house', 'detector']).sum()
 
 

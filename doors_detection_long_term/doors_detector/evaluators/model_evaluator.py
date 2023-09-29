@@ -130,10 +130,14 @@ class ModelEvaluator:
                     )
             img_count_temp += 1
 
-    def add_predictions_bboxes_filtering(self, bboxes, new_values, target_bboxes, img_size):
+    def add_predictions_bboxes_filtering(self, bboxes, target_bboxes, img_size):
+        # NB: the images without doors are discarded
+
         img_count_temp = self._img_count
 
         for target in target_bboxes:
+            if len(target) == 0:
+                continue
             for [x, y, w, h, label] in target.tolist():
                 self._gt_bboxes.append(BoundingBox(
                     image_name=str(self._img_count),
@@ -146,17 +150,15 @@ class ModelEvaluator:
                 ))
             self._img_count += 1
 
-        for bboxes_image, new_confidences, new_labels in zip(bboxes, new_values[0], new_values[1]):
-            for (x, y, w, h), confidence, labels in zip(bboxes_image.transpose(0, 1)[:, :4].tolist(), new_confidences.tolist(), new_labels.tolist()):
+        for i, bboxes_image in enumerate(bboxes):
+            if len(target_bboxes[i]) == 0:
+                continue
+            for (x, y, w, h, confidence), labels in zip(bboxes_image[:, :5].tolist(), bboxes_image[:, 5:].tolist()):
                 label = labels.index(max(labels))
-                # If label == 0 then the bbox is background, so it is filtered
-
-                if label == 0:
-                    continue
 
                 box = BoundingBox(
                     image_name=str(img_count_temp),
-                    class_id=str(label - 1),
+                    class_id=str(label),
                     coordinates=(x, y, w, h),
                     bb_type=BBType.DETECTED,
                     confidence=confidence,
@@ -164,7 +166,6 @@ class ModelEvaluator:
                     type_coordinates=CoordinatesType.RELATIVE,
                     img_size=img_size
                 )
-                #x1, y1, x2, y2 = box.get_absolute_bounding_box(BBFormat.XYX2Y2)
 
                 self._predicted_bboxes.append(box)
             img_count_temp += 1

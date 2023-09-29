@@ -207,6 +207,7 @@ def collate_fn_bboxes(image_grid_dimensions: List[Tuple[int, int]] = None, use_c
                                               target['target_boxes'][:, 1:2] - target['target_boxes'][:, 3:4] / 2,
                                               target['target_boxes'][:, 0:1] + target['target_boxes'][:, 2:3] / 2,
                                               target['target_boxes'][:, 1:2] + target['target_boxes'][:, 3:4] / 2], dim=1)
+
                     targets_x1y1x2y2 = targets_x1y1x2y2 * torch.tensor([real_size_width, real_size_height, real_size_width, real_size_height])
                 # print(targets_x1y1x2y2)
                     targets_x1y1x2y2 = torch.cat([targets_x1y1x2y2, target['target_boxes'][:, 4: 5]], dim=1)
@@ -236,7 +237,11 @@ def collate_fn_bboxes(image_grid_dimensions: List[Tuple[int, int]] = None, use_c
                                                   target['detected_boxes'][:, 1:2] + target['detected_boxes'][:, 3:4] / 2], dim=1)
                 detected_x1y1x2y2 = detected_x1y1x2y2 * torch.tensor([real_size_width, real_size_height, real_size_width, real_size_height])
                 detected_x1y1x2y2 = detected_x1y1x2y2 / torch.tensor([step_w, step_h, step_w, step_h])
-                detected_x1y1x2y2 = torch.round(detected_x1y1x2y2).type(torch.int32)
+                detected_x1y1x2y2 = torch.round(detected_x1y1x2y2)
+                detected_x1y1x2y2 = torch.clamp(detected_x1y1x2y2, min=0.0)
+                detected_x1y1x2y2[:, 2] = torch.clamp(detected_x1y1x2y2[:, 2], max=grid_w)
+                detected_x1y1x2y2[:, 3] = torch.clamp(detected_x1y1x2y2[:, 3], max=grid_h)
+                detected_x1y1x2y2 = detected_x1y1x2y2.type(torch.int32)
 
                 image_grids[(grid_w, grid_h)].append(grid)
                 target_boxes_grid[(grid_w, grid_h)].append(targets_boxes_grid_coords)

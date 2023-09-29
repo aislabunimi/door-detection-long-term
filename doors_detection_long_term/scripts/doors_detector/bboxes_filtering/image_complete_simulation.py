@@ -19,7 +19,8 @@ from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyE
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
 from doors_detection_long_term.doors_detector.models.background_grid_network import IMAGE_GRID_NETWORK
 from doors_detection_long_term.doors_detector.models.bbox_filter_network_geometric import \
-    BboxFilterNetworkGeometricBackground, IMAGE_NETWORK_GEOMETRIC_BACKGROUND
+    BboxFilterNetworkGeometricBackground, IMAGE_NETWORK_GEOMETRIC_BACKGROUND, bbox_filtering_nms, \
+    BboxFilterNetworkGeometricLabelLoss
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
@@ -29,7 +30,7 @@ from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering im
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 torch.autograd.detect_anomaly(True)
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-num_bboxes = 20
+num_bboxes = 50
 
 grid_dim = [(2**i, 2**i) for i in range(3, 7)][::-1]
 
@@ -40,9 +41,9 @@ dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector
 train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
 
 print(len(train_bboxes), len(test_bboxes))
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=False, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
-test_dataset_bboxes = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=False, image_grid_dimensions=grid_dim), num_workers=4)
-#check_bbox_dataset(train_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=(8, 8))
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
+test_dataset_bboxes = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
+#check_bbox_dataset(train_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=(32, 32))
 
 # Calculate Metrics in real worlds
 houses = ['floor1', 'floor4', 'chemistry_floor0']
@@ -52,20 +53,66 @@ with torch.no_grad():
     for house in houses:
         dataset_loader = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson_dd2_' + house)
         train_bboxes, test_bboxes = dataset_loader.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
-        datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=False, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
+        datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
 
 #check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold, scale_number=(32, 32))
+
+
 # Calculate results
+evaluator_complete_metric = MyEvaluatorCompleteMetric()
+for data in test_dataset_bboxes:
+    images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
+    detected_bboxes = detected_bboxes.transpose(1, 2)
+    detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=confidence_threshold, iou_threshold=0.5, img_size=images.size()[::-1][:2])
+    evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
+metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=iou_threshold_matching)
+nms_performance = {'sim': {}}
+
+for label, values in metrics.items():
+    for k, v in values.items():
+        if k not in nms_performance['sim']:
+            nms_performance['sim'][k] = v
+        else:
+            nms_performance['sim'][k] += v
+
+for house in houses:
+    nms_performance[house] = {}
+    evaluator_complete_metric = MyEvaluatorCompleteMetric()
+    for data in datasets_real_worlds[house]:
+        images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
+        detected_bboxes = detected_bboxes.transpose(1, 2)
+        detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=confidence_threshold, iou_threshold=0.5, img_size=images.size()[::-1][:2])
+
+        evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
+    metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=iou_threshold_matching)
+    for label, values in metrics.items():
+        for k, v in values.items():
+            if k not in nms_performance[house]:
+                nms_performance[house][k] = v
+            else:
+                nms_performance[house][k] += v
+
+# Plots
+for env, values in nms_performance.items():
+    fig = plt.figure()
+    plt.axhline(values['TP'], label='TP', color='green')
+    plt.axhline(values['FP'], label='FP', color='blue')
+    plt.axhline(values['FPiou'], label='FPiou', color='red')
+    plt.title('env')
+    plt.legend()
+    plt.savefig(f'image_complete/{env}.svg')
 
 
-bbox_model = BboxFilterNetworkGeometricBackground(initial_channels=6, image_grid_dimensions=grid_dim, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_NETWORK_GEOMETRIC_BACKGROUND, description_background=IMAGE_GRID_NETWORK)
+bbox_model = BboxFilterNetworkGeometricBackground(initial_channels=7, image_grid_dimensions=grid_dim, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_NETWORK_GEOMETRIC_BACKGROUND, description_background=IMAGE_GRID_NETWORK)
 bbox_model.to('cuda')
 
-criterion = ImageGridNetworkLoss()
+# Fix parameters of background network
+criterion = BboxFilterNetworkGeometricLabelLoss()
+criterion.to('cuda')
 
 optimizer = optim.Adam(bbox_model.parameters(), lr=0.001)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
-criterion.to('cuda')
+
 #for n, p in bbox_model.named_parameters():
 #    if p.requires_grad:
 #        print(n)
@@ -94,13 +141,14 @@ for epoch in range(60):
 
         for k, v in image_grids.items():
             image_grids[k] = v.to('cuda')
-        #detected_bboxes = detected_bboxes.to('cuda')
+        detected_bboxes = detected_bboxes.to('cuda')
         #confidences = confidences.to('cuda')
-        #labels_encoded = labels_encoded.to('cuda')
+        labels_encoded = labels_encoded.to('cuda')
         #ious = ious.to('cuda')
 
-        preds = bbox_model(images)
-        final_loss = criterion(preds, image_grids, target_boxes_grid)
+        preds = bbox_model(images, detected_bboxes, detected_boxes_grid)
+        final_loss = criterion(preds, labels_encoded)
+        print(final_loss.item())
 
         #print(final_loss.item())
         optimizer.zero_grad()

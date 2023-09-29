@@ -2,6 +2,7 @@ import os
 from typing import List, Tuple
 
 import torch
+import torchvision.ops
 from torch import nn
 
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import DATASET, FINAL_DOORS_DATASET
@@ -43,11 +44,11 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
             nn.Sigmoid(),
         )
 
-        self.shared_mlp_1 = SharedMLP(channels=[initial_channels + 16, 16, 32, 64])
-        self.shared_mlp_2 = SharedMLP(channels=[64, 128, 256, 512])
+        self.shared_mlp_1 = SharedMLP(channels=[initial_channels + 16, 32, 64, 128])
+        self.shared_mlp_2 = SharedMLP(channels=[128, 256, 512, 1024])
         self.shared_mlp_3 = SharedMLP(channels=[512, 512, 1024])
 
-        self.shared_mlp_4 = SharedMLP(channels=[64 + 512, 256, 128, 64])
+        self.shared_mlp_4 = SharedMLP(channels=[128 + 1024, 256, 128, 64])
 
         self.shared_mlp_5 = SharedMLP(channels=[64, 32, 16, 1], last_activation=nn.Sigmoid())
 
@@ -65,18 +66,17 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
     def forward(self, images, bboxes, bboxes_mask):
 
         background_features = torch.transpose(self.background_to_geometric(self.background_network(images)), 2, 3)
-
+        #print(background_features.size(), background_features.size()[::-1][:2], bboxes_mask[background_features.size()[::-1][:2]])
         bboxes_mask = bboxes_mask[background_features.size()[::-1][:2]]
+
 
         bboxes_background_features = []
 
         for features, bboxes_mask_list in zip(background_features, bboxes_mask):
             for x1, y1, x2, y2 in bboxes_mask_list:
-                bboxes_background_features.append(torch.mean(features[:, x1: x2 + 1, y1: y2 + 1].reshape(background_features.size()[1], -1), dim=1))
-
-        bboxes = torch.cat(bboxes, torch.stack(bboxes_background_features).reshape(background_features.size()[0], -1, background_features.size()[1]), dim=2)
-
-
+                bboxes_background_features.append(torch.mean(features[:, x1: x2, y1: y2].reshape(background_features.size()[1], -1), dim=1))
+        bboxes = torch.cat([bboxes, torch.stack(bboxes_background_features).reshape(background_features.size()[0], background_features.size()[1], -1)], dim=1)
+        #print(bboxes)
         local_features_1 = self.shared_mlp_1(bboxes)
         local_features_2 = self.shared_mlp_2(local_features_1)
         #local_features_3 = self.shared_mlp_3(local_features_2)
@@ -98,3 +98,33 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         label_features = torch.transpose(label_features, 1, 2)
 
         return score_features, label_features
+
+
+class BboxFilterNetworkGeometricLabelLoss(nn.Module):
+
+    def forward(self, preds, label_targets):
+
+        scores_features, labels_features = preds
+        #print(labels_features, label_targets)
+        labels_loss = torch.log(labels_features) * label_targets
+        #print(labels_loss)
+        labels_loss = torch.mean(torch.mean(torch.sum(labels_loss, 2) * -1, 1))
+
+        return labels_loss
+
+
+def bbox_filtering_nms(bboxes, img_size, iou_threshold=.1, confidence_threshold=0.75):
+
+    filtered_bboxes = []
+    for image_bboxes in bboxes:
+        image_bboxes = image_bboxes[image_bboxes[:, 4] >= confidence_threshold]
+
+        coords = torch.stack([image_bboxes[:, 0] - image_bboxes[:, 2] / 2,
+                              image_bboxes[:, 1] - image_bboxes[:, 3] / 2,
+                              image_bboxes[:, 0] + image_bboxes[:, 2] / 2,
+                              image_bboxes[:, 1] + image_bboxes[:, 3] / 2], dim=1)
+        coords[coords < 0.0] = 0.0
+        coords = coords * torch.tensor([[img_size[0], img_size[1], img_size[0], img_size[1]]])
+        keep = torchvision.ops.nms(boxes=coords, scores=image_bboxes[:, 4], iou_threshold=iou_threshold)
+        filtered_bboxes.append(image_bboxes[keep])
+    return filtered_bboxes
