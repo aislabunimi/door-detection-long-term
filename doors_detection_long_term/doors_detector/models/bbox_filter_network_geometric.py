@@ -69,23 +69,18 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         #print(background_features.size(), background_features.size()[::-1][:2], bboxes_mask[background_features.size()[::-1][:2]])
         bboxes_mask = bboxes_mask[background_features.size()[::-1][:2]]
 
-
         bboxes_background_features = []
 
         for features, bboxes_mask_list in zip(background_features, bboxes_mask):
             for x1, y1, x2, y2 in bboxes_mask_list:
-                bboxes_background_features.append(torch.mean(features[:, x1: x2, y1: y2].reshape(background_features.size()[1], -1), dim=1))
+                mean = torch.mean(features[:, x1: x2, y1: y2].reshape(background_features.size()[1], -1), dim=1)
+                bboxes_background_features.append(mean)
         bboxes = torch.cat([bboxes, torch.stack(bboxes_background_features).reshape(background_features.size()[0], background_features.size()[1], -1)], dim=1)
-        #print(bboxes)
         local_features_1 = self.shared_mlp_1(bboxes)
         local_features_2 = self.shared_mlp_2(local_features_1)
-        #local_features_3 = self.shared_mlp_3(local_features_2)
 
         global_features_1 = torch.max(local_features_2, 2, keepdim=True)[0]
         global_features_1 = global_features_1.repeat(1, 1, local_features_1.size(-1))
-
-        #global_features_2 = torch.max(local_features_3, 2, keepdim=True)[0]
-        #global_features_2 = global_features_2.repeat(1, 1, local_features_1.size(-1))
 
         mixed_features = torch.cat([local_features_1, global_features_1], 1)
 

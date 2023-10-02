@@ -84,13 +84,14 @@ def plot_results(epoch, count, env, images, bboxes, preds, targets, confidence_t
     colors = {0: (0, 0, 1), 1: (0, 1, 0)}
 
     for c_batch, (image, bboxes_image, confidences, labels, target) in enumerate(zip(images, bboxes, preds[0], preds[1], targets)):
-        bboxes_image = bboxes_image.transpose(0, 1)
+        #bboxes_image = bboxes_image.transpose(0, 1)
         w_image, h_image = image.size()[1:][::-1]
         image = image.to('cpu')
         image = image * torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
         image = image + torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
         image_detected = cv2.cvtColor(np.transpose(np.array(image), (1, 2, 0)), cv2.COLOR_RGB2BGR)
         target_image = image_detected.copy()
+        #print(bboxes_image.size())
         for (cx, cy, w, h), confidence, classes in zip(bboxes_image[:, :4].tolist(), confidences.tolist(), labels.tolist()):
             #print(cx, cy, w, h)
             x, y, x2, y2 = np.array([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2]) * np.array([w_image, h_image, w_image, h_image])
@@ -111,7 +112,6 @@ def plot_results(epoch, count, env, images, bboxes, preds, targets, confidence_t
 
         image = cv2.hconcat([target_image, image_detected])
         cv2.imwrite('/home/antonazzi/myfiles/bbox_filtering/'+str(epoch) + f'/{env}'+f"/{count}_{c_batch}.png", (image*255).astype(np.uint8))
-
 
 
 def plot_grid_dataset(epoch, count, env, images, grid_targets, target_boxes, preds):

@@ -243,6 +243,12 @@ def collate_fn_bboxes(image_grid_dimensions: List[Tuple[int, int]] = None, use_c
                 detected_x1y1x2y2[:, 3] = torch.clamp(detected_x1y1x2y2[:, 3], max=grid_h)
                 detected_x1y1x2y2 = detected_x1y1x2y2.type(torch.int32)
 
+                # Remove equal values
+                detected_x1y1x2y2[:,2][(detected_x1y1x2y2[:, 0] == detected_x1y1x2y2[:, 2]) & (detected_x1y1x2y2[:, 2] < grid_w)] += 1
+                detected_x1y1x2y2[:,0][(detected_x1y1x2y2[:, 0] == detected_x1y1x2y2[:, 2]) & (detected_x1y1x2y2[:, 2] == grid_w)] -= 1
+                detected_x1y1x2y2[:,3][(detected_x1y1x2y2[:, 1] == detected_x1y1x2y2[:, 3]) & (detected_x1y1x2y2[:, 3] < grid_h)] += 1
+                detected_x1y1x2y2[:,1][(detected_x1y1x2y2[:, 1] == detected_x1y1x2y2[:, 3]) & (detected_x1y1x2y2[:, 3] == grid_h)] -= 1
+
                 image_grids[(grid_w, grid_h)].append(grid)
                 target_boxes_grid[(grid_w, grid_h)].append(targets_boxes_grid_coords)
                 detected_boxes_grid[(grid_w, grid_h)].append(detected_x1y1x2y2)

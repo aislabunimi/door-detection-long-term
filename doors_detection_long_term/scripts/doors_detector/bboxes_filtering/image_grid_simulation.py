@@ -6,7 +6,7 @@ from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetLoad
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.models.background_grid_network import IMAGE_GRID_NETWORK, \
     ImageGridNetwork, ImageGridNetworkLoss
-from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, BBOX_FILTER_NETWORK_GEOMETRIC, IMAGE_BACKGROUND_NETWORK
+from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, IMAGE_BACKGROUND_NETWORK
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_yolov5, collate_fn_bboxes
 from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering import plot_grid_dataset, \
@@ -27,7 +27,7 @@ train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_
 print(len(train_bboxes), len(test_bboxes))
 train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
-#check_bbox_dataset(train_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=(8, 8))
+#check_bbox_dataset(test_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=(8, 8))
 
 # Calculate Metrics in real worlds
 houses = ['floor1', 'floor4', 'chemistry_floor0']
