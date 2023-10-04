@@ -44,7 +44,7 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
             nn.Sigmoid(),
         )
 
-        self.shared_mlp_1 = SharedMLP(channels=[initial_channels + 16, 32, 64, 128])
+        self.shared_mlp_1 = SharedMLP(channels=[initial_channels, 32, 64, 128])
         self.shared_mlp_2 = SharedMLP(channels=[128, 256, 512, 1024])
         self.shared_mlp_3 = SharedMLP(channels=[512, 512, 1024])
 
@@ -65,17 +65,18 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
 
     def forward(self, images, bboxes, bboxes_mask):
 
-        background_features = torch.transpose(self.background_to_geometric(self.background_network(images)), 2, 3)
+        #background_features = torch.transpose(self.background_to_geometric(self.background_network(images)), 2, 3)
         #print(background_features.size(), background_features.size()[::-1][:2], bboxes_mask[background_features.size()[::-1][:2]])
-        bboxes_mask = bboxes_mask[background_features.size()[::-1][:2]]
+        #bboxes_mask = bboxes_mask[background_features.size()[::-1][:2]]
 
         bboxes_background_features = []
-
+        """
         for features, bboxes_mask_list in zip(background_features, bboxes_mask):
             for x1, y1, x2, y2 in bboxes_mask_list:
                 mean = torch.mean(features[:, x1: x2, y1: y2].reshape(background_features.size()[1], -1), dim=1)
                 bboxes_background_features.append(mean)
         bboxes = torch.cat([bboxes, torch.stack(bboxes_background_features).reshape(background_features.size()[0], background_features.size()[1], -1)], dim=1)
+        """
         local_features_1 = self.shared_mlp_1(bboxes)
         local_features_2 = self.shared_mlp_2(local_features_1)
 
@@ -101,9 +102,9 @@ class BboxFilterNetworkGeometricLabelLoss(nn.Module):
 
         scores_features, labels_features = preds
         #print(labels_features, label_targets)
-        labels_loss = torch.log(labels_features) * label_targets
+        labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[0.20, 1, 1]], device='cuda')
         #print(labels_loss)
-        labels_loss = torch.mean(torch.mean(torch.sum(labels_loss, 2) * -1, 1))
+        labels_loss = torch.mean(torch.sum(torch.sum(labels_loss, 2) * -1, 1))
 
         return labels_loss
 

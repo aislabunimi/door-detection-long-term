@@ -34,15 +34,16 @@ num_bboxes = 50
 
 grid_dim = [(2**i, 2**i) for i in range(3, 7)][::-1]
 
+iou_threshold_matching_metric = 0.5
 iou_threshold_matching = 0.5
 confidence_threshold = 0.75
 
-dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson_deep_doors_2_door_nodoor')
-train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
+dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson_deep_doors_2')
+train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=True)
 
 print(len(train_bboxes), len(test_bboxes))
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
-test_dataset_bboxes = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=8, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
+test_dataset_bboxes = DataLoader(test_bboxes, batch_size=8, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
 #check_bbox_dataset(test_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=(32, 32))
 
 # Calculate Metrics in real worlds
@@ -65,7 +66,7 @@ for data in test_dataset_bboxes:
     detected_bboxes = detected_bboxes.transpose(1, 2)
     detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=confidence_threshold, iou_threshold=0.5, img_size=images.size()[::-1][:2])
     evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
-metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=iou_threshold_matching)
+metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=iou_threshold_matching_metric)
 nms_performance = {'sim_test': {}}
 
 for label, values in metrics.items():
@@ -84,7 +85,7 @@ for house in houses:
         detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=confidence_threshold, iou_threshold=0.5, img_size=images.size()[::-1][:2])
 
         evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
-    metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=iou_threshold_matching)
+    metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=iou_threshold_matching_metric)
     for label, values in metrics.items():
         for k, v in values.items():
             if k not in nms_performance[house]:
@@ -113,10 +114,15 @@ criterion.to('cuda')
 optimizer = optim.Adam(bbox_model.parameters(), lr=0.001)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
 
+for n, p in bbox_model.named_parameters():
+    if any([x in n for x in ['fpn.conv1.weight', 'fpn.bn1.weight', 'fpn.bn1.bias', 'fpn.layer1', 'background_network']]):
+        p.requires_grad = False
+        #print(n)
 # Fix parameters of background network
 for n, p in bbox_model.named_parameters():
-    if 'background_network' in n:
-        p.requires_grad = False
+    #if 'background_network' in n:
+    print(n, p.requires_grad)
+        #p.requires_grad = True
         #print('IS')
 
 logs = {'train': {'loss_label':[], 'loss_confidence':[], 'loss_final':[]},
@@ -199,7 +205,7 @@ for epoch in range(60):
 
             # Filtering bboxes according to new labels
             detected_bboxes = torch.unbind(detected_bboxes, 0)
-            detected_bboxes = [b[n==0, :] for b, n in zip(detected_bboxes, new_labels_indexes)]
+            detected_bboxes = [b[n!=0, :] for b, n in zip(detected_bboxes, new_labels_indexes)]
 
             detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=0.0, iou_threshold=0.5, img_size=images.size()[::-1][:2])
             evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
@@ -210,7 +216,7 @@ for epoch in range(60):
 
             plot_results(epoch=epoch, count=i, env='simulation', images=images, bboxes=detected_bboxes, targets=target_boxes, preds=preds, confidence_threshold=0.0)
 
-        metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=iou_threshold_matching)
+        metrics = evaluator_complete_metric.get_metrics(confidence_threshold=.0, iou_threshold=iou_threshold_matching_metric)
         for label, values in metrics.items():
             for k, v in values.items():
                 if len(net_performance['sim_test'][k]) == epoch:
@@ -242,7 +248,7 @@ for epoch in range(60):
 
                 # Filtering bboxes according to new labels
                 detected_bboxes = torch.unbind(detected_bboxes, 0)
-                detected_bboxes = [b[n==0, :] for b, n in zip(detected_bboxes, new_labels_indexes)]
+                detected_bboxes = [b[n!=0, :] for b, n in zip(detected_bboxes, new_labels_indexes)]
 
                 detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=.0, iou_threshold=0.5, img_size=images.size()[::-1][:2])
                 evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
@@ -253,7 +259,7 @@ for epoch in range(60):
                 plot_results(epoch=epoch, count=i, env=house, images=images, bboxes=detected_bboxes, targets=target_boxes, preds=preds, confidence_threshold=0.0)
 
             logs['test_real_world'][house]['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
-            metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=iou_threshold_matching)
+            metrics = evaluator_complete_metric.get_metrics(confidence_threshold=.0, iou_threshold=iou_threshold_matching_metric)
             for label, values in metrics.items():
                 for k, v in values.items():
                     if len(net_performance[house][k]) == epoch:
