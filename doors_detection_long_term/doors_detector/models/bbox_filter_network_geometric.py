@@ -46,9 +46,9 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
 
         self.shared_mlp_1 = SharedMLP(channels=[initial_channels, 32, 64, 128, 256])
         self.shared_mlp_2 = SharedMLP(channels=[256, 256, 512, 1024])
-        self.shared_mlp_3 = SharedMLP(channels=[1024, 1024, 2048])
+        #self.shared_mlp_3 = SharedMLP(channels=[1024, 1024, 2048])
 
-        self.shared_mlp_4 = SharedMLP(channels=[256 + 2048 + 1024, 2048, 1024, 512, 256, 128])
+        self.shared_mlp_4 = SharedMLP(channels=[256 + 1024, 2048, 1024, 512, 256, 128])
 
         self.shared_mlp_5 = SharedMLP(channels=[128, 64, 32, 16, 1], last_activation=nn.Sigmoid())
 
@@ -79,15 +79,15 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         """
         local_features_1 = self.shared_mlp_1(bboxes)
         local_features_2 = self.shared_mlp_2(local_features_1)
-        local_features_3 = self.shared_mlp_3(local_features_2)
+        #local_features_3 = self.shared_mlp_3(local_features_2)
 
         global_features_1 = torch.max(local_features_2, 2, keepdim=True)[0]
         global_features_1 = global_features_1.repeat(1, 1, local_features_1.size(-1))
 
-        global_features_2 = torch.max(local_features_3, 2, keepdim=True)[0]
-        global_features_2 = global_features_2.repeat(1, 1, local_features_1.size(-1))
+        #global_features_2 = torch.max(local_features_3, 2, keepdim=True)[0]
+        #global_features_2 = global_features_2.repeat(1, 1, local_features_1.size(-1))
 
-        mixed_features = torch.cat([local_features_1, global_features_1, global_features_2], 1)
+        mixed_features = torch.cat([local_features_1, global_features_1], 1)
 
         mixed_features = self.shared_mlp_4(mixed_features)
 
@@ -108,7 +108,7 @@ class BboxFilterNetworkGeometricLabelLoss(nn.Module):
         #print(labels_features, label_targets)
         labels_loss = torch.log(labels_features) * label_targets #* torch.tensor([[0.20, 1, 1]], device='cuda')
         #print(labels_loss)
-        labels_loss = torch.mean(torch.sum(torch.sum(labels_loss, 2) * -1, 1))
+        labels_loss = torch.mean(torch.mean(torch.sum(labels_loss, 2) * -1, 1))
 
         return labels_loss
 

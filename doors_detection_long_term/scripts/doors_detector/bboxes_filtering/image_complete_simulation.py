@@ -39,11 +39,11 @@ iou_threshold_matching = 0.5
 confidence_threshold = 0.75
 
 dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson_deep_doors_2')
-train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=True)
+train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
 
 print(len(train_bboxes), len(test_bboxes))
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=8, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
-test_dataset_bboxes = DataLoader(test_bboxes, batch_size=8, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
+test_dataset_bboxes = DataLoader(test_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
 #check_bbox_dataset(test_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=(32, 32))
 
 # Calculate Metrics in real worlds
@@ -58,6 +58,23 @@ with torch.no_grad():
 
 #check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold, scale_number=(32, 32))
 
+nms_performance = {'sim_test': {}, 'sim_train': {}}
+# Calculate results
+evaluator_complete_metric = MyEvaluatorCompleteMetric()
+for data in train_dataset_bboxes:
+    images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
+    detected_bboxes = detected_bboxes.transpose(1, 2)
+    detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=confidence_threshold, iou_threshold=0.5, img_size=images.size()[::-1][:2])
+    evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
+metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=iou_threshold_matching_metric)
+
+for label, values in metrics.items():
+    for k, v in values.items():
+        if k not in nms_performance['sim_train']:
+            nms_performance['sim_train'][k] = v
+        else:
+            nms_performance['sim_train'][k] += v
+
 
 # Calculate results
 evaluator_complete_metric = MyEvaluatorCompleteMetric()
@@ -67,7 +84,7 @@ for data in test_dataset_bboxes:
     detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=confidence_threshold, iou_threshold=0.5, img_size=images.size()[::-1][:2])
     evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
 metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=iou_threshold_matching_metric)
-nms_performance = {'sim_test': {}}
+
 
 for label, values in metrics.items():
     for k, v in values.items():
@@ -169,6 +186,7 @@ for epoch in range(60):
         criterion.eval()
 
         temp_losses_final = []
+        evaluator_complete_metric = MyEvaluatorCompleteMetric()
         for i, data in tqdm(enumerate(train_dataset_bboxes), total=len(train_dataset_bboxes), desc=f'Training epoch {epoch}'):
 
             images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
@@ -181,10 +199,27 @@ for epoch in range(60):
             #ious = ious.to('cuda')
 
             preds = bbox_model(images, detected_bboxes, detected_boxes_grid)
+            new_labels, new_labels_indexes = torch.max(preds[1].to('cpu'), dim=2, keepdim=False)
+            detected_bboxes = detected_bboxes.transpose(1, 2).to('cpu')
+
+            # Filtering bboxes according to new labels
+            detected_bboxes = torch.unbind(detected_bboxes, 0)
+            detected_bboxes = [b[n!=0, :] for b, n in zip(detected_bboxes, new_labels_indexes)]
+
+            detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=0.0, iou_threshold=0.5, img_size=images.size()[::-1][:2])
+            evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
+
             final_loss = criterion(preds, labels_encoded)
 
             temp_losses_final.append(final_loss.item())
 
+        metrics = evaluator_complete_metric.get_metrics(confidence_threshold=.0, iou_threshold=iou_threshold_matching_metric)
+        for label, values in metrics.items():
+            for k, v in values.items():
+                if len(net_performance['sim_train'][k]) == epoch:
+                    net_performance['sim_train'][k].append(v)
+                else:
+                    net_performance['sim_train'][k][-1] += v
         logs['train']['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
 
         temp_losses_final = []
