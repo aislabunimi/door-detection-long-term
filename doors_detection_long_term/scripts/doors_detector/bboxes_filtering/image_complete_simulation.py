@@ -60,14 +60,19 @@ with torch.no_grad():
 #check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold, scale_number=(32, 32))
 
 nms_performance = {'sim_test': {}, 'sim_train': {}}
+nms_performance_ap = {'sim_test': {}, 'sim_train': {}}
+
 # Calculate results
 evaluator_complete_metric = MyEvaluatorCompleteMetric()
+evaluator_ap = MyEvaluator()
 for data in train_dataset_bboxes:
     images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
     detected_bboxes = detected_bboxes.transpose(1, 2)
     detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=confidence_threshold, iou_threshold=0.5, img_size=images.size()[::-1][:2])
     evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
+    evaluator_ap.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
 metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=iou_threshold_matching_metric)
+metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=iou_threshold_matching_metric)
 
 for label, values in metrics.items():
     for k, v in values.items():
@@ -76,15 +81,21 @@ for label, values in metrics.items():
         else:
             nms_performance['sim_train'][k] += v
 
+for label, v in metrics_ap['per_bbox'].items():
+    nms_performance_ap['sim_train'][label] = v['AP']
 
 # Calculate results
 evaluator_complete_metric = MyEvaluatorCompleteMetric()
+evaluator_ap = MyEvaluator()
 for data in test_dataset_bboxes:
     images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
     detected_bboxes = detected_bboxes.transpose(1, 2)
     detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=confidence_threshold, iou_threshold=0.5, img_size=images.size()[::-1][:2])
     evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
+    evaluator_ap.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
+
 metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=iou_threshold_matching_metric)
+metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=iou_threshold_matching_metric)
 
 
 for label, values in metrics.items():
@@ -94,32 +105,51 @@ for label, values in metrics.items():
         else:
             nms_performance['sim_test'][k] += v
 
+for label, v in metrics_ap['per_bbox'].items():
+    nms_performance_ap['sim_test'][label] = v['AP']
+
+
 for house in houses:
     nms_performance[house] = {}
+    nms_performance_ap[house] = {}
     evaluator_complete_metric = MyEvaluatorCompleteMetric()
+    evaluator_ap = MyEvaluator()
     for data in datasets_real_worlds[house]:
         images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
         detected_bboxes = detected_bboxes.transpose(1, 2)
         detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=confidence_threshold, iou_threshold=0.5, img_size=images.size()[::-1][:2])
 
         evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
+        evaluator_ap.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
     metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=iou_threshold_matching_metric)
+    metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=iou_threshold_matching_metric)
+
     for label, values in metrics.items():
         for k, v in values.items():
             if k not in nms_performance[house]:
                 nms_performance[house][k] = v
             else:
                 nms_performance[house][k] += v
+    for label, v in metrics_ap['per_bbox'].items():
+        nms_performance_ap[house][label] = v['AP']
 
 # Plots
 for env, values in nms_performance.items():
     fig = plt.figure()
-    plt.axhline(values['TP'], label='TP', color='green')
-    plt.axhline(values['FP'], label='FP', color='blue')
-    plt.axhline(values['FPiou'], label='FPiou', color='red')
+    plt.axhline(values['TP'], label='TP', color='green', linestyle='--')
+    plt.axhline(values['FP'], label='FP', color='blue', linestyle='--')
+    plt.axhline(values['FPiou'], label='FPiou', color='red', linestyle='--')
     plt.title('env')
     plt.legend()
-    plt.savefig(f'image_complete/{env}.svg')
+    plt.savefig(f'image_complete/COMPLETE_METRIC_{env}.svg')
+
+for env, values in nms_performance_ap.items():
+    fig = plt.figure()
+    plt.axhline(values['0'], label='Closed', color='red', linestyle='--')
+    plt.axhline(values['1'], label='Open', color='green', linestyle='--')
+    plt.title('env')
+    plt.legend()
+    plt.savefig(f'image_complete/AP_{env}.svg')
 
 
 bbox_model = BboxFilterNetworkGeometricBackground(initial_channels=7, image_grid_dimensions=grid_dim, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_NETWORK_GEOMETRIC_BACKGROUND, description_background=IMAGE_GRID_NETWORK)
@@ -150,10 +180,16 @@ logs = {'train': {'loss_label':[], 'loss_confidence':[], 'loss_final':[]},
         'complete_metric': {'TP': [], 'FP': [], 'BFD': []}}
 
 net_performance = {}
+net_performance_ap = {}
 for env, metrics in nms_performance.items():
     net_performance[env] = {}
     for metric, v in metrics.items():
         net_performance[env][metric] = []
+
+for env, metrics in nms_performance_ap.items():
+    net_performance_ap[env] = {}
+    for metric, _ in metrics.items():
+        net_performance_ap[env][metric] = []
 
 for epoch in range(60):
     #scheduler.step()
@@ -188,6 +224,7 @@ for epoch in range(60):
 
         temp_losses_final = []
         evaluator_complete_metric = MyEvaluatorCompleteMetric()
+        evaluator_ap = MyEvaluator()
         for i, data in tqdm(enumerate(train_dataset_bboxes), total=len(train_dataset_bboxes), desc=f'Test on training set epoch {epoch}'):
 
             images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
@@ -211,22 +248,29 @@ for epoch in range(60):
 
             detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=0.0, iou_threshold=0.5, img_size=images.size()[::-1][:2])
             evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
-
+            evaluator_ap.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
             final_loss = criterion(preds, labels_encoded)
 
             temp_losses_final.append(final_loss.item())
 
         metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
+        metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
+
         for label, values in metrics.items():
             for k, v in values.items():
                 if len(net_performance['sim_train'][k]) == epoch:
                     net_performance['sim_train'][k].append(v)
                 else:
                     net_performance['sim_train'][k][-1] += v
+
+        for label, v in metrics_ap['per_bbox'].items():
+            net_performance_ap['sim_train'][label].append(v['AP'])
+
         logs['train']['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
 
         temp_losses_final = []
         evaluator_complete_metric = MyEvaluatorCompleteMetric()
+        evaluator_ap = MyEvaluator()
         for i, data in tqdm(enumerate(test_dataset_bboxes), total=len(test_dataset_bboxes), desc=f'TEST epoch {epoch}'):
             images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
             images = images.to('cuda')
@@ -249,6 +293,7 @@ for epoch in range(60):
 
             detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=0.0, iou_threshold=0.5, img_size=images.size()[::-1][:2])
             evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
+            evaluator_ap.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
 
             final_loss = criterion(preds, labels_encoded)
 
@@ -257,13 +302,18 @@ for epoch in range(60):
             plot_results(epoch=epoch, count=i, env='simulation', images=images, bboxes=detected_bboxes, targets=target_boxes, confidence_threshold=confidence_threshold_metric)
 
         metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
+        metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
+
         for label, values in metrics.items():
             for k, v in values.items():
                 if len(net_performance['sim_test'][k]) == epoch:
                     net_performance['sim_test'][k].append(v)
                 else:
                     net_performance['sim_test'][k][-1] += v
-            
+
+        for label, v in metrics_ap['per_bbox'].items():
+            net_performance_ap['sim_test'][label].append(v['AP'])
+
         logs['test']['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
 
         # Test with real world data
@@ -272,6 +322,7 @@ for epoch in range(60):
             temp_losses_final = []
             temp_accuracy = {0: 0, 1: 0}
             evaluator_complete_metric = MyEvaluatorCompleteMetric()
+            evaluator_ap = MyEvaluator()
             for i, data in tqdm(enumerate(dataset_real_world), total=len(dataset_real_world), desc=f'TEST in {house}, epoch {epoch}'):
                 images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
                 images = images.to('cuda')
@@ -294,6 +345,7 @@ for epoch in range(60):
 
                 detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=.0, iou_threshold=0.5, img_size=images.size()[::-1][:2])
                 evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
+                evaluator_ap.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
 
                 final_loss = criterion(preds, labels_encoded)
                 temp_losses_final.append(final_loss.item())
@@ -302,27 +354,41 @@ for epoch in range(60):
 
             logs['test_real_world'][house]['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
             metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
+            metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
+
             for label, values in metrics.items():
                 for k, v in values.items():
                     if len(net_performance[house][k]) == epoch:
                         net_performance[house][k].append(v)
                     else:
                         net_performance[house][k][-1] += v
+            for label, v in metrics_ap['per_bbox'].items():
+                net_performance_ap[house][label].append(v['AP'])
 
         print(logs['train'], logs['test'])
         #print(net_performance)
         for env, values in net_performance.items():
             fig = plt.figure()
-            plt.axhline(nms_performance[env]['TP'], label='nms TP', color='green')
-            plt.axhline(nms_performance[env]['FP'], label='nms FP', color='blue')
-            plt.axhline(nms_performance[env]['FPiou'], label='nms FPiou', color='red')
+            plt.axhline(nms_performance[env]['TP'], label='nms TP', color='green', linestyle='--')
+            plt.axhline(nms_performance[env]['FP'], label='nms FP', color='blue', linestyle='--')
+            plt.axhline(nms_performance[env]['FPiou'], label='nms FPiou', color='red', linestyle='--')
 
             plt.plot([i for i in range(len(values['TP']))], values['TP'], label='TP', color='green')
             plt.plot([i for i in range(len(values['TP']))], values['FP'], label='FP', color='blue')
             plt.plot([i for i in range(len(values['TP']))], values['FPiou'], label='FPiou', color='red')
             plt.title('env')
             plt.legend()
-            plt.savefig(f'image_complete/{env}.svg')
+            plt.savefig(f'image_complete/COMPLETE_METRIC_{env}.svg')
+        for env, values in net_performance_ap.items():
+            fig = plt.figure()
+            plt.axhline(nms_performance_ap[env]['0'], label='nms Closed', color='red', linestyle='--')
+            plt.axhline(nms_performance_ap[env]['1'], label='nms Open', color='green', linestyle='--')
+
+            plt.plot([i for i in range(len(values['0']))], values['0'], label='Closed', color='red')
+            plt.plot([i for i in range(len(values['1']))], values['1'], label='Open', color='green')
+            plt.title('env')
+            plt.legend()
+            plt.savefig(f'image_complete/AP_{env}.svg')
 
         fig = plt.figure()
         plt.plot([i for i in range(len(logs['train']['loss_final']))], logs['train']['loss_final'], label='Train loss')
