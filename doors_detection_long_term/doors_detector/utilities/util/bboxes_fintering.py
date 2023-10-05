@@ -5,6 +5,7 @@ import numpy as np
 import torch
 import torchvision
 
+from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import xywh2xyxy
 
 #Check the dataset
@@ -83,7 +84,15 @@ def plot_results(epoch, count, env, images, bboxes, preds, targets, confidence_t
         os.makedirs('/home/antonazzi/myfiles/bbox_filtering/'+str(epoch) + f'/{env}')
     colors = {0: (0, 0, 1), 1: (0, 1, 0)}
 
-    for c_batch, (image, bboxes_image, confidences, labels, target) in enumerate(zip(images, bboxes, preds[0], preds[1], targets)):
+    evaluator_complete_metric = MyEvaluatorCompleteMetric()
+    evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=bboxes, target_bboxes=targets, img_size=images.size()[::-1][:2])
+    metrics = evaluator_complete_metric.get_metrics(confidence_threshold=0.0, iou_threshold=0.5)
+    fpiou = 0
+    for label, values in metrics.items():
+        for k, v in values.items():
+            if k == 'FPiou':
+                fpiou += v
+    for c_batch, (image, bboxes_image, target) in enumerate(zip(images, bboxes, targets)):
         #bboxes_image = bboxes_image.transpose(0, 1)
         w_image, h_image = image.size()[1:][::-1]
         image = image.to('cpu')
@@ -92,16 +101,16 @@ def plot_results(epoch, count, env, images, bboxes, preds, targets, confidence_t
         image_detected = cv2.cvtColor(np.transpose(np.array(image), (1, 2, 0)), cv2.COLOR_RGB2BGR)
         target_image = image_detected.copy()
         #print(bboxes_image.size())
-        for (cx, cy, w, h), confidence, classes in zip(bboxes_image[:, :4].tolist(), confidences.tolist(), labels.tolist()):
+        for (cx, cy, w, h, c, closed, open) in bboxes_image.tolist():
             #print(cx, cy, w, h)
             x, y, x2, y2 = np.array([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2]) * np.array([w_image, h_image, w_image, h_image])
             x, y, x2, y2 = round(x), round(y), round(x2), round(y2)
-            label = classes.index(max(classes))
-            if label == 0 or confidence < confidence_threshold:
-                continue
-            label -= 1
+            label = [closed, open].index(max([closed, open]))
+
             image_detected = cv2.rectangle(image_detected, (x, y),
                                            (x2, y2), colors[label], 2)
+            image_detected = cv2.putText(image_detected, f'{round(c, 2)}', (x, y+15), cv2.FONT_HERSHEY_PLAIN,
+                                         2, (255, 255, 255), 2, cv2.LINE_AA)
 
         for cx, cy, w, h, label in target.tolist():
             x, y, x2, y2 = np.array([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2]) * np.array([w_image, h_image, w_image, h_image])
@@ -109,6 +118,9 @@ def plot_results(epoch, count, env, images, bboxes, preds, targets, confidence_t
             label = int(label)
             target_image = cv2.rectangle(target_image, (x, y),
                                          (x2, y2), colors[label], 2)
+
+        image_detected = cv2.putText(image_detected, f'FPiou: {fpiou}', (0,30), cv2.cv2.FONT_HERSHEY_PLAIN ,
+                            2, (255, 0, 0) , 2, cv2.LINE_AA)
 
         image = cv2.hconcat([target_image, image_detected])
         cv2.imwrite('/home/antonazzi/myfiles/bbox_filtering/'+str(epoch) + f'/{env}'+f"/{count}_{c_batch}.png", (image*255).astype(np.uint8))
