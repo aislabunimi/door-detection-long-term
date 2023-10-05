@@ -44,15 +44,15 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
             nn.Sigmoid(),
         )
 
-        self.shared_mlp_1 = SharedMLP(channels=[initial_channels, 32, 64, 128])
-        self.shared_mlp_2 = SharedMLP(channels=[128, 256, 512, 1024])
-        self.shared_mlp_3 = SharedMLP(channels=[512, 512, 1024])
+        self.shared_mlp_1 = SharedMLP(channels=[initial_channels, 32, 64, 128, 256])
+        self.shared_mlp_2 = SharedMLP(channels=[256, 256, 512, 1024])
+        self.shared_mlp_3 = SharedMLP(channels=[1024, 1024, 2048])
 
-        self.shared_mlp_4 = SharedMLP(channels=[128 + 1024, 256, 128, 64])
+        self.shared_mlp_4 = SharedMLP(channels=[256 + 2048 + 1024, 2048, 1024, 512, 256, 128])
 
-        self.shared_mlp_5 = SharedMLP(channels=[64, 32, 16, 1], last_activation=nn.Sigmoid())
+        self.shared_mlp_5 = SharedMLP(channels=[128, 64, 32, 16, 1], last_activation=nn.Sigmoid())
 
-        self.shared_mlp_6 = SharedMLP(channels=[64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
+        self.shared_mlp_6 = SharedMLP(channels=[128, 64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
 
         if pretrained:
             if pretrained:
@@ -79,11 +79,15 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         """
         local_features_1 = self.shared_mlp_1(bboxes)
         local_features_2 = self.shared_mlp_2(local_features_1)
+        local_features_3 = self.shared_mlp_3(local_features_2)
 
         global_features_1 = torch.max(local_features_2, 2, keepdim=True)[0]
         global_features_1 = global_features_1.repeat(1, 1, local_features_1.size(-1))
 
-        mixed_features = torch.cat([local_features_1, global_features_1], 1)
+        global_features_2 = torch.max(local_features_3, 2, keepdim=True)[0]
+        global_features_2 = global_features_2.repeat(1, 1, local_features_1.size(-1))
+
+        mixed_features = torch.cat([local_features_1, global_features_1, global_features_2], 1)
 
         mixed_features = self.shared_mlp_4(mixed_features)
 
