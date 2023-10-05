@@ -206,8 +206,8 @@ for epoch in range(60):
             detected_bboxes = torch.unbind(detected_bboxes, 0)
             detected_bboxes = [b[i != 0, :] for b, i in zip(detected_bboxes, new_labels_indexes)]
             # Modify the label according to the new label assigned by the model
-            detected_bboxes = [torch.cat([b[:, :5], p[i != 0][:, 1:]]) for b, p, i in zip(detected_bboxes, preds[1], new_labels_indexes)]
-            print(detected_bboxes)
+            detected_bboxes = [torch.cat([b[:, :5], p[i != 0][:, 1:]], dim=1) for b, p, i in zip(detected_bboxes, preds[1].to('cpu'), new_labels_indexes)]
+
             detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=0.0, iou_threshold=0.5, img_size=images.size()[::-1][:2])
             evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
 
