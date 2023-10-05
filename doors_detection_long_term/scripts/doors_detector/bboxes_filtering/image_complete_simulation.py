@@ -37,6 +37,7 @@ grid_dim = [(2**i, 2**i) for i in range(3, 7)][::-1]
 iou_threshold_matching_metric = 0.5
 iou_threshold_matching = 0.5
 confidence_threshold = 0.75
+confidence_threshold_metric = 0.1
 
 dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson_deep_doors_2')
 train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
@@ -187,7 +188,7 @@ for epoch in range(60):
 
         temp_losses_final = []
         evaluator_complete_metric = MyEvaluatorCompleteMetric()
-        for i, data in tqdm(enumerate(train_dataset_bboxes), total=len(train_dataset_bboxes), desc=f'Training epoch {epoch}'):
+        for i, data in tqdm(enumerate(train_dataset_bboxes), total=len(train_dataset_bboxes), desc=f'Test on training set epoch {epoch}'):
 
             images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
             images = images.to('cuda')
@@ -215,7 +216,7 @@ for epoch in range(60):
 
             temp_losses_final.append(final_loss.item())
 
-        metrics = evaluator_complete_metric.get_metrics(confidence_threshold=.0, iou_threshold=iou_threshold_matching_metric)
+        metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
         for label, values in metrics.items():
             for k, v in values.items():
                 if len(net_performance['sim_train'][k]) == epoch:
@@ -253,9 +254,9 @@ for epoch in range(60):
 
             temp_losses_final.append(final_loss.item())
 
-            plot_results(epoch=epoch, count=i, env='simulation', images=images, bboxes=detected_bboxes, targets=target_boxes, preds=preds, confidence_threshold=0.0)
+            plot_results(epoch=epoch, count=i, env='simulation', images=images, bboxes=detected_bboxes, targets=target_boxes, confidence_threshold=confidence_threshold_metric)
 
-        metrics = evaluator_complete_metric.get_metrics(confidence_threshold=.0, iou_threshold=iou_threshold_matching_metric)
+        metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
         for label, values in metrics.items():
             for k, v in values.items():
                 if len(net_performance['sim_test'][k]) == epoch:
@@ -297,10 +298,10 @@ for epoch in range(60):
                 final_loss = criterion(preds, labels_encoded)
                 temp_losses_final.append(final_loss.item())
 
-                plot_results(epoch=epoch, count=i, env=house, images=images, bboxes=detected_bboxes, targets=target_boxes, preds=preds, confidence_threshold=0.0)
+                plot_results(epoch=epoch, count=i, env=house, images=images, bboxes=detected_bboxes, targets=target_boxes, confidence_threshold=confidence_threshold_metric)
 
             logs['test_real_world'][house]['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
-            metrics = evaluator_complete_metric.get_metrics(confidence_threshold=.0, iou_threshold=iou_threshold_matching_metric)
+            metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
             for label, values in metrics.items():
                 for k, v in values.items():
                     if len(net_performance[house][k]) == epoch:

@@ -77,7 +77,7 @@ def check_bbox_dataset(dataset, confidence_threshold, scale_number):
         cv2.waitKey()
 
 
-def plot_results(epoch, count, env, images, bboxes, preds, targets, confidence_threshold):
+def plot_results(epoch, count, env, images, bboxes, targets, confidence_threshold):
     if not os.path.exists('/home/antonazzi/myfiles/bbox_filtering/'+str(epoch)):
         os.makedirs('/home/antonazzi/myfiles/bbox_filtering/'+str(epoch))
     if not os.path.exists('/home/antonazzi/myfiles/bbox_filtering/'+str(epoch) + f'/{env}'):
@@ -86,7 +86,7 @@ def plot_results(epoch, count, env, images, bboxes, preds, targets, confidence_t
 
     evaluator_complete_metric = MyEvaluatorCompleteMetric()
     evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=bboxes, target_bboxes=targets, img_size=images.size()[::-1][:2])
-    metrics = evaluator_complete_metric.get_metrics(confidence_threshold=0.0, iou_threshold=0.5)
+    metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=0.5)
     fpiou = 0
     for label, values in metrics.items():
         for k, v in values.items():
@@ -102,6 +102,8 @@ def plot_results(epoch, count, env, images, bboxes, preds, targets, confidence_t
         target_image = image_detected.copy()
         #print(bboxes_image.size())
         for (cx, cy, w, h, c, closed, open) in bboxes_image.tolist():
+            if c < confidence_threshold:
+                continue
             #print(cx, cy, w, h)
             x, y, x2, y2 = np.array([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2]) * np.array([w_image, h_image, w_image, h_image])
             x, y, x2, y2 = round(x), round(y), round(x2), round(y2)
@@ -119,7 +121,7 @@ def plot_results(epoch, count, env, images, bboxes, preds, targets, confidence_t
             target_image = cv2.rectangle(target_image, (x, y),
                                          (x2, y2), colors[label], 2)
 
-        image_detected = cv2.putText(image_detected, f'FPiou: {fpiou}', (0,30), cv2.cv2.FONT_HERSHEY_PLAIN ,
+        image_detected = cv2.putText(image_detected, f'FPiou: {fpiou}', (0,30), cv2.FONT_HERSHEY_PLAIN ,
                             2, (255, 0, 0) , 2, cv2.LINE_AA)
 
         image = cv2.hconcat([target_image, image_detected])
