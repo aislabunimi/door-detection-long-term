@@ -30,7 +30,7 @@ from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering im
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 torch.autograd.detect_anomaly(True)
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-num_bboxes = 50
+num_bboxes = 30
 
 grid_dim = [(2**i, 2**i) for i in range(3, 7)][::-1]
 
@@ -38,12 +38,12 @@ iou_threshold_matching_metric = 0.5
 iou_threshold_matching = 0.5
 confidence_threshold = 0.75
 
-dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson_deep_doors_2')
+dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson')
 train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
 
 print(len(train_bboxes), len(test_bboxes))
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
-test_dataset_bboxes = DataLoader(test_bboxes, batch_size=32, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
+test_dataset_bboxes = DataLoader(test_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
 #check_bbox_dataset(test_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=(32, 32))
 
 # Calculate Metrics in real worlds
