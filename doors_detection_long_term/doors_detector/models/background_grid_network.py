@@ -137,7 +137,7 @@ class ImageGridNetworkLoss(nn.Module):
         for prediction, image_grid in zip(predictions, image_grids[tuple(predictions.size()[1:])]):
             loss_target.append(torch.nan_to_num(-torch.log(torch.mean(prediction[image_grid.bool()]))))
             p = 0.3 if torch.count_nonzero(image_grid.bool()) == 0 else 1.0
-            loss_background.append(p*torch.nan_to_num(-torch.log(1-torch.mean(prediction[~image_grid.bool()]))))
+            loss_background.append(torch.nan_to_num(-torch.log(1-torch.mean(prediction[~image_grid.bool()]))))
 
 
         loss_background = torch.stack(loss_background)
@@ -145,7 +145,7 @@ class ImageGridNetworkLoss(nn.Module):
 
         loss = torch.mean(loss_background, dim=0) + torch.mean(loss_target, dim=0)
         return loss
-
+"""
 image = torch.rand(4, 3, 240, 320)
 
 bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=[(2**i, 2**i) for i in range(3, 7)][::-1], n_labels=3, model_name=IMAGE_GRID_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
@@ -153,7 +153,7 @@ model_parameters = filter(lambda p: p.requires_grad, bbox_model.parameters())
 params = sum([np.prod(p.size()) for p in model_parameters])
 print(f'I PARAMTETRI SONO: {params}')
 bbox_model(image)
-
+"""
 
 
 
