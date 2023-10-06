@@ -16,7 +16,7 @@ torch.autograd.detect_anomaly(True)
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 num_bboxes = 20
 
-grid_dim = [(2**i, 2**i) for i in range(3, 7)][::-1]
+grid_dim = [(2**i, 2**i) for i in range(3, 6)][::-1]
 
 iou_threshold_matching = 0.5
 confidence_threshold = 0.75

@@ -85,19 +85,19 @@ class ImageGridNetwork(GenericModel):
         self.fpn = ResNet18FPN()
 
         self.conv_x2 = nn.Sequential(
-            nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[1]),
+            nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[0]),
             MultipleConvolutions(original_size=128, start_size=128, end_size=64),
-            nn.Upsample(size=image_grid_dimensions[1], mode='nearest')
+            nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
         )
         self.conv_x3 = nn.Sequential(
-            nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[2]),
+            nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[1]),
             MultipleConvolutions(original_size=256, start_size=128, end_size=32),
-            nn.Upsample(size=image_grid_dimensions[1], mode='nearest')
+            nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
         )
         self.conv_x4 = nn.Sequential(
-            nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[3]),
+            nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[2]),
             MultipleConvolutions(original_size=512, start_size=128, end_size=32),
-            nn.Upsample(size=image_grid_dimensions[1], mode='nearest')
+            nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
         )
 
         self.final_convolution = nn.Sequential(
