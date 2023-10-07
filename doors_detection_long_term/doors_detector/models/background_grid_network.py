@@ -78,35 +78,67 @@ class MultipleConvolutions(nn.Module):
         return self.convolutions(x)
 
 
+class FPNBackbone(nn.Module):
+    def __init__(self, start_size: int, end_size: int, image_grid_dimensions: List[Tuple[int, int]]):
+        super(FPNBackbone, self).__init__()
+        print(len(image_grid_dimensions))
+        self.backbone = nn.Sequential(*[nn.Sequential() for _ in range(len(image_grid_dimensions))])
+        self.upsample = nn.Sequential()
+
+        for size in image_grid_dimensions[:-1]:
+            self.upsample.append(nn.Upsample(size=size, mode='nearest'))
+
+        while start_size > end_size:
+            for sequential in self.backbone:
+                sequential.append(
+                    MultipleConvolutions(original_size=start_size, start_size=start_size, end_size=start_size // 2),
+                )
+            start_size //= 2
+        print(self.backbone, self.upsample)
+    def forward(self, features):
+        for backbones in zip(*self.backbone):
+            for i, backbone in enumerate(backbones):
+                features[i] = backbone(features[i])
+                if i > 0:
+                    features[i - 1] += self.upsample[i - 1](features[i])
+        for f in features:
+            print(f.size())
+        return features
+
+
 class ImageGridNetwork(GenericModel):
     def __init__(self, fpn_channels: int, image_grid_dimensions: List[Tuple[int, int]], model_name: ModelName, pretrained: bool, n_labels: int, dataset_name: DATASET, description: DESCRIPTION):
         super(ImageGridNetwork, self).__init__(model_name, dataset_name, description)
         self._image_grid_dimensions = image_grid_dimensions
         self.fpn = ResNet18FPN()
+        self.fpn_backbone = FPNBackbone(start_size=128, end_size=32, image_grid_dimensions=image_grid_dimensions)
 
-        self.conv_x2 = nn.Sequential(
+        self.conv_x0 = nn.Sequential(
             nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[0]),
-            MultipleConvolutions(original_size=128, start_size=128, end_size=64),
-            nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
+            #MultipleConvolutions(original_size=128, start_size=128, end_size=64),
+            #nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
         )
-        self.conv_x3 = nn.Sequential(
+        self.conv_x1 = nn.Sequential(
             nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[1]),
-            MultipleConvolutions(original_size=256, start_size=128, end_size=32),
-            nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
+            MultipleConvolutions(original_size=256, start_size=128, end_size=128),
+            #nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
         )
-        self.conv_x4 = nn.Sequential(
+        self.conv_x2 = nn.Sequential(
             nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[2]),
-            MultipleConvolutions(original_size=512, start_size=128, end_size=32),
-            nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
+            MultipleConvolutions(original_size=512, start_size=128, end_size=128),
+            #nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
         )
+
+        self.upsample_x0 = nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
+        self.upsample_x1 = nn.Upsample(size=image_grid_dimensions[1], mode='nearest')
+        self.upsample_x2 = nn.Upsample(size=image_grid_dimensions[2], mode='nearest')
 
         self.final_convolution = nn.Sequential(
-            MultipleConvolutions(original_size=128, start_size=128, end_size=16),
+            MultipleConvolutions(original_size=96, start_size=128, end_size=16),
             nn.Conv2d(in_channels=16, out_channels=1, kernel_size=1, padding=0),
             nn.BatchNorm2d(1),
             nn.Sigmoid()
         )
-
 
         if pretrained:
             path = os.path.join('train_params', self._model_name + '_' + str(self._description), str(self._dataset_name))
@@ -117,12 +149,17 @@ class ImageGridNetwork(GenericModel):
             self.load_state_dict(torch.load(os.path.join(path, 'model.pth'), map_location=torch.device('cpu')))
 
     def forward(self, images):
-        x2, x3, x4 = self.fpn(images)
+        x0, x1, x2 = self.fpn(images)
+        x0 = self.conv_x0(x0)
+        x1 = self.conv_x1(x1)
         x2 = self.conv_x2(x2)
-        x3 = self.conv_x3(x3)
-        x4 = self.conv_x4(x4)
 
-        x = torch.cat([x2, x3, x4], dim=1)
+        x0, x1, x2 = self.fpn_backbone([x0, x1, x2])
+        x0 = self.upsample_x0(x0)
+        x1 = self.upsample_x0(x1)
+        x2 = self.upsample_x0(x2)
+
+        x = torch.cat([x0, x1, x2], dim=1)
         image_region_features = self.final_convolution(x).squeeze(1)
         image_region_features = image_region_features.transpose(1, 2)
 
@@ -145,15 +182,15 @@ class ImageGridNetworkLoss(nn.Module):
 
         loss = torch.mean(loss_background, dim=0) + torch.mean(loss_target, dim=0)
         return loss
-"""
+
 image = torch.rand(4, 3, 240, 320)
 
-bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=[(2**i, 2**i) for i in range(3, 7)][::-1], n_labels=3, model_name=IMAGE_GRID_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
+bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=[(2**i, 2**i) for i in range(3, 6)][::-1], n_labels=3, model_name=IMAGE_GRID_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
 model_parameters = filter(lambda p: p.requires_grad, bbox_model.parameters())
 params = sum([np.prod(p.size()) for p in model_parameters])
 print(f'I PARAMTETRI SONO: {params}')
 bbox_model(image)
-"""
+
 
 
 
