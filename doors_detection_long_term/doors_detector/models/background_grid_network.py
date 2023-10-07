@@ -94,15 +94,14 @@ class FPNBackbone(nn.Module):
                     MultipleConvolutions(original_size=start_size, start_size=start_size, end_size=start_size // 2),
                 )
             start_size //= 2
-        print(self.backbone, self.upsample)
+
     def forward(self, features):
         for backbones in zip(*self.backbone):
             for i, backbone in enumerate(backbones):
                 features[i] = backbone(features[i])
                 if i > 0:
-                    features[i - 1] += self.upsample[i - 1](features[i])
-        for f in features:
-            print(f.size())
+                    features[i - 1] = features[i - 1] + self.upsample[i - 1](features[i])
+
         return features
 
 
@@ -182,7 +181,7 @@ class ImageGridNetworkLoss(nn.Module):
 
         loss = torch.mean(loss_background, dim=0) + torch.mean(loss_target, dim=0)
         return loss
-
+"""
 image = torch.rand(4, 3, 240, 320)
 
 bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=[(2**i, 2**i) for i in range(3, 6)][::-1], n_labels=3, model_name=IMAGE_GRID_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
@@ -190,7 +189,7 @@ model_parameters = filter(lambda p: p.requires_grad, bbox_model.parameters())
 params = sum([np.prod(p.size()) for p in model_parameters])
 print(f'I PARAMTETRI SONO: {params}')
 bbox_model(image)
-
+"""
 
 
 
