@@ -53,8 +53,8 @@ for n, p in bbox_model.named_parameters():
         p.requires_grad = False
         #print(n)
 
-logs = {'train': {'loss_label':[], 'loss_confidence':[], 'loss_final':[]},
-        'test': {'loss_label':[], 'loss_confidence':[], 'loss_final':[]},
+logs = {'train': {'loss_label': [], 'loss_confidence': [], 'loss_final': []},
+        'test': {'loss_label': [], 'loss_confidence': [], 'loss_final': []},
         'test_real_world': {'loss_label':[], 'loss_confidence':[], 'loss_final':[]},
         'ap': {0: [], 1: []},
         'complete_metric': {'TP': [], 'FP': [], 'BFD': []}}

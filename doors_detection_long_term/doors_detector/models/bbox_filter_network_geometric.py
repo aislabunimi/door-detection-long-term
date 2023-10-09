@@ -116,7 +116,7 @@ class BboxFilterNetworkGeometricLabelLoss(nn.Module):
 class BboxFilterNetworkGeometricConfidenceLoss(nn.Module):
     def forward(self, preds, confidences):
         scores_features, labels_features = preds
-        confidence_loss = torch.mean(torch.sum(torch.abs(scores_features - confidences), dim=1))
+        confidence_loss = torch.mean(torch.mean(torch.abs(scores_features - confidences), dim=1))
 
         return confidence_loss
 

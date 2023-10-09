@@ -32,12 +32,12 @@ torch.autograd.detect_anomaly(True)
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 num_bboxes = 30
 
-grid_dim = [(2**i, 2**i) for i in range(3, 7)][::-1]
+grid_dim = [(2**i, 2**i) for i in range(3, 6)][::-1]
 
 iou_threshold_matching_metric = 0.5
 iou_threshold_matching = 0.5
 confidence_threshold = 0.75
-confidence_threshold_metric = 0.05
+confidence_threshold_metric = 0.5
 
 dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson_deep_doors_2')
 train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
@@ -207,7 +207,7 @@ for epoch in range(60):
         for k, v in image_grids.items():
             image_grids[k] = v.to('cuda')
         detected_bboxes = detected_bboxes.to('cuda')
-        #confidences = confidences.to('cuda')
+        confidences = confidences.to('cuda')
         labels_encoded = labels_encoded.to('cuda')
         #ious = ious.to('cuda')
 
@@ -235,7 +235,7 @@ for epoch in range(60):
             for k, v in image_grids.items():
                 image_grids[k] = v.to('cuda')
             detected_bboxes = detected_bboxes.to('cuda')
-            #confidences = confidences.to('cuda')
+            confidences = confidences.to('cuda')
             labels_encoded = labels_encoded.to('cuda')
             #ious = ious.to('cuda')
 
@@ -287,7 +287,7 @@ for epoch in range(60):
             for k, v in image_grids.items():
                 image_grids[k] = v.to('cuda')
             detected_bboxes = detected_bboxes.to('cuda')
-            #confidences = confidences.to('cuda')
+            confidences = confidences.to('cuda')
             labels_encoded = labels_encoded.to('cuda')
             #ious = ious.to('cuda')
 
@@ -328,9 +328,9 @@ for epoch in range(60):
         for label, v in metrics_ap['per_bbox'].items():
             net_performance_ap['sim_test'][label].append(v['AP'])
 
-        logs['train']['loss_final'].append(sum(temp_losses_final['loss_final']) / len(temp_losses_final['loss_final']))
-        logs['train']['loss_confidence'].append(sum(temp_losses_final['loss_confidence']) / len(temp_losses_final['loss_confidence']))
-        logs['train']['loss_label'].append(sum(temp_losses_final['loss_label']) / len(temp_losses_final['loss_label']))
+        logs['test']['loss_final'].append(sum(temp_losses_final['loss_final']) / len(temp_losses_final['loss_final']))
+        logs['test']['loss_confidence'].append(sum(temp_losses_final['loss_confidence']) / len(temp_losses_final['loss_confidence']))
+        logs['test']['loss_label'].append(sum(temp_losses_final['loss_label']) / len(temp_losses_final['loss_label']))
 
         # Test with real world data
 
@@ -345,7 +345,7 @@ for epoch in range(60):
                 for k, v in image_grids.items():
                     image_grids[k] = v.to('cuda')
                 detected_bboxes = detected_bboxes.to('cuda')
-                #confidences = confidences.to('cuda')
+                confidences = confidences.to('cuda')
                 labels_encoded = labels_encoded.to('cuda')
                 #ious = ious.to('cuda')
 
@@ -403,6 +403,7 @@ for epoch in range(60):
             plt.title('env')
             plt.legend()
             plt.savefig(f'image_complete/COMPLETE_METRIC_{env}.svg')
+            plt.close()
         for env, values in net_performance_ap.items():
             fig = plt.figure()
             plt.axhline(nms_performance_ap[env]['0'], label='nms Closed', color='red', linestyle='--')
@@ -413,16 +414,17 @@ for epoch in range(60):
             plt.title('env')
             plt.legend()
             plt.savefig(f'image_complete/AP_{env}.svg')
-
-        fig = plt.figure()
-        plt.plot([i for i in range(len(logs['train']['loss_final']))], logs['train']['loss_final'], label='Train loss')
-        plt.plot([i for i in range(len(logs['train']['loss_final']))], logs['test']['loss_final'], label='Test loss')
-        for h in houses:
-            plt.plot([i for i in range(len(logs['test_real_world'][house]['loss_final']))], logs['test_real_world'][house]['loss_final'], label=f'Loss in {h}')
-        plt.title('Losses')
-        plt.legend()
-        plt.savefig('image_complete/final_losses.svg')
-
+            plt.close()
+        for l_type in logs['train'].keys():
+            fig = plt.figure()
+            plt.plot([i for i in range(len(logs['train'][l_type]))], logs['train'][l_type], label='Train loss')
+            plt.plot([i for i in range(len(logs['test'][l_type]))], logs['test'][l_type], label='Test loss')
+            for h in houses:
+                plt.plot([i for i in range(len(logs['test_real_world'][house][l_type]))], logs['test_real_world'][house][l_type], label=f'Loss in {h}')
+            plt.title(f'Losses {l_type}')
+            plt.legend()
+            plt.savefig(f'image_complete/final_losses_{l_type}.svg')
+            plt.close()
     bbox_model.save(epoch=epoch, optimizer_state_dict=optimizer.state_dict(), params={}, logs=logs, lr_scheduler_state_dict={})
 
 
