@@ -136,7 +136,7 @@ class TorchDatasetBBoxes(Dataset):
             original_confidences.append([detected_box.get_confidence()])
             original_labels.append([0 if i != original_label else 1 for i in range(2)])
 
-            confidences.append(0.0 if gt_box is None else 1.0)
+            confidences.append(0.0 if gt_box is None else BoundingBox.iou(detected_box, gt_box))
             label = 0 if gt_box is None else int(gt_box.get_class_id()) + 1
             labels_encoded.append([0 if i != label else 1 for i in range(3)]) # 3 is the number of label (background, closed door, open door)
             ious.append(0.0 if gt_box is None else BoundingBox.iou(detected_box, gt_box))
