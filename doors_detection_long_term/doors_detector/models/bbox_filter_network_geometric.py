@@ -113,6 +113,14 @@ class BboxFilterNetworkGeometricLabelLoss(nn.Module):
         return labels_loss
 
 
+class BboxFilterNetworkGeometricConfidenceLoss(nn.Module):
+    def forward(self, preds, confidences):
+        scores_features, labels_features = preds
+        confidence_loss = torch.mean(torch.sum(torch.abs(scores_features - confidences), dim=1))
+
+        return confidence_loss
+
+
 def bbox_filtering_nms(bboxes, img_size, iou_threshold=.1, confidence_threshold=0.75):
 
     filtered_bboxes = []

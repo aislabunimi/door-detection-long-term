@@ -20,14 +20,14 @@ from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_
 from doors_detection_long_term.doors_detector.models.background_grid_network import IMAGE_GRID_NETWORK
 from doors_detection_long_term.doors_detector.models.bbox_filter_network_geometric import \
     BboxFilterNetworkGeometricBackground, IMAGE_NETWORK_GEOMETRIC_BACKGROUND, bbox_filtering_nms, \
-    BboxFilterNetworkGeometricLabelLoss
+    BboxFilterNetworkGeometricLabelLoss, BboxFilterNetworkGeometricConfidenceLoss
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
 from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_yolov5, collate_fn_bboxes
 from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering import bounding_box_filtering_yolo, \
     check_bbox_dataset, plot_results, plot_grid_dataset
-from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
+
 torch.autograd.detect_anomaly(True)
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 num_bboxes = 30
@@ -157,7 +157,9 @@ bbox_model.to('cuda')
 
 
 criterion = BboxFilterNetworkGeometricLabelLoss()
+criterion_confidence = BboxFilterNetworkGeometricConfidenceLoss()
 criterion.to('cuda')
+criterion_confidence.to('cuda')
 
 optimizer = optim.Adam(bbox_model.parameters(), lr=0.001)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
@@ -210,19 +212,20 @@ for epoch in range(60):
         #ious = ious.to('cuda')
 
         preds = bbox_model(images, detected_bboxes, detected_boxes_grid)
-        final_loss = criterion(preds, labels_encoded)
+        loss_label = criterion(preds, labels_encoded)
+        loss_confidence = criterion_confidence(preds, confidences)
+        final_loss = loss_label + loss_confidence
 
         #print(final_loss.item())
         optimizer.zero_grad()
         final_loss.backward()
         optimizer.step()
 
-
     with torch.no_grad():
         bbox_model.eval()
         criterion.eval()
 
-        temp_losses_final = []
+        temp_losses_final = {'loss_label':[], 'loss_confidence':[], 'loss_final':[]}
         evaluator_complete_metric = MyEvaluatorCompleteMetric()
         evaluator_ap = MyEvaluator()
         for i, data in tqdm(enumerate(train_dataset_bboxes), total=len(train_dataset_bboxes), desc=f'Test on training set epoch {epoch}'):
@@ -249,9 +252,14 @@ for epoch in range(60):
             detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=0.0, iou_threshold=0.5, img_size=images.size()[::-1][:2])
             evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
             evaluator_ap.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
-            final_loss = criterion(preds, labels_encoded)
 
-            temp_losses_final.append(final_loss.item())
+            loss_label = criterion(preds, labels_encoded)
+            loss_confidence = criterion_confidence(preds, confidences)
+            final_loss = loss_label + loss_confidence
+
+            temp_losses_final['loss_final'].append(final_loss.item())
+            temp_losses_final['loss_label'].append(loss_label.item())
+            temp_losses_final['loss_confidence'].append(loss_confidence.item())
 
         metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
         metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
@@ -266,9 +274,11 @@ for epoch in range(60):
         for label, v in metrics_ap['per_bbox'].items():
             net_performance_ap['sim_train'][label].append(v['AP'])
 
-        logs['train']['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
+        logs['train']['loss_final'].append(sum(temp_losses_final['loss_final']) / len(temp_losses_final['loss_final']))
+        logs['train']['loss_confidence'].append(sum(temp_losses_final['loss_confidence']) / len(temp_losses_final['loss_confidence']))
+        logs['train']['loss_label'].append(sum(temp_losses_final['loss_label']) / len(temp_losses_final['loss_label']))
 
-        temp_losses_final = []
+        temp_losses_final = {'loss_label':[], 'loss_confidence':[], 'loss_final':[]}
         evaluator_complete_metric = MyEvaluatorCompleteMetric()
         evaluator_ap = MyEvaluator()
         for i, data in tqdm(enumerate(test_dataset_bboxes), total=len(test_dataset_bboxes), desc=f'TEST epoch {epoch}'):
@@ -295,9 +305,13 @@ for epoch in range(60):
             evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
             evaluator_ap.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
 
-            final_loss = criterion(preds, labels_encoded)
+            loss_label = criterion(preds, labels_encoded)
+            loss_confidence = criterion_confidence(preds, confidences)
+            final_loss = loss_label + loss_confidence
 
-            temp_losses_final.append(final_loss.item())
+            temp_losses_final['loss_final'].append(final_loss.item())
+            temp_losses_final['loss_label'].append(loss_label.item())
+            temp_losses_final['loss_confidence'].append(loss_confidence.item())
 
             plot_results(epoch=epoch, count=i, env='simulation', images=images, bboxes=detected_bboxes, targets=target_boxes, confidence_threshold=confidence_threshold_metric)
 
@@ -314,12 +328,14 @@ for epoch in range(60):
         for label, v in metrics_ap['per_bbox'].items():
             net_performance_ap['sim_test'][label].append(v['AP'])
 
-        logs['test']['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
+        logs['train']['loss_final'].append(sum(temp_losses_final['loss_final']) / len(temp_losses_final['loss_final']))
+        logs['train']['loss_confidence'].append(sum(temp_losses_final['loss_confidence']) / len(temp_losses_final['loss_confidence']))
+        logs['train']['loss_label'].append(sum(temp_losses_final['loss_label']) / len(temp_losses_final['loss_label']))
 
         # Test with real world data
 
         for house, dataset_real_world in datasets_real_worlds.items():
-            temp_losses_final = []
+            temp_losses_final = {'loss_label':[], 'loss_confidence':[], 'loss_final':[]}
             temp_accuracy = {0: 0, 1: 0}
             evaluator_complete_metric = MyEvaluatorCompleteMetric()
             evaluator_ap = MyEvaluator()
@@ -347,12 +363,20 @@ for epoch in range(60):
                 evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
                 evaluator_ap.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
 
-                final_loss = criterion(preds, labels_encoded)
-                temp_losses_final.append(final_loss.item())
+                loss_label = criterion(preds, labels_encoded)
+                loss_confidence = criterion_confidence(preds, confidences)
+                final_loss = loss_label + loss_confidence
+
+                temp_losses_final['loss_final'].append(final_loss.item())
+                temp_losses_final['loss_label'].append(loss_label.item())
+                temp_losses_final['loss_confidence'].append(loss_confidence.item())
 
                 plot_results(epoch=epoch, count=i, env=house, images=images, bboxes=detected_bboxes, targets=target_boxes, confidence_threshold=confidence_threshold_metric)
 
-            logs['test_real_world'][house]['loss_final'].append(sum(temp_losses_final) / len(temp_losses_final))
+            logs['test_real_world'][house]['loss_final'].append(sum(temp_losses_final['loss_final']) / len(temp_losses_final['loss_final']))
+            logs['test_real_world'][house]['loss_confidence'].append(sum(temp_losses_final['loss_confidence']) / len(temp_losses_final['loss_confidence']))
+            logs['test_real_world'][house]['loss_label'].append(sum(temp_losses_final['loss_label']) / len(temp_losses_final['loss_label']))
+
             metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
             metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
 
