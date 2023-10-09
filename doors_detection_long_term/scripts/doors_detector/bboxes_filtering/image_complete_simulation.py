@@ -243,6 +243,9 @@ for epoch in range(60):
             new_labels, new_labels_indexes = torch.max(preds[1].to('cpu'), dim=2, keepdim=False)
             detected_bboxes = detected_bboxes.transpose(1, 2).to('cpu')
 
+            # Modify confidences according to the model output
+            detected_bboxes[:, :, 4] = preds[0].to('cpu')
+
             # Filtering bboxes according to new labels
             detected_bboxes = torch.unbind(detected_bboxes, 0)
             detected_bboxes = [b[i != 0, :] for b, i in zip(detected_bboxes, new_labels_indexes)]
@@ -294,6 +297,9 @@ for epoch in range(60):
             preds = bbox_model(images, detected_bboxes, detected_boxes_grid)
             new_labels, new_labels_indexes = torch.max(preds[1].to('cpu'), dim=2, keepdim=False)
             detected_bboxes = detected_bboxes.transpose(1, 2).to('cpu')
+
+            # Modify confidences according to the model output
+            detected_bboxes[:, :, 4] = preds[0].to('cpu')
 
             # Filtering bboxes according to new labels
             detected_bboxes = torch.unbind(detected_bboxes, 0)
@@ -352,6 +358,9 @@ for epoch in range(60):
                 preds = bbox_model(images, detected_bboxes, detected_boxes_grid)
                 new_labels, new_labels_indexes = torch.max(preds[1].to('cpu'), dim=2, keepdim=False)
                 detected_bboxes = detected_bboxes.transpose(1, 2).to('cpu')
+
+                # Modify confidences according to the model output
+                detected_bboxes[:, :, 4] = preds[0].to('cpu')
 
                 # Filtering bboxes according to new labels
                 detected_bboxes = torch.unbind(detected_bboxes, 0)
