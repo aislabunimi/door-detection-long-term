@@ -29,6 +29,48 @@ class SharedMLP(nn.Module):
         return self.shared_mlp(input)
 
 
+class MaskNetwork(nn.Module):
+    def __init__(self, image_size: Tuple[int, int]):
+        super(MaskNetwork, self).__init__()
+
+        self._image_size = image_size
+
+        final_size = image_size[0] * image_size[1]
+        self.x1 = nn.Linear(in_features=1, out_features=final_size)
+        self.x2 = nn.Linear(in_features=1, out_features=final_size)
+        self.y1 = nn.Linear(in_features=1, out_features=final_size)
+        self.y2 = nn.Linear(in_features=1, out_features=final_size)
+
+        with torch.no_grad():
+            self.x1.weight.fill_(1.0)
+            self.x2.weight.fill_(1.0)
+            self.y1.weight.fill_(1.0)
+            self.y2.weight.fill_(1.0)
+            self.x1.bias = nn.Parameter(torch.tensor([i % image_size[0] * -1.0 for i in range(final_size)]))
+            self.x2.bias = nn.Parameter(torch.tensor([i % image_size[0] * -1.0 for i in range(final_size)]))
+            self.y1.bias = nn.Parameter(torch.tensor([i % image_size[0] * -1.0 for i in range(final_size)]).reshape(image_size).transpose(0,1).flatten())
+            self.y2.bias = nn.Parameter(torch.tensor([i % image_size[0] * -1.0 for i in range(final_size)]).reshape(image_size).transpose(0,1).flatten())
+
+        for p in self.parameters():
+            p.requires_grad = False
+
+    def forward(self, bboxes_masks):
+
+        x1 = self.x1(bboxes_masks[:, 0])
+        x2 = self.x2(bboxes_masks[:, 2])
+        y1 = self.y1(bboxes_masks[:, 1])
+        y2 = self.y2(bboxes_masks[:, 3])
+
+        x1 = x1 <= 0
+        x2 = x2 > 0
+        y1 = y1 <= 0
+        y2 = y2 > 0
+        x = x1 * x2 * y1 * y2
+        x = x.reshape(bboxes_masks.size(0), self._image_size[0], self._image_size[1])
+
+        return x
+
+
 class BboxFilterNetworkGeometricBackground(GenericModel):
     def __init__(self, model_name: ModelName, pretrained: bool, initial_channels: int, n_labels: int, dataset_name: DATASET, description: DESCRIPTION, description_background: DESCRIPTION, image_grid_dimensions: List[Tuple[int, int]]):
         super(BboxFilterNetworkGeometricBackground, self).__init__(model_name, dataset_name, description)
@@ -136,3 +178,8 @@ def bbox_filtering_nms(bboxes, img_size, iou_threshold=.1, confidence_threshold=
         keep = torchvision.ops.nms(boxes=coords, scores=image_bboxes[:, 4], iou_threshold=iou_threshold)
         filtered_bboxes.append(image_bboxes[keep])
     return filtered_bboxes
+
+"""
+mask_network = MaskNetwork(image_size=(4, 4))
+print(mask_network(torch.tensor([[0.0, 1, 3, 2]])))
+"""
