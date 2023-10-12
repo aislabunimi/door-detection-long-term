@@ -54,19 +54,19 @@ class MaskNetwork(nn.Module):
         for p in self.parameters():
             p.requires_grad = False
 
-    def forward(self, bboxes_masks):
+    def forward(self, bboxes_masks, features_number: int = 1):
 
-        x1 = self.x1(bboxes_masks[:, 0])
-        x2 = self.x2(bboxes_masks[:, 2])
-        y1 = self.y1(bboxes_masks[:, 1])
-        y2 = self.y2(bboxes_masks[:, 3])
+        x1 = self.x1(bboxes_masks[:, 0].view(-1, 1))
+        x2 = self.x2(bboxes_masks[:, 2].view(-1, 1))
+        y1 = self.y1(bboxes_masks[:, 1].view(-1, 1))
+        y2 = self.y2(bboxes_masks[:, 3].view(-1, 1))
 
         x1 = x1 <= 0
         x2 = x2 > 0
         y1 = y1 <= 0
         y2 = y2 > 0
         x = x1 * x2 * y1 * y2
-        x = x.reshape(bboxes_masks.size(0), self._image_size[0], self._image_size[1])
+        x = x.reshape(bboxes_masks.size(0), 1, self._image_size[0], self._image_size[1]).repeat(1, features_number, 1, 1)
 
         return x
 
@@ -74,17 +74,14 @@ class MaskNetwork(nn.Module):
 class BboxFilterNetworkGeometricBackground(GenericModel):
     def __init__(self, model_name: ModelName, pretrained: bool, initial_channels: int, n_labels: int, dataset_name: DATASET, description: DESCRIPTION, description_background: DESCRIPTION, image_grid_dimensions: List[Tuple[int, int]]):
         super(BboxFilterNetworkGeometricBackground, self).__init__(model_name, dataset_name, description)
+        self._image_grid_dimensions = image_grid_dimensions
         self._initial_channels = initial_channels
 
         self.background_network = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=image_grid_dimensions, n_labels=3, model_name=IMAGE_BACKGROUND_NETWORK, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=description_background)
 
-        self.background_network.final_convolution = nn.Sequential(*self.background_network.final_convolution[:-3], nn.ReLU())
+        self.background_network.final_convolution = nn.Sequential(*self.background_network.final_convolution[:-3])
 
-        self.background_to_geometric = nn.Sequential(
-            nn.Conv2d(in_channels=32, out_channels=16, kernel_size=3, padding=1),
-            nn.BatchNorm2d(16),
-            nn.Sigmoid(),
-        )
+        self.mask_network = MaskNetwork(image_size=image_grid_dimensions[0])
 
         self.shared_mlp_1 = SharedMLP(channels=[initial_channels, 32, 64, 128, 256])
         self.shared_mlp_2 = SharedMLP(channels=[256, 256, 512, 1024])
@@ -107,18 +104,13 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
 
     def forward(self, images, bboxes, bboxes_mask):
 
-        #background_features = torch.transpose(self.background_to_geometric(self.background_network(images)), 2, 3)
-        #print(background_features.size(), background_features.size()[::-1][:2], bboxes_mask[background_features.size()[::-1][:2]])
-        #bboxes_mask = bboxes_mask[background_features.size()[::-1][:2]]
+        background_features = self.background_network(images).transpose(1, 2).transpose(2, 3)
+        mask = self.mask_network(bboxes_mask[self._image_grid_dimensions[0]].view(-1, 4).float(), background_features.size(1))
+        mask = mask.view(images.size(0), bboxes.size(-1), *mask.size()[1:])
+        background_features = background_features.unsqueeze(1)
+        bounding_boxes_background_features = torch.amax(mask * background_features, dim=(3, 4)).transpose(1, 2)
 
-        bboxes_background_features = []
-        """
-        for features, bboxes_mask_list in zip(background_features, bboxes_mask):
-            for x1, y1, x2, y2 in bboxes_mask_list:
-                mean = torch.mean(features[:, x1: x2, y1: y2].reshape(background_features.size()[1], -1), dim=1)
-                bboxes_background_features.append(mean)
-        bboxes = torch.cat([bboxes, torch.stack(bboxes_background_features).reshape(background_features.size()[0], background_features.size()[1], -1)], dim=1)
-        """
+
         local_features_1 = self.shared_mlp_1(bboxes)
         local_features_2 = self.shared_mlp_2(local_features_1)
         local_features_3 = self.shared_mlp_3(local_features_2)
@@ -181,5 +173,6 @@ def bbox_filtering_nms(bboxes, img_size, iou_threshold=.1, confidence_threshold=
 
 """
 mask_network = MaskNetwork(image_size=(4, 4))
-print(mask_network(torch.tensor([[0.0, 1, 3, 2]])))
+print(mask_network(torch.rand(30*16, 4)))
+
 """

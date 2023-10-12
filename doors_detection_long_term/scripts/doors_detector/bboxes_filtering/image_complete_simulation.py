@@ -206,6 +206,10 @@ for epoch in range(60):
 
         for k, v in image_grids.items():
             image_grids[k] = v.to('cuda')
+
+        for k, v in detected_boxes_grid.items():
+            detected_boxes_grid[k] = v.to('cuda')
+
         detected_bboxes = detected_bboxes.to('cuda')
         confidences = confidences.to('cuda')
         labels_encoded = labels_encoded.to('cuda')
@@ -234,6 +238,10 @@ for epoch in range(60):
             images = images.to('cuda')
             for k, v in image_grids.items():
                 image_grids[k] = v.to('cuda')
+
+            for k, v in detected_boxes_grid.items():
+                detected_boxes_grid[k] = v.to('cuda')
+
             detected_bboxes = detected_bboxes.to('cuda')
             confidences = confidences.to('cuda')
             labels_encoded = labels_encoded.to('cuda')
@@ -289,6 +297,10 @@ for epoch in range(60):
             images = images.to('cuda')
             for k, v in image_grids.items():
                 image_grids[k] = v.to('cuda')
+
+            for k, v in detected_boxes_grid.items():
+                detected_boxes_grid[k] = v.to('cuda')
+
             detected_bboxes = detected_bboxes.to('cuda')
             confidences = confidences.to('cuda')
             labels_encoded = labels_encoded.to('cuda')
@@ -350,6 +362,8 @@ for epoch in range(60):
                 images = images.to('cuda')
                 for k, v in image_grids.items():
                     image_grids[k] = v.to('cuda')
+                for k, v in detected_boxes_grid.items():
+                    detected_boxes_grid[k] = v.to('cuda')
                 detected_bboxes = detected_bboxes.to('cuda')
                 confidences = confidences.to('cuda')
                 labels_encoded = labels_encoded.to('cuda')
