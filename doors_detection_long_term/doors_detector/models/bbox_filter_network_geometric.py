@@ -83,11 +83,15 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
 
         self.mask_network = MaskNetwork(image_size=image_grid_dimensions[0])
 
-        self.shared_mlp_1 = SharedMLP(channels=[initial_channels, 32, 64, 128, 256])
-        self.shared_mlp_2 = SharedMLP(channels=[256, 256, 512, 1024])
+        self.shared_mlp_background_1 = SharedMLP(channels=[16, 32, 64, 128])
+        self.shared_mlp_background_2 = SharedMLP(channels=[128, 256, 512, 1024])
+        self.shared_mlp_background_3 = SharedMLP(channels=[1024 + 128, 512, 256, 128])
+
+        self.shared_mlp_1 = SharedMLP(channels=[initial_channels, 16, 32, 64, 128])
+        self.shared_mlp_2 = SharedMLP(channels=[128, 256, 512, 1024])
         self.shared_mlp_3 = SharedMLP(channels=[1024, 1024, 2048])
 
-        self.shared_mlp_4 = SharedMLP(channels=[256 + 1024 + 2048, 2048, 1024, 512, 256, 128])
+        self.shared_mlp_4 = SharedMLP(channels=[128 + 1024, 512, 256, 128])
 
         self.shared_mlp_5 = SharedMLP(channels=[128, 64, 32, 16, 1], last_activation=nn.Sigmoid())
 
@@ -110,18 +114,24 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         background_features = background_features.unsqueeze(1)
         bounding_boxes_background_features = torch.amax(mask * background_features, dim=(3, 4)).transpose(1, 2)
 
+        local_features_background = self.shared_mlp_background_1(bounding_boxes_background_features)
+        global_features_background = self.shared_mlp_background_2(local_features_background)
+
+        global_features_background = torch.max(global_features_background, 2, keepdim=True)[0]
+        global_features_background = global_features_background.repeat(1, 1, local_features_background.size(-1))
+        mixed_features_background = torch.cat([local_features_background, global_features_background], 1)
+
+
 
         local_features_1 = self.shared_mlp_1(bboxes)
         local_features_2 = self.shared_mlp_2(local_features_1)
-        local_features_3 = self.shared_mlp_3(local_features_2)
 
         global_features_1 = torch.max(local_features_2, 2, keepdim=True)[0]
         global_features_1 = global_features_1.repeat(1, 1, local_features_1.size(-1))
 
-        global_features_2 = torch.max(local_features_3, 2, keepdim=True)[0]
-        global_features_2 = global_features_2.repeat(1, 1, local_features_1.size(-1))
+        mixed_features = torch.cat([local_features_1, global_features_1], 1)
 
-        mixed_features = torch.cat([local_features_1, global_features_1, global_features_2], 1)
+        mixed_features = mixed_features + mixed_features_background
 
         mixed_features = self.shared_mlp_4(mixed_features)
 
