@@ -131,12 +131,12 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
 
         mixed_features = torch.cat([local_features_1, global_features_1], 1)
 
-        mixed_features = mixed_features + mixed_features_background
+        #mixed_features = mixed_features + mixed_features_background
 
         mixed_features = self.shared_mlp_4(mixed_features)
 
         score_features = self.shared_mlp_5(mixed_features)
-        label_features = self.shared_mlp_6(mixed_features)
+        label_features = self.shared_mlp_6(mixed_features_background)
 
         score_features = torch.squeeze(score_features, dim=1)
         label_features = torch.transpose(label_features, 1, 2)
