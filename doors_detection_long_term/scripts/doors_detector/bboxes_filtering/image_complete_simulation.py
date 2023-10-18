@@ -37,7 +37,7 @@ grid_dim = [(2**i, 2**i) for i in range(3, 6)][::-1]
 iou_threshold_matching_metric = 0.5
 iou_threshold_matching = 0.5
 confidence_threshold = 0.75
-confidence_threshold_metric = 0.5
+confidence_threshold_metric = 0.0
 
 dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson_deep_doors_2')
 train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
@@ -252,17 +252,20 @@ for epoch in range(60):
             detected_bboxes = detected_bboxes.transpose(1, 2).to('cpu')
 
             # Modify confidences according to the model output
-            old_conf = detected_bboxes[:, :, 4]
-            detected_bboxes[:, :, 4] = preds[0].to('cpu')
+            #detected_bboxes[:, :, 4] = preds[0].to('cpu')
+
+            # Remove bboxes with background network
+            new_labels_indexes[preds[0] < 0.5] = 0
 
             # Filtering bboxes according to new labels
             detected_bboxes = torch.unbind(detected_bboxes, 0)
             detected_bboxes = [b[i != 0, :] for b, i in zip(detected_bboxes, new_labels_indexes)]
-            # Modify the label according to the new label assigned by the model
-            detected_bboxes = [torch.cat([b[:, :5], p[i != 0][:, 1:]], dim=1) for b, p, i in zip(detected_bboxes, preds[1].to('cpu'), new_labels_indexes)]
 
-            detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=0.5, iou_threshold=0.5, img_size=images.size()[::-1][:2])
-            detected_bboxes[:, :, 4] = old_conf
+            detected_bboxes = [torch.cat([b[:, :5], p[i != 0][:, 1:]], dim=1) for b, p, i in zip(detected_bboxes, preds[1].to('cpu'), new_labels_indexes)]
+            # Delete bboxes according to the background network
+
+
+            detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=0.0, iou_threshold=0.5, img_size=images.size()[::-1][:2])
             evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
             evaluator_ap.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
 
@@ -313,8 +316,10 @@ for epoch in range(60):
             detected_bboxes = detected_bboxes.transpose(1, 2).to('cpu')
 
             # Modify confidences according to the model output
-            old_conf = detected_bboxes[:, :, 4]
-            detected_bboxes[:, :, 4] = preds[0].to('cpu')
+            #detected_bboxes[:, :, 4] = preds[0].to('cpu')
+
+            # Remove bboxes with background network
+            new_labels_indexes[preds[0] < 0.5] = 0
 
             # Filtering bboxes according to new labels
             detected_bboxes = torch.unbind(detected_bboxes, 0)
@@ -322,8 +327,7 @@ for epoch in range(60):
             # Modify the label according to the new label assigned by the model
             detected_bboxes = [torch.cat([b[:, :5], p[i != 0][:, 1:]], dim=1) for b, p, i in zip(detected_bboxes, preds[1].to('cpu'), new_labels_indexes)]
 
-            detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=0.5, iou_threshold=0.5, img_size=images.size()[::-1][:2])
-            detected_bboxes[:, :, 4] = old_conf
+            detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=0.0, iou_threshold=0.5, img_size=images.size()[::-1][:2])
             evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
             evaluator_ap.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
 
@@ -378,8 +382,10 @@ for epoch in range(60):
                 detected_bboxes = detected_bboxes.transpose(1, 2).to('cpu')
 
                 # Modify confidences according to the model output
-                old_conf = detected_bboxes[:, :, 4]
-                detected_bboxes[:, :, 4] = preds[0].to('cpu')
+                #detected_bboxes[:, :, 4] = preds[0].to('cpu')
+
+                # Remove bboxes with background network
+                new_labels_indexes[preds[0] < 0.5] = 0
 
                 # Filtering bboxes according to new labels
                 detected_bboxes = torch.unbind(detected_bboxes, 0)
@@ -387,8 +393,7 @@ for epoch in range(60):
                 # Modify the label according to the new label assigned by the model
                 detected_bboxes = [torch.cat([b[:, :5], p[i != 0][:, 1:]], dim=1) for b, p, i in zip(detected_bboxes, preds[1].to('cpu'), new_labels_indexes)]
 
-                detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=.5, iou_threshold=0.5, img_size=images.size()[::-1][:2])
-                detected_bboxes[:, :, 4] = old_conf
+                detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=.0, iou_threshold=0.5, img_size=images.size()[::-1][:2])
                 evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
                 evaluator_ap.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
 
