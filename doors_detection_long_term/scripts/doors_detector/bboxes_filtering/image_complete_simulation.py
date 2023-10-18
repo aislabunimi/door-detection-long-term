@@ -43,7 +43,7 @@ dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector
 train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
 
 print(len(train_bboxes), len(test_bboxes))
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=8, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
 #check_bbox_dataset(test_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=(32, 32))
 
@@ -218,7 +218,7 @@ for epoch in range(60):
         preds = bbox_model(images, detected_bboxes, detected_boxes_grid)
         loss_label = criterion(preds, labels_encoded)
         loss_confidence = criterion_confidence(preds, confidences)
-        final_loss = loss_label
+        final_loss = loss_label + loss_confidence
 
         #print(final_loss.item())
         optimizer.zero_grad()
@@ -266,7 +266,7 @@ for epoch in range(60):
 
             loss_label = criterion(preds, labels_encoded)
             loss_confidence = criterion_confidence(preds, confidences)
-            final_loss = loss_label
+            final_loss = loss_label + loss_confidence
 
             temp_losses_final['loss_final'].append(final_loss.item())
             temp_losses_final['loss_label'].append(loss_label.item())
@@ -325,7 +325,7 @@ for epoch in range(60):
 
             loss_label = criterion(preds, labels_encoded)
             loss_confidence = criterion_confidence(preds, confidences)
-            final_loss = loss_label
+            final_loss = loss_label + loss_confidence
 
             temp_losses_final['loss_final'].append(final_loss.item())
             temp_losses_final['loss_label'].append(loss_label.item())
@@ -388,7 +388,7 @@ for epoch in range(60):
 
                 loss_label = criterion(preds, labels_encoded)
                 loss_confidence = criterion_confidence(preds, confidences)
-                final_loss = loss_label
+                final_loss = loss_label + loss_confidence
 
                 temp_losses_final['loss_final'].append(final_loss.item())
                 temp_losses_final['loss_label'].append(loss_label.item())
