@@ -5,7 +5,7 @@ from tqdm import tqdm
 from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetLoaderBBoxes import DatasetLoaderBBoxes
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.models.background_grid_network import IMAGE_GRID_NETWORK, \
-    ImageGridNetwork, ImageGridNetworkLoss
+    ImageGridNetwork, ImageGridNetworkLoss, IMAGE_GRID_NETWORK_GIBSON_DD2
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, IMAGE_BACKGROUND_NETWORK
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_yolov5, collate_fn_bboxes
@@ -21,11 +21,11 @@ grid_dim = [(2**i, 2**i) for i in range(3, 6)][::-1]
 iou_threshold_matching = 0.5
 confidence_threshold = 0.75
 
-dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson_deep_doors_2_door_nodoor')
+dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson_deep_doors_2')
 train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
 
 print(len(train_bboxes), len(test_bboxes))
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=True)
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
 #check_bbox_dataset(test_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=(8, 8))
 
@@ -40,7 +40,7 @@ with torch.no_grad():
         datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
 
 #check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold, scale_number=(32, 32))
-bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=grid_dim, n_labels=3, model_name=IMAGE_BACKGROUND_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
+bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=grid_dim, n_labels=3, model_name=IMAGE_BACKGROUND_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK_GIBSON_DD2)
 bbox_model.to('cuda')
 
 criterion = ImageGridNetworkLoss()
@@ -64,7 +64,7 @@ train_accuracy = {0: [], 1: []}
 test_accuracy = {0: [], 1: []}
 real_world_accuracy = {h: {0: [], 1: []} for h in houses}
 
-for epoch in range(60):
+for epoch in range(30):
     scheduler.step()
     bbox_model.train()
     criterion.train()

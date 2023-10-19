@@ -43,7 +43,7 @@ dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector
 train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
 
 print(len(train_bboxes), len(test_bboxes))
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=8, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=8, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=True)
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
 #check_bbox_dataset(test_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=(32, 32))
 
@@ -165,7 +165,7 @@ optimizer = optim.Adam(bbox_model.parameters(), lr=0.001)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
 
 for n, p in bbox_model.named_parameters():
-    if any([x in n for x in ['fpn.conv1.weight', 'fpn.bn1.weight', 'fpn.bn1.bias', 'fpn.layer1', 'background_network']]):
+    if any([x in n for x in ['fpn.', 'background_network']]):
         p.requires_grad = False
         #print(n)
 # Fix parameters of background network
@@ -194,7 +194,7 @@ for env, metrics in nms_performance_ap.items():
         net_performance_ap[env][metric] = []
 
 for epoch in range(60):
-    #scheduler.step()
+    scheduler.step()
     bbox_model.train()
     criterion.train()
     optimizer.zero_grad()
@@ -218,7 +218,7 @@ for epoch in range(60):
         preds = bbox_model(images, detected_bboxes, detected_boxes_grid)
         loss_label = criterion(preds, labels_encoded)
         loss_confidence = criterion_confidence(preds, confidences)
-        final_loss = loss_label + loss_confidence
+        final_loss = loss_label #+ loss_confidence
 
         #print(final_loss.item())
         optimizer.zero_grad()
@@ -255,7 +255,7 @@ for epoch in range(60):
             #detected_bboxes[:, :, 4] = preds[0].to('cpu')
 
             # Remove bboxes with background network
-            new_labels_indexes[preds[0] < 0.5] = 0
+            #new_labels_indexes[preds[0] < 0.5] = 0
 
             # Filtering bboxes according to new labels
             detected_bboxes = torch.unbind(detected_bboxes, 0)
@@ -271,7 +271,7 @@ for epoch in range(60):
 
             loss_label = criterion(preds, labels_encoded)
             loss_confidence = criterion_confidence(preds, confidences)
-            final_loss = loss_label + loss_confidence
+            final_loss = loss_label #+ loss_confidence
 
             temp_losses_final['loss_final'].append(final_loss.item())
             temp_losses_final['loss_label'].append(loss_label.item())
@@ -319,7 +319,7 @@ for epoch in range(60):
             #detected_bboxes[:, :, 4] = preds[0].to('cpu')
 
             # Remove bboxes with background network
-            new_labels_indexes[preds[0] < 0.5] = 0
+            #new_labels_indexes[preds[0] < 0.5] = 0
 
             # Filtering bboxes according to new labels
             detected_bboxes = torch.unbind(detected_bboxes, 0)
@@ -333,7 +333,7 @@ for epoch in range(60):
 
             loss_label = criterion(preds, labels_encoded)
             loss_confidence = criterion_confidence(preds, confidences)
-            final_loss = loss_label + loss_confidence
+            final_loss = loss_label #+ loss_confidence
 
             temp_losses_final['loss_final'].append(final_loss.item())
             temp_losses_final['loss_label'].append(loss_label.item())
@@ -385,7 +385,7 @@ for epoch in range(60):
                 #detected_bboxes[:, :, 4] = preds[0].to('cpu')
 
                 # Remove bboxes with background network
-                new_labels_indexes[preds[0] < 0.5] = 0
+                #new_labels_indexes[preds[0] < 0.5] = 0
 
                 # Filtering bboxes according to new labels
                 detected_bboxes = torch.unbind(detected_bboxes, 0)
@@ -399,7 +399,7 @@ for epoch in range(60):
 
                 loss_label = criterion(preds, labels_encoded)
                 loss_confidence = criterion_confidence(preds, confidences)
-                final_loss = loss_label + loss_confidence
+                final_loss = loss_label #+ loss_confidence
 
                 temp_losses_final['loss_final'].append(final_loss.item())
                 temp_losses_final['loss_label'].append(loss_label.item())

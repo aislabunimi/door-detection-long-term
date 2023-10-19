@@ -19,6 +19,7 @@ from doors_detection_long_term.scripts.doors_detector.dataset_configurator impor
 
 TEST: DESCRIPTION = 0
 IMAGE_GRID_NETWORK: DESCRIPTION = 1
+IMAGE_GRID_NETWORK_GIBSON_DD2: DESCRIPTION = 2
 
 
 class ResNet18FPN(ResNet):
