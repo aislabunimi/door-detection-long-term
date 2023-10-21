@@ -1,6 +1,8 @@
+import math
 from collections import OrderedDict
 
 import cv2
+import numpy as np
 import torch.optim
 from matplotlib import pyplot as plt
 from torch import optim
@@ -17,7 +19,8 @@ from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetLoad
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
-from doors_detection_long_term.doors_detector.models.background_grid_network import IMAGE_GRID_NETWORK
+from doors_detection_long_term.doors_detector.models.background_grid_network import IMAGE_GRID_NETWORK, \
+    IMAGE_GRID_NETWORK_GIBSON_DD2
 from doors_detection_long_term.doors_detector.models.bbox_filter_network_geometric import \
     BboxFilterNetworkGeometricBackground, IMAGE_NETWORK_GEOMETRIC_BACKGROUND, bbox_filtering_nms, \
     BboxFilterNetworkGeometricLabelLoss, BboxFilterNetworkGeometricConfidenceLoss
@@ -40,7 +43,7 @@ confidence_threshold = 0.75
 confidence_threshold_metric = 0.0
 
 dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson_deep_doors_2')
-train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
+train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=True)
 
 print(len(train_bboxes), len(test_bboxes))
 train_dataset_bboxes = DataLoader(train_bboxes, batch_size=8, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=True)
@@ -152,7 +155,7 @@ for env, values in nms_performance_ap.items():
     plt.savefig(f'image_complete/AP_{env}.svg')
 
 
-bbox_model = BboxFilterNetworkGeometricBackground(initial_channels=7, image_grid_dimensions=grid_dim, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_NETWORK_GEOMETRIC_BACKGROUND, description_background=IMAGE_GRID_NETWORK)
+bbox_model = BboxFilterNetworkGeometricBackground(initial_channels=7, image_grid_dimensions=grid_dim, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_NETWORK_GEOMETRIC_BACKGROUND, description_background=IMAGE_GRID_NETWORK_GIBSON_DD2)
 bbox_model.to('cuda')
 
 
@@ -165,7 +168,7 @@ optimizer = optim.Adam(bbox_model.parameters(), lr=0.001)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
 
 for n, p in bbox_model.named_parameters():
-    if any([x in n for x in ['fpn.', 'background_network']]):
+    if any([x in n for x in ['fpn.conv1.weight', 'fpn.bn1.weight', 'fpn.bn1.bias', 'fpn.layer1',]]):
         p.requires_grad = False
         #print(n)
 # Fix parameters of background network
@@ -194,7 +197,7 @@ for env, metrics in nms_performance_ap.items():
         net_performance_ap[env][metric] = []
 
 for epoch in range(60):
-    scheduler.step()
+    #scheduler.step()
     bbox_model.train()
     criterion.train()
     optimizer.zero_grad()
@@ -218,7 +221,7 @@ for epoch in range(60):
         preds = bbox_model(images, detected_bboxes, detected_boxes_grid)
         loss_label = criterion(preds, labels_encoded)
         loss_confidence = criterion_confidence(preds, confidences)
-        final_loss = loss_label #+ loss_confidence
+        final_loss = loss_label + loss_confidence
 
         #print(final_loss.item())
         optimizer.zero_grad()
@@ -232,6 +235,7 @@ for epoch in range(60):
         temp_losses_final = {'loss_label':[], 'loss_confidence':[], 'loss_final':[]}
         evaluator_complete_metric = MyEvaluatorCompleteMetric()
         evaluator_ap = MyEvaluator()
+        confidence_mean = {0:[], 1:[]}
         for i, data in tqdm(enumerate(train_dataset_bboxes), total=len(train_dataset_bboxes), desc=f'Test on training set epoch {epoch}'):
 
             images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
@@ -252,7 +256,9 @@ for epoch in range(60):
             detected_bboxes = detected_bboxes.transpose(1, 2).to('cpu')
 
             # Modify confidences according to the model output
-            #detected_bboxes[:, :, 4] = preds[0].to('cpu')
+            detected_bboxes[:, :, 4] = preds[0].to('cpu')
+            confidence_mean[0].append(preds[0][confidences<0.5].mean())
+            confidence_mean[1].append(preds[0][confidences>=0.5].mean())
 
             # Remove bboxes with background network
             #new_labels_indexes[preds[0] < 0.5] = 0
@@ -271,12 +277,14 @@ for epoch in range(60):
 
             loss_label = criterion(preds, labels_encoded)
             loss_confidence = criterion_confidence(preds, confidences)
-            final_loss = loss_label #+ loss_confidence
+            final_loss = loss_label + loss_confidence
 
             temp_losses_final['loss_final'].append(final_loss.item())
             temp_losses_final['loss_label'].append(loss_label.item())
             temp_losses_final['loss_confidence'].append(loss_confidence.item())
 
+        print(f'Confidence media errori: {sum(filter(lambda x: not math.isnan(x),confidence_mean[0])) / len(list(filter(lambda x: not math.isnan(x),confidence_mean[0])))}',
+                  f'Confidence media corretti: {sum(filter(lambda x: not math.isnan(x),confidence_mean[1])) / len(list(filter(lambda x: not math.isnan(x),confidence_mean[1])))}')
         metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
         metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
 
@@ -297,6 +305,7 @@ for epoch in range(60):
         temp_losses_final = {'loss_label':[], 'loss_confidence':[], 'loss_final':[]}
         evaluator_complete_metric = MyEvaluatorCompleteMetric()
         evaluator_ap = MyEvaluator()
+        confidence_mean = {0:[], 1:[]}
         for i, data in tqdm(enumerate(test_dataset_bboxes), total=len(test_dataset_bboxes), desc=f'TEST epoch {epoch}'):
             images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
             images = images.to('cuda')
@@ -316,8 +325,9 @@ for epoch in range(60):
             detected_bboxes = detected_bboxes.transpose(1, 2).to('cpu')
 
             # Modify confidences according to the model output
-            #detected_bboxes[:, :, 4] = preds[0].to('cpu')
-
+            detected_bboxes[:, :, 4] = preds[0].to('cpu')
+            confidence_mean[0].append(preds[0][confidences<0.5].mean().item())
+            confidence_mean[1].append(preds[0][confidences>=0.5].mean().item())
             # Remove bboxes with background network
             #new_labels_indexes[preds[0] < 0.5] = 0
 
@@ -333,7 +343,7 @@ for epoch in range(60):
 
             loss_label = criterion(preds, labels_encoded)
             loss_confidence = criterion_confidence(preds, confidences)
-            final_loss = loss_label #+ loss_confidence
+            final_loss = loss_label + loss_confidence
 
             temp_losses_final['loss_final'].append(final_loss.item())
             temp_losses_final['loss_label'].append(loss_label.item())
@@ -341,6 +351,8 @@ for epoch in range(60):
 
             plot_results(epoch=epoch, count=i, env='simulation', images=images, bboxes=detected_bboxes, targets=target_boxes, confidence_threshold=confidence_threshold_metric)
 
+        print(f'Confidence media errori: {sum(filter(lambda x: not math.isnan(x),confidence_mean[0])) / len(list(filter(lambda x: not math.isnan(x),confidence_mean[0])))}',
+              f'Confidence media corretti: {sum(filter(lambda x: not math.isnan(x),confidence_mean[1])) / len(list(filter(lambda x: not math.isnan(x),confidence_mean[1])))}')
         metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
         metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
 
@@ -365,6 +377,7 @@ for epoch in range(60):
             temp_accuracy = {0: 0, 1: 0}
             evaluator_complete_metric = MyEvaluatorCompleteMetric()
             evaluator_ap = MyEvaluator()
+            confidence_mean={0:[], 1:[]}
             for i, data in tqdm(enumerate(dataset_real_world), total=len(dataset_real_world), desc=f'TEST in {house}, epoch {epoch}'):
                 images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
                 images = images.to('cuda')
@@ -382,7 +395,10 @@ for epoch in range(60):
                 detected_bboxes = detected_bboxes.transpose(1, 2).to('cpu')
 
                 # Modify confidences according to the model output
-                #detected_bboxes[:, :, 4] = preds[0].to('cpu')
+                detected_bboxes[:, :, 4] = preds[0].to('cpu')
+                confidence_mean[0].append(preds[0][confidences<0.5].mean().item())
+                confidence_mean[1].append(preds[0][confidences>=0.5].mean().item())
+
 
                 # Remove bboxes with background network
                 #new_labels_indexes[preds[0] < 0.5] = 0
@@ -399,7 +415,7 @@ for epoch in range(60):
 
                 loss_label = criterion(preds, labels_encoded)
                 loss_confidence = criterion_confidence(preds, confidences)
-                final_loss = loss_label #+ loss_confidence
+                final_loss = loss_label + loss_confidence
 
                 temp_losses_final['loss_final'].append(final_loss.item())
                 temp_losses_final['loss_label'].append(loss_label.item())
@@ -410,7 +426,8 @@ for epoch in range(60):
             logs['test_real_world'][house]['loss_final'].append(sum(temp_losses_final['loss_final']) / len(temp_losses_final['loss_final']))
             logs['test_real_world'][house]['loss_confidence'].append(sum(temp_losses_final['loss_confidence']) / len(temp_losses_final['loss_confidence']))
             logs['test_real_world'][house]['loss_label'].append(sum(temp_losses_final['loss_label']) / len(temp_losses_final['loss_label']))
-
+            print(f'Confidence media errori: {sum(filter(lambda x: not math.isnan(x),confidence_mean[0])) / len(list(filter(lambda x: not math.isnan(x),confidence_mean[0])))}',
+                  f'Confidence media corretti: {sum(filter(lambda x: not math.isnan(x),confidence_mean[1])) / len(list(filter(lambda x: not math.isnan(x),confidence_mean[1])))}')
             metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
             metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
 

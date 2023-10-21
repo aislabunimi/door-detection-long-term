@@ -22,7 +22,11 @@ class SharedMLP(nn.Module):
             layers += [nn.Conv1d(in_channels=in_channels, out_channels=out_channels, kernel_size=1),
                        nn.BatchNorm1d(num_features=out_channels),
                        nn.ReLU()]
-        layers[-1] = last_activation
+
+        if last_activation is None:
+            layers = layers[:-2]
+        else:
+            layers[-1] = last_activation
         self.shared_mlp = nn.Sequential(*layers)
 
     def forward(self, input):
@@ -93,7 +97,7 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
 
         self.shared_mlp_4 = SharedMLP(channels=[1024+128, 1024, 512, 256])
 
-        self.shared_mlp_5 = SharedMLP(channels=[16 + 7, 32, 64, 32, 16, 8, 1], last_activation=nn.Sigmoid())
+        self.shared_mlp_5 = SharedMLP(channels=[256, 128, 64, 32, 16, 1], last_activation=None)
 
         self.shared_mlp_6 = SharedMLP(channels=[512, 256, 128, 64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
 
@@ -113,8 +117,12 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         background_features = self.background_network(images).transpose(1, 2).transpose(2, 3)
         mask = self.mask_network(bboxes_mask[self._image_grid_dimensions[0]].view(-1, 4).float(), background_features.size(1))
         mask = mask.view(images.size(0), bboxes.size(-1), *mask.size()[1:])
+        # Max
         background_features = background_features.unsqueeze(1)
         bounding_boxes_background_features = torch.amax(mask * background_features, dim=(3, 4)).transpose(1, 2)
+        # Mean
+        #background_features = background_features.unsqueeze(1)
+        #bounding_boxes_background_features = ((mask * background_features).sum(dim=(3, 4)) / mask.sum(dim=(3, 4))).transpose(1, 2)
 
         local_features_background = self.shared_mlp_background_1(bounding_boxes_background_features)
         global_features_background = self.shared_mlp_background_2(local_features_background)
@@ -140,7 +148,7 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
 
         mixed_features = torch.cat([mixed_features, mixed_features_partial_background], dim=1)
 
-        score_features = self.shared_mlp_5(torch.cat([bboxes,bounding_boxes_background_features], dim=1))
+        score_features = self.shared_mlp_5(mixed_features_partial_background)
         label_features = self.shared_mlp_6(mixed_features)
 
         score_features = torch.squeeze(score_features, dim=1)
@@ -165,7 +173,7 @@ class BboxFilterNetworkGeometricLabelLoss(nn.Module):
 class BboxFilterNetworkGeometricConfidenceLoss(nn.Module):
     def forward(self, preds, confidences):
         scores_features, labels_features = preds
-        confidence_loss = torch.mean(torch.sum(torch.abs(scores_features - confidences), dim=1))
+        confidence_loss = torch.mean(torch.mean(torch.abs(scores_features - confidences), dim=1))
 
         return confidence_loss
 
