@@ -136,7 +136,7 @@ def collate_fn_bboxes(image_grid_dimensions: List[Tuple[int, int]] = None, use_c
         images,
         detected_bounding_boxes encoded as [cx, cy, w, h, original_confidence, original_label_encoded],
         fixed_bounding_boxes,
-        confidences 0 if the bbox is suppressed (background), 1 otherwise
+        confidences 0 if the bbox is on the background, 1 otherwise (the area_threshold is a parameter)
         labels_encoded: the ground truth labels of the bounding boxes [background, closed, open]
         ious: the iou with the target bbox. It is 0 if the bbox is background
         target_boxes: the target bounding boxes encoded as [cx, cy, w, h, label]

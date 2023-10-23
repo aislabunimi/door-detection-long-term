@@ -136,13 +136,23 @@ class TorchDatasetBBoxes(Dataset):
             original_confidences.append([detected_box.get_confidence()])
             original_labels.append([0 if i != original_label else 1 for i in range(2)])
 
-            confidences.append(0.0 if gt_box is None else BoundingBox.iou(detected_box, gt_box))
             label = 0 if gt_box is None else int(gt_box.get_class_id()) + 1
             labels_encoded.append([0 if i != label else 1 for i in range(3)]) # 3 is the number of label (background, closed door, open door)
-            ious.append(0.0 if gt_box is None else BoundingBox.iou(detected_box, gt_box))
             gt_x, gt_y, gt_w, gt_h = gt_box.get_absolute_bounding_box() if gt_box is not None else (x, y, w, h)
 
             fixed_boxes.append((gt_x, gt_y, gt_x + gt_w, gt_y + gt_h))
+
+        for detected_box in bboxes:
+            background = True
+            max_iou = 0.0
+            for gt_box in gt_bboxes:
+                if BoundingBox.get_intersection_area(detected_box, gt_box) >= 0.5 * detected_box.get_area():
+                    background = False
+                iou = BoundingBox.iou(detected_box, target_boxes)
+                max_iou = max(max_iou, iou)
+
+            ious.append(max_iou)
+            confidences.append(0.0 if background else 1.0)
 
         len_detected_bboxes = len(detected_boxes)
         len_fixed_bboxes = len(fixed_boxes)
