@@ -97,7 +97,7 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
 
         self.shared_mlp_4 = SharedMLP(channels=[1024+128, 1024, 512, 256])
 
-        self.shared_mlp_5 = SharedMLP(channels=[256, 128, 64, 32, 16, 1], last_activation=None)
+        self.shared_mlp_5 = SharedMLP(channels=[256, 128, 64, 32, 16, 1], last_activation=nn.Sigmoid())
 
         self.shared_mlp_6 = SharedMLP(channels=[512, 256, 128, 64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
 
@@ -130,8 +130,6 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         global_features_background = torch.max(global_features_background, 2, keepdim=True)[0]
         global_features_background = global_features_background.repeat(1, 1, local_features_background.size(-1))
         mixed_features_background = torch.cat([local_features_background, global_features_background], dim=1)
-
-
 
         local_features_1 = self.shared_mlp_1(bboxes)
         local_features_2 = self.shared_mlp_2(local_features_1)
