@@ -25,8 +25,6 @@ iou_threshold_matching = 0.5
 confidence_threshold = 0.75
 
 
-
-
 class BboxFilterNetworkGeometricLabelLoss(nn.Module):
 
     def __init__(self, weight=1.0, reduction_image='sum', reduction_global='mean'):
