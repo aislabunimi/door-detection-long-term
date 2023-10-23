@@ -256,12 +256,12 @@ for epoch in range(60):
             detected_bboxes = detected_bboxes.transpose(1, 2).to('cpu')
 
             # Modify confidences according to the model output
-            detected_bboxes[:, :, 4] = preds[0].to('cpu')
+            #detected_bboxes[:, :, 4] = preds[0].to('cpu')
             confidence_mean[0].append(preds[0][confidences<0.5].mean())
             confidence_mean[1].append(preds[0][confidences>=0.5].mean())
 
             # Remove bboxes with background network
-            #new_labels_indexes[preds[0] < 0.5] = 0
+            new_labels_indexes[preds[0] < 0.5] = 0
 
             # Filtering bboxes according to new labels
             detected_bboxes = torch.unbind(detected_bboxes, 0)
@@ -325,11 +325,12 @@ for epoch in range(60):
             detected_bboxes = detected_bboxes.transpose(1, 2).to('cpu')
 
             # Modify confidences according to the model output
-            detected_bboxes[:, :, 4] = preds[0].to('cpu')
+            #detected_bboxes[:, :, 4] = preds[0].to('cpu')
             confidence_mean[0].append(preds[0][confidences<0.5].mean().item())
             confidence_mean[1].append(preds[0][confidences>=0.5].mean().item())
+
             # Remove bboxes with background network
-            #new_labels_indexes[preds[0] < 0.5] = 0
+            new_labels_indexes[preds[0] < 0.5] = 0
 
             # Filtering bboxes according to new labels
             detected_bboxes = torch.unbind(detected_bboxes, 0)
@@ -395,13 +396,13 @@ for epoch in range(60):
                 detected_bboxes = detected_bboxes.transpose(1, 2).to('cpu')
 
                 # Modify confidences according to the model output
-                detected_bboxes[:, :, 4] = preds[0].to('cpu')
+                #detected_bboxes[:, :, 4] = preds[0].to('cpu')
                 confidence_mean[0].append(preds[0][confidences<0.5].mean().item())
                 confidence_mean[1].append(preds[0][confidences>=0.5].mean().item())
 
 
                 # Remove bboxes with background network
-                #new_labels_indexes[preds[0] < 0.5] = 0
+                new_labels_indexes[preds[0] < 0.5] = 0
 
                 # Filtering bboxes according to new labels
                 detected_bboxes = torch.unbind(detected_bboxes, 0)
