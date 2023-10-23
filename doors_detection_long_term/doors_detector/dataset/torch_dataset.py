@@ -148,7 +148,7 @@ class TorchDatasetBBoxes(Dataset):
             for gt_box in gt_bboxes:
                 if BoundingBox.get_intersection_area(detected_box, gt_box) >= 0.5 * detected_box.get_area():
                     background = False
-                iou = BoundingBox.iou(detected_box, target_boxes)
+                iou = BoundingBox.iou(detected_box, gt_box)
                 max_iou = max(max_iou, iou)
 
             ious.append(max_iou)
