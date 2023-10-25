@@ -1,3 +1,4 @@
+import math
 from abc import abstractmethod
 import random
 from typing import Type, List, Tuple
@@ -26,6 +27,9 @@ DATASET = str
 DEEP_DOORS_2_LABELLED: DATASET = 'deep_doors_2_labelled'
 FINAL_DOORS_DATASET: DATASET = 'final_doors_dataset'
 BOUNDING_BOX_DATASET: DATASET = 'bounding_box_dataset'
+
+def get_values_from_normal(x, mean, std):
+    return math.exp(-(x - mean)**2 / (2*std**2)) / math.sqrt(2*math.pi*std**2)
 
 
 class TorchDatasetBBoxes(Dataset):
@@ -151,7 +155,8 @@ class TorchDatasetBBoxes(Dataset):
                 iou = BoundingBox.iou(detected_box, gt_box)
                 max_iou = max(max_iou, iou)
 
-            ious.append(max_iou)
+            iou_class = int(max_iou / 0.1)
+            ious.append([get_values_from_normal(i, iou_class + 5, 1.0) for i in range(20)])
             confidences.append(0.0 if background else 1.0)
 
         len_detected_bboxes = len(detected_boxes)
@@ -194,7 +199,7 @@ class TorchDatasetBBoxes(Dataset):
         target['confidences'] = torch.tensor(confidences, dtype=torch.float)
         target['original_labels'] = torch.tensor(original_labels, dtype=torch.float)
         target['original_confidences'] = torch.tensor(original_confidences, dtype=torch.float)
-        target['ious'] = torch.tensor(ious, dtype=torch.float)
+        target['ious'] = torch.tensor(ious, dtype=torch.float64)
         target['fixed_boxes'] = torch.tensor(fixed_boxes, dtype=torch.float)
         target['detected_boxes'] = torch.tensor(detected_boxes, dtype=torch.float)
         if target_boxes.size()[0] > 0:

@@ -23,7 +23,8 @@ from doors_detection_long_term.doors_detector.models.background_grid_network imp
     IMAGE_GRID_NETWORK_GIBSON_DD2
 from doors_detection_long_term.doors_detector.models.bbox_filter_network_geometric import \
     BboxFilterNetworkGeometricBackground, IMAGE_NETWORK_GEOMETRIC_BACKGROUND, bbox_filtering_nms, \
-    BboxFilterNetworkGeometricLabelLoss, BboxFilterNetworkGeometricSuppressLoss
+    BboxFilterNetworkGeometricLabelLoss, BboxFilterNetworkGeometricSuppressLoss, \
+    BboxFilterNetworkGeometricConfidenceLoss
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
@@ -161,8 +162,10 @@ bbox_model.to('cuda')
 
 criterion_new_labels = BboxFilterNetworkGeometricLabelLoss()
 criterion_suppress = BboxFilterNetworkGeometricSuppressLoss()
+criterion_confidence = BboxFilterNetworkGeometricConfidenceLoss()
 criterion_new_labels.to('cuda')
 criterion_suppress.to('cuda')
+criterion_confidence.to('cuda')
 
 optimizer = optim.Adam(bbox_model.parameters(), lr=0.001)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
@@ -217,12 +220,13 @@ for epoch in range(60):
         detected_bboxes = detected_bboxes.to('cuda')
         confidences = confidences.to('cuda')
         labels_encoded = labels_encoded.to('cuda')
-        #ious = ious.to('cuda')
+        ious = ious.to('cuda')
 
         preds = bbox_model(images, detected_bboxes, detected_boxes_grid)
         loss_label = criterion_new_labels(preds[0], labels_encoded)
         loss_suppress = criterion_suppress(preds[1], confidences)
-        final_loss = loss_label + loss_suppress
+        loss_confidence = criterion_confidence(preds[2], ious)
+        final_loss = loss_label + loss_suppress + loss_confidence
 
         #print(final_loss.item())
         optimizer.zero_grad()
@@ -250,7 +254,7 @@ for epoch in range(60):
             detected_bboxes = detected_bboxes.to('cuda')
             confidences = confidences.to('cuda')
             labels_encoded = labels_encoded.to('cuda')
-            #ious = ious.to('cuda')
+            ious = ious.to('cuda')
 
             preds = bbox_model(images, detected_bboxes, detected_boxes_grid)
             new_labels, new_labels_indexes = torch.max(preds[0].to('cpu'), dim=2, keepdim=False)
@@ -277,11 +281,13 @@ for epoch in range(60):
 
             loss_label = criterion_new_labels(preds[0], labels_encoded)
             loss_suppress = criterion_suppress(preds[1], confidences)
-            final_loss = loss_label + loss_suppress
+            loss_confidence = criterion_confidence(preds[2], ious)
+            final_loss = loss_label + loss_suppress + loss_confidence
 
             temp_losses_final['loss_final'].append(final_loss.item())
             temp_losses_final['loss_label'].append(loss_label.item())
             temp_losses_final['loss_suppress'].append(loss_suppress.item())
+            temp_losses_final['loss_confidence'].append(loss_confidence.item())
 
         print(f'Confidence media errori: {sum(filter(lambda x: not math.isnan(x),confidence_mean[0])) / len(list(filter(lambda x: not math.isnan(x),confidence_mean[0])))}',
                   f'Confidence media corretti: {sum(filter(lambda x: not math.isnan(x),confidence_mean[1])) / len(list(filter(lambda x: not math.isnan(x),confidence_mean[1])))}')
@@ -301,6 +307,7 @@ for epoch in range(60):
         logs['train']['loss_final'].append(sum(temp_losses_final['loss_final']) / len(temp_losses_final['loss_final']))
         logs['train']['loss_suppress'].append(sum(temp_losses_final['loss_suppress']) / len(temp_losses_final['loss_suppress']))
         logs['train']['loss_label'].append(sum(temp_losses_final['loss_label']) / len(temp_losses_final['loss_label']))
+        logs['train']['loss_confidence'].append(sum(temp_losses_final['loss_confidence']) / len(temp_losses_final['loss_confidence']))
 
         temp_losses_final = {'loss_label':[], 'loss_confidence':[], 'loss_final':[], 'loss_suppress':[]}
         evaluator_complete_metric = MyEvaluatorCompleteMetric()
@@ -318,7 +325,7 @@ for epoch in range(60):
             detected_bboxes = detected_bboxes.to('cuda')
             confidences = confidences.to('cuda')
             labels_encoded = labels_encoded.to('cuda')
-            #ious = ious.to('cuda')
+            ious = ious.to('cuda')
 
             preds = bbox_model(images, detected_bboxes, detected_boxes_grid)
             new_labels, new_labels_indexes = torch.max(preds[0].to('cpu'), dim=2, keepdim=False)
@@ -344,11 +351,13 @@ for epoch in range(60):
 
             loss_label = criterion_new_labels(preds[0], labels_encoded)
             loss_suppress = criterion_suppress(preds[1], confidences)
-            final_loss = loss_label + loss_suppress
+            loss_confidence = criterion_confidence(preds[2], ious)
+            final_loss = loss_label + loss_suppress + loss_confidence
 
             temp_losses_final['loss_final'].append(final_loss.item())
             temp_losses_final['loss_label'].append(loss_label.item())
             temp_losses_final['loss_suppress'].append(loss_suppress.item())
+            temp_losses_final['loss_confidence'].append(loss_confidence.item())
 
             plot_results(epoch=epoch, count=i, env='simulation', images=images, bboxes=detected_bboxes, targets=target_boxes, confidence_threshold=confidence_threshold_metric)
 
@@ -370,9 +379,9 @@ for epoch in range(60):
         logs['test']['loss_final'].append(sum(temp_losses_final['loss_final']) / len(temp_losses_final['loss_final']))
         logs['test']['loss_suppress'].append(sum(temp_losses_final['loss_suppress']) / len(temp_losses_final['loss_suppress']))
         logs['test']['loss_label'].append(sum(temp_losses_final['loss_label']) / len(temp_losses_final['loss_label']))
+        logs['test']['loss_confidence'].append(sum(temp_losses_final['loss_confidence']) / len(temp_losses_final['loss_confidence']))
 
         # Test with real world data
-
         for house, dataset_real_world in datasets_real_worlds.items():
             temp_losses_final = {'loss_label':[], 'loss_confidence':[], 'loss_final':[], 'loss_suppress':[]}
             temp_accuracy = {0: 0, 1: 0}
@@ -389,7 +398,7 @@ for epoch in range(60):
                 detected_bboxes = detected_bboxes.to('cuda')
                 confidences = confidences.to('cuda')
                 labels_encoded = labels_encoded.to('cuda')
-                #ious = ious.to('cuda')
+                ious = ious.to('cuda')
 
                 preds = bbox_model(images, detected_bboxes, detected_boxes_grid)
                 new_labels, new_labels_indexes = torch.max(preds[0].to('cpu'), dim=2, keepdim=False)
@@ -399,7 +408,6 @@ for epoch in range(60):
                 #detected_bboxes[:, :, 4] = preds[0].to('cpu')
                 confidence_mean[0].append(preds[0][confidences<0.5].mean().item())
                 confidence_mean[1].append(preds[0][confidences>=0.5].mean().item())
-
 
                 # Remove bboxes with background network
                 new_labels_indexes[preds[1] < 0.5] = 0
@@ -416,17 +424,21 @@ for epoch in range(60):
 
                 loss_label = criterion_new_labels(preds[0], labels_encoded)
                 loss_suppress = criterion_suppress(preds[1], confidences)
-                final_loss = loss_label + loss_suppress
+                loss_confidence = criterion_confidence(preds[2], ious)
+                final_loss = loss_label + loss_suppress + loss_confidence
 
                 temp_losses_final['loss_final'].append(final_loss.item())
                 temp_losses_final['loss_label'].append(loss_label.item())
                 temp_losses_final['loss_suppress'].append(loss_suppress.item())
+                temp_losses_final['loss_confidence'].append(loss_confidence.item())
 
                 plot_results(epoch=epoch, count=i, env=house, images=images, bboxes=detected_bboxes, targets=target_boxes, confidence_threshold=confidence_threshold_metric)
 
             logs['test_real_world'][house]['loss_final'].append(sum(temp_losses_final['loss_final']) / len(temp_losses_final['loss_final']))
             logs['test_real_world'][house]['loss_suppress'].append(sum(temp_losses_final['loss_suppress']) / len(temp_losses_final['loss_suppress']))
             logs['test_real_world'][house]['loss_label'].append(sum(temp_losses_final['loss_label']) / len(temp_losses_final['loss_label']))
+            logs['test_real_world'][house]['loss_confidence'].append(sum(temp_losses_final['loss_confidence']) / len(temp_losses_final['loss_confidence']))
+
             print(f'Confidence media errori: {sum(filter(lambda x: not math.isnan(x),confidence_mean[0])) / len(list(filter(lambda x: not math.isnan(x),confidence_mean[0])))}',
                   f'Confidence media corretti: {sum(filter(lambda x: not math.isnan(x),confidence_mean[1])) / len(list(filter(lambda x: not math.isnan(x),confidence_mean[1])))}')
             metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)

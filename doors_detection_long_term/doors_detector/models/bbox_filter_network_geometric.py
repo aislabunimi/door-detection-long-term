@@ -100,7 +100,7 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         self.shared_mlp_new_labels = SharedMLP(channels=[256, 128, 64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
 
         # Mixed
-        self.shared_mlp_new_confidences = SharedMLP(channels=[512, 256, 128, 64, 32, 10], last_activation=nn.Softmax(dim=1))
+        self.shared_mlp_new_confidences = SharedMLP(channels=[512, 256, 128, 64, 32, 20], last_activation=nn.Softmax(dim=1))
 
         if pretrained:
             if pretrained:
@@ -175,6 +175,15 @@ class BboxFilterNetworkGeometricSuppressLoss(nn.Module):
         #confidence_loss = torch.mean(torch.mean(torch.abs(scores_features - confidences), dim=1))
         #print(-torch.sum(torch.log(scores_features) * confidences + torch.log(1-scores_features) * (1-confidences), dim=1).size())
         confidence_loss = torch.mean(-torch.mean(torch.log(suppress_features) * confidences + torch.log(1-suppress_features) * (1-confidences), dim=1))
+        return confidence_loss
+
+class BboxFilterNetworkGeometricConfidenceLoss(nn.Module):
+    def forward(self, confidence_features, ious):
+        print(confidence_features.to(torch.float64).log(), ious.log())
+
+        #confidence_loss = torch.mean(torch.mean(torch.abs(scores_features - confidences), dim=1))
+        #print(-torch.sum(torch.log(scores_features) * confidences + torch.log(1-scores_features) * (1-confidences), dim=1).size())
+        confidence_loss = torch.mean(torch.mean(torch.sum(ious * (ious.log() - confidence_features.to(torch.float64).log()), dim=2), dim=1))
         return confidence_loss
 
 
