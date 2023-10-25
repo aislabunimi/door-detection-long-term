@@ -179,7 +179,6 @@ class BboxFilterNetworkGeometricSuppressLoss(nn.Module):
 
 class BboxFilterNetworkGeometricConfidenceLoss(nn.Module):
     def forward(self, confidence_features, ious):
-        print(confidence_features.to(torch.float64).log(), ious.log())
 
         #confidence_loss = torch.mean(torch.mean(torch.abs(scores_features - confidences), dim=1))
         #print(-torch.sum(torch.log(scores_features) * confidences + torch.log(1-scores_features) * (1-confidences), dim=1).size())
