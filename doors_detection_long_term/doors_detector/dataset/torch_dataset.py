@@ -11,6 +11,8 @@ from generic_dataset.dataset_manager import DatasetManager
 from sklearn.utils import shuffle
 from src.bounding_box import BoundingBox
 from src.utils.enumerators import BBType, BBFormat
+#from src.bounding_box import BoundingBox
+#from src.utils.enumerators import BBType, BBFormat
 
 from doors_detection_long_term.positions_extractor.doors_dataset.door_sample import DoorSample
 
@@ -26,6 +28,7 @@ DATASET = str
 DEEP_DOORS_2_LABELLED: DATASET = 'deep_doors_2_labelled'
 FINAL_DOORS_DATASET: DATASET = 'final_doors_dataset'
 BOUNDING_BOX_DATASET: DATASET = 'bounding_box_dataset'
+IGIBSON_DATASET: DATASET = 'igibson_dataset'
 
 
 class TorchDatasetBBoxes(Dataset):
@@ -47,6 +50,7 @@ class TorchDatasetBBoxes(Dataset):
                 T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
             ])
         else:
+
             self._transform = T.Compose([
                 T.RandomSelect(
                     T.Identity(),
