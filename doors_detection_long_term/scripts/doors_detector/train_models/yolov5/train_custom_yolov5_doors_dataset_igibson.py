@@ -1,3 +1,5 @@
+import re
+
 import numpy as np
 import time
 from torch.optim import lr_scheduler
@@ -10,27 +12,33 @@ from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import check_amp
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.loss import ComputeLoss
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.torch_utils import smart_optimizer
+from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import seed_everything, collate_fn_yolov5
 from doors_detection_long_term.doors_detector.utilities.plot import plot_losses
-from doors_detection_long_term.doors_detector.utilities.utils import collate_fn_yolov5
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
-from doors_detection_long_term.doors_detector.utilities.utils import seed_everything
 
 
 device = 'cuda'
 
-#epochs_general_detector = [40, 60, 80, 100]
-epochs_general_detector = [10, 20, 30, 40]
+epochs_general_detector = [40, 60]
+#epochs_general_detector = [10, 20, 30, 40]
+
+
+frozen_layers = 3
 
 # Params
 params = {
     #'epochs': 40,
-    #'batch_size': 8,
-    'batch_size': 48,
+    'batch_size': 4,
     'seed': 0
 }
 
-def prepare_model(description, reload_model, restart_checkpoint, epochs):
+def prepare_model(description, reload_model, restart_checkpoint, epochs, fix_backbone=True):
     model = YOLOv5Model(model_name=YOLOv5, n_labels=len(labels.keys()), pretrained=reload_model, dataset_name=IGIBSON_DATASET, description=description)
+    for n, p in model.named_parameters():
+        p.requires_grad = True
+        if fix_backbone and int(re.findall(r'\d+', n)[0]) < frozen_layers:
+            p.requires_grad = False
+            print(n)
 
     logs = {'train': [], 'train_after_backpropagation': [], 'validation': [], 'test': [], 'time': []}
     optimizer_state_dict = {}
