@@ -8,8 +8,6 @@
   booktitle={2023 European Conference on Mobile Robots (ECMR)}, 
   title={Enhancing Door-Status Detection for Autonomous Mobile Robots During Environment-Specific Operational Use}, 
   year={2023},
-  volume={},
-  number={},
   pages={1-8},
   doi={10.1109/ECMR59166.2023.10256289}}
 ```
