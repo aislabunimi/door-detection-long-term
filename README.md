@@ -1,5 +1,19 @@
 # Enhancing Door Detection for Autonomous Mobile Robots with Environment-Specific Data Collection
 
+# Citation
+
+```
+@INPROCEEDINGS{antonazzi2023doordetection,
+  author={Antonazzi, Michele and Luperto, Matteo and Basilico, Nicola and Borghese, N. Alberto},
+  booktitle={2023 European Conference on Mobile Robots (ECMR)}, 
+  title={Enhancing Door-Status Detection for Autonomous Mobile Robots During Environment-Specific Operational Use}, 
+  year={2023},
+  volume={},
+  number={},
+  pages={1-8},
+  doi={10.1109/ECMR59166.2023.10256289}}
+```
+
 Here you can find the code and the datasets used in the article entitled **Enhancing Door Detection for Autonomous Mobile Robots with Environment-Specific Data Collection**
 To use this package and install all the dependencies, clone this repository and run:
 
