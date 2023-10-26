@@ -182,7 +182,7 @@ class BboxFilterNetworkGeometricConfidenceLoss(nn.Module):
 
         #confidence_loss = torch.mean(torch.mean(torch.abs(scores_features - confidences), dim=1))
         #print(-torch.sum(torch.log(scores_features) * confidences + torch.log(1-scores_features) * (1-confidences), dim=1).size())
-        confidence_loss = torch.mean(torch.mean(torch.sum(ious * (ious.log() - confidence_features.to(torch.float64).log()), dim=2), dim=1))
+        confidence_loss = torch.mean(torch.mean(torch.sum(torch.abs(confidence_features - ious), dim=2), dim=1))
         return confidence_loss
 
 

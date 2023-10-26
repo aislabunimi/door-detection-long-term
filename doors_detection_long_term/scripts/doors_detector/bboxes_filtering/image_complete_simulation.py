@@ -240,7 +240,6 @@ for epoch in range(60):
         temp_losses_final = {'loss_label':[], 'loss_confidence':[], 'loss_final':[], 'loss_suppress':[]}
         evaluator_complete_metric = MyEvaluatorCompleteMetric()
         evaluator_ap = MyEvaluator()
-        confidence_mean = {0:[], 1:[]}
         for i, data in tqdm(enumerate(train_dataset_bboxes), total=len(train_dataset_bboxes), desc=f'Test on training set epoch {epoch}'):
 
             images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
@@ -261,9 +260,14 @@ for epoch in range(60):
             detected_bboxes = detected_bboxes.transpose(1, 2).to('cpu')
 
             # Modify confidences according to the model output
-            #detected_bboxes[:, :, 4] = preds[0].to('cpu')
-            confidence_mean[0].append(preds[0][confidences<0.5].mean())
-            confidence_mean[1].append(preds[0][confidences>=0.5].mean())
+            new_confidences = preds[2]
+            _, new_confidences_indexes = torch.max(new_confidences, dim=2)
+            new_confidences_indexes = new_confidences_indexes - 5
+            new_confidences_indexes[new_confidences_indexes < 0] = 0
+            new_confidences_indexes[new_confidences_indexes > 9] = 9
+            new_confidences_indexes = new_confidences_indexes * 0.1
+
+            detected_bboxes[:, :, 4] = new_confidences_indexes
 
             # Remove bboxes with background network
             new_labels_indexes[preds[1] < 0.5] = 0
@@ -289,8 +293,6 @@ for epoch in range(60):
             temp_losses_final['loss_suppress'].append(loss_suppress.item())
             temp_losses_final['loss_confidence'].append(loss_confidence.item())
 
-        print(f'Confidence media errori: {sum(filter(lambda x: not math.isnan(x),confidence_mean[0])) / len(list(filter(lambda x: not math.isnan(x),confidence_mean[0])))}',
-                  f'Confidence media corretti: {sum(filter(lambda x: not math.isnan(x),confidence_mean[1])) / len(list(filter(lambda x: not math.isnan(x),confidence_mean[1])))}')
         metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
         metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
 
@@ -312,7 +314,7 @@ for epoch in range(60):
         temp_losses_final = {'loss_label':[], 'loss_confidence':[], 'loss_final':[], 'loss_suppress':[]}
         evaluator_complete_metric = MyEvaluatorCompleteMetric()
         evaluator_ap = MyEvaluator()
-        confidence_mean = {0:[], 1:[]}
+
         for i, data in tqdm(enumerate(test_dataset_bboxes), total=len(test_dataset_bboxes), desc=f'TEST epoch {epoch}'):
             images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
             images = images.to('cuda')
@@ -332,9 +334,15 @@ for epoch in range(60):
             detected_bboxes = detected_bboxes.transpose(1, 2).to('cpu')
 
             # Modify confidences according to the model output
-            #detected_bboxes[:, :, 4] = preds[0].to('cpu')
-            confidence_mean[0].append(preds[0][confidences<0.5].mean().item())
-            confidence_mean[1].append(preds[0][confidences>=0.5].mean().item())
+            # Modify confidences according to the model output
+            new_confidences = preds[2]
+            _, new_confidences_indexes = torch.max(new_confidences, dim=2)
+            new_confidences_indexes = new_confidences_indexes - 5
+            new_confidences_indexes[new_confidences_indexes < 0] = 0
+            new_confidences_indexes[new_confidences_indexes > 9] = 9
+            new_confidences_indexes = new_confidences_indexes * 0.1
+
+            detected_bboxes[:, :, 4] = new_confidences_indexes
 
             # Remove bboxes with background network
             new_labels_indexes[preds[1] < 0.5] = 0
@@ -361,8 +369,6 @@ for epoch in range(60):
 
             plot_results(epoch=epoch, count=i, env='simulation', images=images, bboxes=detected_bboxes, targets=target_boxes, confidence_threshold=confidence_threshold_metric)
 
-        print(f'Confidence media errori: {sum(filter(lambda x: not math.isnan(x),confidence_mean[0])) / len(list(filter(lambda x: not math.isnan(x),confidence_mean[0])))}',
-              f'Confidence media corretti: {sum(filter(lambda x: not math.isnan(x),confidence_mean[1])) / len(list(filter(lambda x: not math.isnan(x),confidence_mean[1])))}')
         metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
         metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
 
@@ -387,7 +393,7 @@ for epoch in range(60):
             temp_accuracy = {0: 0, 1: 0}
             evaluator_complete_metric = MyEvaluatorCompleteMetric()
             evaluator_ap = MyEvaluator()
-            confidence_mean={0:[], 1:[]}
+
             for i, data in tqdm(enumerate(dataset_real_world), total=len(dataset_real_world), desc=f'TEST in {house}, epoch {epoch}'):
                 images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
                 images = images.to('cuda')
@@ -405,9 +411,14 @@ for epoch in range(60):
                 detected_bboxes = detected_bboxes.transpose(1, 2).to('cpu')
 
                 # Modify confidences according to the model output
-                #detected_bboxes[:, :, 4] = preds[0].to('cpu')
-                confidence_mean[0].append(preds[0][confidences<0.5].mean().item())
-                confidence_mean[1].append(preds[0][confidences>=0.5].mean().item())
+                new_confidences = preds[2]
+                _, new_confidences_indexes = torch.max(new_confidences, dim=2)
+                new_confidences_indexes = new_confidences_indexes - 5
+                new_confidences_indexes[new_confidences_indexes < 0] = 0
+                new_confidences_indexes[new_confidences_indexes > 9] = 9
+                new_confidences_indexes = new_confidences_indexes * 0.1
+
+                detected_bboxes[:, :, 4] = new_confidences_indexes
 
                 # Remove bboxes with background network
                 new_labels_indexes[preds[1] < 0.5] = 0
@@ -439,8 +450,6 @@ for epoch in range(60):
             logs['test_real_world'][house]['loss_label'].append(sum(temp_losses_final['loss_label']) / len(temp_losses_final['loss_label']))
             logs['test_real_world'][house]['loss_confidence'].append(sum(temp_losses_final['loss_confidence']) / len(temp_losses_final['loss_confidence']))
 
-            print(f'Confidence media errori: {sum(filter(lambda x: not math.isnan(x),confidence_mean[0])) / len(list(filter(lambda x: not math.isnan(x),confidence_mean[0])))}',
-                  f'Confidence media corretti: {sum(filter(lambda x: not math.isnan(x),confidence_mean[1])) / len(list(filter(lambda x: not math.isnan(x),confidence_mean[1])))}')
             metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
             metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
 
