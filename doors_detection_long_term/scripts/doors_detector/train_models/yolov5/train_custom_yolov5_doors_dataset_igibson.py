@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
     model, compute_loss, optimizer, scheduler, scaler, start_epoch, nl, nw, nb, amp, nbs, accumulate, lf, logs = \
         prepare_model(
-            description=globals()[f'EXP_1_IGIBSON_ALL_SCENES_REALISTIC_MODE_HALF_EPOCHS_{epochs_general_detector[0]}'.upper()],
+            description=globals()[f'EXP_1_IGIBSON_ALL_SCENES_REALISTIC_MODE_EPOCHS_{epochs_general_detector[0]}'.upper()],
             reload_model=False,
             restart_checkpoint=False,
             epochs=epochs_general_detector[-1]
