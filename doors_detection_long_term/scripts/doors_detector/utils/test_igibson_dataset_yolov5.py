@@ -7,11 +7,11 @@ from mpl_toolkits.axes_grid1 import ImageGrid
 from torch.utils.data import DataLoader
 import os
 
-from doors_detection_long_term.doors_detector.utilities.utils import collate_fn, collate_fn_yolov5
+from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_yolov5
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 import torchvision.transforms as T
 
-train, validation, labels, _ = get_igibson_dataset_scene("Rs_int")
+train, validation, labels, _ = get_igibson_dataset_all_scenes(doors_config='realistic')
 print(f"Train dataset size: {len(train)} | Validation dataset size: {len(validation)}")
 data_loader_train = DataLoader(train, batch_size=4, collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
 data_loader_validation = DataLoader(validation, batch_size=4, collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
