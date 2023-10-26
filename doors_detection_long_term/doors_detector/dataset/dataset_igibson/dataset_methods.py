@@ -3,7 +3,6 @@ import gzip
 import json
 
 from typing import NoReturn
-from geometry_msgs.msg import Pose, Point, Quaternion
 
 def save_tuple_list(path: str, data: list) -> NoReturn:
     with open(path + '.txt', mode='w') as file:
