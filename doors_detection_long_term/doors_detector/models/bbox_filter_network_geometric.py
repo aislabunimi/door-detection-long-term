@@ -91,13 +91,13 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         self.shared_mlp_background_2 = SharedMLP(channels=[128, 256, 512, 1024])
 
         self.shared_mlp_mix_background = SharedMLP(channels=[1024+128, 1024, 512, 256])
-        self.shared_mlp_suppress_background = SharedMLP(channels=[256, 128, 64, 32, 16, 1], last_activation=nn.Sigmoid())
+        self.shared_mlp_suppress_background = SharedMLP(channels=[16, 8, 4, 1], last_activation=nn.Sigmoid())
 
         # Geometric
         self.shared_mlp_geometric_1 = SharedMLP(channels=[initial_channels, 16, 32, 64, 128])
         self.shared_mlp_geometric_2 = SharedMLP(channels=[128, 256, 512, 1024])
         self.shared_mlp_mix_geometric = SharedMLP(channels=[1024+128, 1024, 512, 256])
-        self.shared_mlp_new_labels = SharedMLP(channels=[256, 128, 64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
+        self.shared_mlp_new_labels = SharedMLP(channels=[512, 256, 128, 64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
 
         # Mixed
         self.shared_mlp_new_confidences = SharedMLP(channels=[512, 256, 128, 64, 32, 10], last_activation=nn.Softmax(dim=1))
@@ -133,7 +133,7 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         mixed_features_background = self.shared_mlp_mix_background(mixed_features_background)
 
         # Output suppress background
-        suppress_background = self.shared_mlp_suppress_background(mixed_features_background)
+        suppress_background = self.shared_mlp_suppress_background(bounding_boxes_background_features)
         suppress_background = torch.squeeze(suppress_background, dim=1)
 
         # Geometric part
@@ -145,12 +145,14 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         mixed_features_geometric = torch.cat([local_features_geometric, global_features_geometric], 1)
         mixed_features_geometric = self.shared_mlp_mix_geometric(mixed_features_geometric)
 
-        # New labels output
-        new_labels = self.shared_mlp_new_labels(mixed_features_geometric)
-        new_labels = torch.transpose(new_labels, 1, 2)
-
         # Mixed part
         mixed_features_geometric_background = torch.cat([mixed_features_geometric, mixed_features_background], dim=1)
+
+        # New labels output
+        new_labels = self.shared_mlp_new_labels(mixed_features_geometric_background)
+        new_labels = torch.transpose(new_labels, 1, 2)
+
+
 
         # Output new confidences
         new_confidences = self.shared_mlp_new_confidences(mixed_features_geometric_background)
