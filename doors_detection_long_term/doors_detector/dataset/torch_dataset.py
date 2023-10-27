@@ -156,7 +156,7 @@ class TorchDatasetBBoxes(Dataset):
                 max_iou = max(max_iou, iou)
 
             iou_class = int(max_iou / 0.1)
-            ious.append([get_values_from_normal(i, iou_class, 0.8) for i in range(10)])
+            ious.append([get_values_from_normal(i, iou_class, 1.0) for i in range(10)])
             confidences.append(0.0 if background else 1.0)
 
         len_detected_bboxes = len(detected_boxes)
