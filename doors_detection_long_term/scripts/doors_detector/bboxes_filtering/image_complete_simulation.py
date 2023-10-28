@@ -227,7 +227,6 @@ for epoch in range(60):
         loss_suppress = criterion_suppress(preds[1], confidences)
         loss_confidence = criterion_confidence(preds[2], ious)
         final_loss = loss_label + loss_suppress + loss_confidence
-        print(loss_confidence)
 
         #print(final_loss.item())
         optimizer.zero_grad()
