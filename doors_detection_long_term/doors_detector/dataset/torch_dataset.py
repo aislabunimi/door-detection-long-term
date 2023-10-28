@@ -156,7 +156,7 @@ class TorchDatasetBBoxes(Dataset):
                 max_iou = max(max_iou, iou)
 
             iou_class = int(max_iou / 0.1)
-            ious.append([get_values_from_normal(i, iou_class, 1.0) for i in range(10)])
+            ious.append([1 if iou_class <= i else 0 for i in range(10)])
             confidences.append(0.0 if background else 1.0)
 
         len_detected_bboxes = len(detected_boxes)
@@ -199,7 +199,7 @@ class TorchDatasetBBoxes(Dataset):
         target['confidences'] = torch.tensor(confidences, dtype=torch.float)
         target['original_labels'] = torch.tensor(original_labels, dtype=torch.float)
         target['original_confidences'] = torch.tensor(original_confidences, dtype=torch.float)
-        target['ious'] = torch.tensor(ious, dtype=torch.float64)
+        target['ious'] = torch.tensor(ious, dtype=torch.float)
         target['fixed_boxes'] = torch.tensor(fixed_boxes, dtype=torch.float)
         target['detected_boxes'] = torch.tensor(detected_boxes, dtype=torch.float)
         if target_boxes.size()[0] > 0:
