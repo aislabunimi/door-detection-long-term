@@ -88,15 +88,15 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         self.mask_network = MaskNetwork(image_size=image_grid_dimensions[0])
 
         self.shared_mlp_background_1 = SharedMLP(channels=[16, 32, 64, 128])
-        self.shared_mlp_background_2 = SharedMLP(channels=[128, 256, 512, 1024])
+        self.shared_mlp_background_2 = SharedMLP(channels=[128, 256, 512])
 
-        self.shared_mlp_mix_background = SharedMLP(channels=[1024+128, 1024, 512, 256])
-        self.shared_mlp_suppress_background = SharedMLP(channels=[256, 128, 64, 32, 16, 1], last_activation=nn.Sigmoid())
+        self.shared_mlp_mix_background = SharedMLP(channels=[512+128, 512, 256])
+        self.shared_mlp_suppress_background = SharedMLP(channels=[256, 128, 64, 32, 1], last_activation=nn.Sigmoid())
 
         # Geometric
         self.shared_mlp_geometric_1 = SharedMLP(channels=[initial_channels, 16, 32, 64, 128])
-        self.shared_mlp_geometric_2 = SharedMLP(channels=[128, 256, 512, 1024])
-        self.shared_mlp_mix_geometric = SharedMLP(channels=[1024+128, 1024, 512, 256])
+        self.shared_mlp_geometric_2 = SharedMLP(channels=[128, 256, 512])
+        self.shared_mlp_mix_geometric = SharedMLP(channels=[512+128, 512, 256])
         self.shared_mlp_new_labels = SharedMLP(channels=[256, 128, 64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
 
         # Mixed

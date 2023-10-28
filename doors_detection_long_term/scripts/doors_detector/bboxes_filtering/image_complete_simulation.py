@@ -41,7 +41,7 @@ grid_dim = [(2**i, 2**i) for i in range(3, 6)][::-1]
 iou_threshold_matching_metric = 0.5
 iou_threshold_matching = 0.5
 confidence_threshold = 0.75
-confidence_threshold_metric = 0.5
+confidence_threshold_metric = 0.38
 
 dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson_deep_doors_2')
 train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=True)
@@ -171,7 +171,7 @@ optimizer = optim.Adam(bbox_model.parameters(), lr=0.001)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
 
 for n, p in bbox_model.named_parameters():
-    if any([x in n for x in ['fpn.conv1.weight', 'fpn.bn1.weight', 'fpn.bn1.bias', 'fpn.layer1',]]):
+    if any([x in n for x in ['fpn.', 'fpn.bn1.weight', 'fpn.bn1.bias', 'fpn.layer1',]]):
         p.requires_grad = False
         #print(n)
 # Fix parameters of background network
@@ -200,7 +200,7 @@ for env, metrics in nms_performance_ap.items():
         net_performance_ap[env][metric] = []
 
 for epoch in range(60):
-    #scheduler.step()
+
     bbox_model.train()
     criterion_new_labels.train()
     criterion_suppress.train()
