@@ -260,19 +260,15 @@ for epoch in range(60):
             detected_bboxes = detected_bboxes.transpose(1, 2).to('cpu')
 
             # Modify confidences according to the model output
-            """
+
             new_confidences = preds[2]
             _, new_confidences_indexes = torch.max(new_confidences, dim=2)
             new_confidences_indexes = new_confidences_indexes
             new_confidences_indexes[new_confidences_indexes < 0] = 0
             new_confidences_indexes[new_confidences_indexes > 9] = 9
             new_confidences_indexes = new_confidences_indexes * 0.1
-            """
-            new_confidences = preds[2]
-            new_confidences = torch.sum(new_confidences > 0.5, dim=2) * 0.1
 
-
-            detected_bboxes[:, :, 4] = new_confidences
+            detected_bboxes[:, :, 4] = new_confidences_indexes
 
             # Remove bboxes with background network
             new_labels_indexes[preds[1] < 0.5] = 0
@@ -340,18 +336,14 @@ for epoch in range(60):
 
             # Modify confidences according to the model output
             # Modify confidences according to the model output
-            """
             new_confidences = preds[2]
             _, new_confidences_indexes = torch.max(new_confidences, dim=2)
             new_confidences_indexes = new_confidences_indexes
             new_confidences_indexes[new_confidences_indexes < 0] = 0
             new_confidences_indexes[new_confidences_indexes > 9] = 9
             new_confidences_indexes = new_confidences_indexes * 0.1
-            """
-            new_confidences = preds[2]
-            new_confidences = torch.sum(new_confidences > 0.5, dim=2) * 0.1
 
-            detected_bboxes[:, :, 4] = new_confidences
+            detected_bboxes[:, :, 4] = new_confidences_indexes
 
             # Remove bboxes with background network
             new_labels_indexes[preds[1] < 0.5] = 0
@@ -420,18 +412,14 @@ for epoch in range(60):
                 detected_bboxes = detected_bboxes.transpose(1, 2).to('cpu')
 
                 # Modify confidences according to the model output
-                """
                 new_confidences = preds[2]
                 _, new_confidences_indexes = torch.max(new_confidences, dim=2)
                 new_confidences_indexes = new_confidences_indexes
                 new_confidences_indexes[new_confidences_indexes < 0] = 0
                 new_confidences_indexes[new_confidences_indexes > 9] = 9
                 new_confidences_indexes = new_confidences_indexes * 0.1
-                """
-                new_confidences = preds[2]
-                new_confidences = torch.sum(new_confidences > 0.5, dim=2) * 0.1
 
-                detected_bboxes[:, :, 4] = new_confidences
+                detected_bboxes[:, :, 4] = new_confidences_indexes
 
                 # Remove bboxes with background network
                 new_labels_indexes[preds[1] < 0.5] = 0
