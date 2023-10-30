@@ -88,19 +88,19 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         self.mask_network = MaskNetwork(image_size=image_grid_dimensions[0])
 
         self.shared_mlp_background_1 = SharedMLP(channels=[16, 32, 64, 128])
-        self.shared_mlp_background_2 = SharedMLP(channels=[128, 256, 512])
+        self.shared_mlp_background_2 = SharedMLP(channels=[128, 256, 512, 1024])
 
-        self.shared_mlp_mix_background = SharedMLP(channels=[512+128, 512, 256])
+        self.shared_mlp_mix_background = SharedMLP(channels=[1024+128, 1024, 512, 256])
         self.shared_mlp_suppress_background = SharedMLP(channels=[256, 128, 64, 32, 1], last_activation=nn.Sigmoid())
 
         # Geometric
         self.shared_mlp_geometric_1 = SharedMLP(channels=[initial_channels, 16, 32, 64, 128])
-        self.shared_mlp_geometric_2 = SharedMLP(channels=[128, 256, 512])
-        self.shared_mlp_mix_geometric = SharedMLP(channels=[512+128, 512, 256])
+        self.shared_mlp_geometric_2 = SharedMLP(channels=[128, 256, 512, 1024])
+        self.shared_mlp_mix_geometric = SharedMLP(channels=[1024+128, 1024, 512, 256])
         self.shared_mlp_new_labels = SharedMLP(channels=[256, 128, 64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
 
         # Mixed
-        self.shared_mlp_new_confidences = SharedMLP(channels=[512, 256, 128, 64, 10], last_activation=nn.Softmax(dim=1))
+        self.shared_mlp_new_confidences = SharedMLP(channels=[512, 256, 128, 64, 32, 10], last_activation=nn.Softmax(dim=1))
 
 
         if pretrained:
@@ -186,6 +186,8 @@ class BboxFilterNetworkGeometricConfidenceLoss(nn.Module):
         #confidence_loss = torch.mean(torch.mean(torch.abs(scores_features - confidences), dim=1))
         #print(-torch.sum(torch.log(scores_features) * confidences + torch.log(1-scores_features) * (1-confidences), dim=1).size())
         confidence_loss = torch.mean(torch.mean(torch.sum(torch.abs(confidence_features - ious), dim=2), dim=1))
+        if torch.count_nonzero(torch.isnan(confidence_loss)):
+            print(confidence_features, ious)
         #confidence_loss = torch.mean(torch.mean(-torch.sum(torch.log(confidence_features) * ious + torch.log(1-confidence_features) * (1-ious), dim=2), dim=1))
         return confidence_loss
 
