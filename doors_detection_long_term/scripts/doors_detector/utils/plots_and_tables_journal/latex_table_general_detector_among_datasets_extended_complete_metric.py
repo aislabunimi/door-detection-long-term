@@ -76,11 +76,11 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0']):
                width=0.16,  color=color, edgecolor='#000000',alpha=0.9, hatch='/',
                linewidth=2)
 
-        plt.errorbar(x=X + (i + 1) * 0.2 + 0.04, y=[0.0 for _ in dataframes],
-                     yerr=[[0 for _ in dataframes], [d.loc[(d['dataset'] == dataset) & (d['house'] == house)]['FPiou_p'].iloc[0] for d in dataframes]],
-                     color='#000000', elinewidth=4, label='error', capsize=4, capthick=5)
-        #plt.vlines(x=X + (i + 1) * 0.2 + 0.04, ymin=[0 for _ in dataframes], ymax=[d.loc[(d['dataset'] == dataset) & (d['house'] == house)]['FPiou_p'].iloc[0] for d in dataframes], colors='#000000', ls='-', lw=4)
-
+        #plt.errorbar(x=X + (i + 1) * 0.2 + 0.04, y=[0.0 for _ in dataframes],
+         #            yerr=[[0 for _ in dataframes], [d.loc[(d['dataset'] == dataset) & (d['house'] == house)]['FPiou_p'].iloc[0] for d in dataframes]],
+          #           color='#000000', elinewidth=4, capsize=4, capthick=5)
+        plt.vlines(x=X + (i + 1) * 0.2 + 0.04, ymin=[0 for _ in dataframes], ymax=[d.loc[(d['dataset'] == dataset) & (d['house'] == house)]['FPiou_p'].iloc[0] for d in dataframes], colors='#000000', ls='-', lw=4)
+        plt.plot(X + (i + 1) * 0.2 + 0.04, [d.loc[(d['dataset'] == dataset) & (d['house'] == house)]['FPiou_p'].iloc[0] for d in dataframes], color='#000000', marker='o', linestyle='None')
 
 
 
@@ -117,7 +117,8 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0']):
     chart_code = chart_code.replace('\\begin{axis}[', '\\begin{axis}[\nwidth=12cm,\nheight=7cm,')
     chart_code = chart_code.replace('legend style={\n', 'legend cell align={left},\nlegend style={\n/tikz/every even column/.append style={column sep=0.3cm},\n')
     chart_code = chart_code.replace('ybar legend', 'area legend')
-    chart_code = chart_code.replace('\\end{axis}', '\\input{graphics/legend_ap_general_detector}\n\\end{axis}')
+    chart_code = chart_code.replace('\\end{axis}', '\\input{graphics/legend_extended_metric_general_detector}\n\\end{axis}')
+    chart_code = chart_code.replace('mark size=3', 'mark size=2')
     text_file = open(f"../latex_plots/general_detector_stacked_complete_metric_e{env_number}.tex", "w")
 
     #write string to file
