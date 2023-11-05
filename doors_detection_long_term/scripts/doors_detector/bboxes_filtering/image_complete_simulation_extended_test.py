@@ -67,14 +67,20 @@ optimizers = [('SGD_0.01', lambda parameters: optim.SGD(params=parameters, lr=0.
               ('ADAM_0.001', lambda parameters: optim.Adam(params=parameters, lr=0.001)),
               ('ADAMW_0.001', lambda parameters: optim.AdamW(params=parameters, lr=0.001))]
 
-for td, bs, activate_s, pg, opt in [(t, b, a, p, o) for t in training_datasets for b in batch_sizes for a in activate_scheduler for p in parameters_grad for o in optimizers]:
-    save_path = f'./image_complete/{td[0]}_{bs[0]}_{activate_s[0]}_{pg[0]}_{opt[0]}'.upper()
+shuffle_box = [('shuffle_yes', True),
+               ('shuffle_no', False)]
+
+transform_train = [('transform_yes', True),
+                                 ('transform_no', False)]
+
+for td, bs, activate_s, pg, opt, sb, tt in [(t, b, a, p, o, s, ttt) for t in training_datasets for b in batch_sizes for a in activate_scheduler for p in parameters_grad for o in optimizers for s in shuffle_box for ttt in transform_train]:
+    save_path = f'./image_complete/{td[0]}_{bs[0]}_{activate_s[0]}_{pg[0]}_{opt[0]}_{sb[0]}_{tt[0]}'.upper()
     if not os.path.exists(save_path):
         os.mkdir(save_path)
 
     try:
         dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name=td[1])
-        train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
+        train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=tt[1], shuffle_boxes=sb[1])
 
         print(len(train_bboxes), len(test_bboxes))
         train_dataset_bboxes = DataLoader(train_bboxes, batch_size=bs[1], collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
