@@ -61,11 +61,11 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0']):
     for i, (dataset, color) in enumerate(zip(datasets, colors[1:])):
 
         ax.bar(X + (i + 1) * 0.2 + 0.04, [d.loc[(d['dataset'] == dataset) & (d["label"] == 0) & (d['house'] == house)]['AP'].iloc[0] / 2 for d in dataframes],
-               width=0.16,  color=color, edgecolor='#000000',alpha=0.9,
+               width=0.16,  color=color, edgecolor='#000000',alpha=0.9, hatch='/',
                linewidth=2)
         ax.bar(X + (i + 1) * 0.2 + 0.04, [d.loc[(d['dataset'] == dataset) & (d["label"] == 1) & (d['house'] == house)]['AP'].iloc[0] / 2 for d in dataframes],
                bottom=[d.loc[(d['dataset'] == dataset) & (d["label"] == 0) & (d['house'] == house)]['AP'].iloc[0] / 2 for d in dataframes],
-               width=0.16, color=color, hatch='/', edgecolor='#000000', alpha=0.9,
+               width=0.16, color=color, edgecolor='#000000', alpha=0.9,
                linewidth=2)
 
 
