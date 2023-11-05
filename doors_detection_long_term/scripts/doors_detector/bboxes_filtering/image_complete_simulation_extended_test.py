@@ -74,7 +74,7 @@ transform_train = [('transform_yes', True),
                                  ('transform_no', False)]
 
 for td, bs, activate_s, pg, opt, sb, tt in [(t, b, a, p, o, s, ttt) for t in training_datasets for b in batch_sizes for a in activate_scheduler for p in parameters_grad for o in optimizers for s in shuffle_box for ttt in transform_train]:
-    save_path = f'./image_complete/{td[0]}_{bs[0]}_{activate_s[0]}_{pg[0]}_{opt[0]}_{sb[0]}_{tt[0]}'.upper()
+    save_path = './image_complete/' + f'{td[0]}_{bs[0]}_{activate_s[0]}_{pg[0]}_{opt[0]}_{sb[0]}_{tt[0]}'.upper()
     if not os.path.exists(save_path):
         os.mkdir(save_path)
 
