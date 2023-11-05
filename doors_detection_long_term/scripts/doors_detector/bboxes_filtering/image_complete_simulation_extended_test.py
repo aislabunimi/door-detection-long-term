@@ -229,7 +229,6 @@ for td, bs, activate_s, pg, opt, sb, tt in [(t, b, a, p, o, s, ttt) for t in tra
         for epoch in range(60):
             for n, p in bbox_model.named_parameters():
                 if pg[1][epoch](n):
-                    print('entro')
                     p.requires_grad = False
                 else:
                     p.requires_grad = True
