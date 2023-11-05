@@ -76,7 +76,10 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0']):
                width=0.16,  color=color, edgecolor='#000000',alpha=0.9, hatch='/',
                linewidth=2)
 
-        plt.vlines(x=X + (i + 1) * 0.2 + 0.04, ymin=[0 for _ in dataframes], ymax=[d.loc[(d['dataset'] == dataset) & (d['house'] == house)]['FPiou_p'].iloc[0] for d in dataframes], colors='#000000', ls='-', lw=4)
+        plt.errorbar(x=X + (i + 1) * 0.2 + 0.04, y=[0.0 for _ in dataframes],
+                     yerr=[[0 for _ in dataframes], [d.loc[(d['dataset'] == dataset) & (d['house'] == house)]['FPiou_p'].iloc[0] for d in dataframes]],
+                     color='#000000', elinewidth=4, label='error', capsize=4, capthick=5)
+        #plt.vlines(x=X + (i + 1) * 0.2 + 0.04, ymin=[0 for _ in dataframes], ymax=[d.loc[(d['dataset'] == dataset) & (d['house'] == house)]['FPiou_p'].iloc[0] for d in dataframes], colors='#000000', ls='-', lw=4)
 
 
 
@@ -100,7 +103,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0']):
         ax.set_xticklabels(model_names, fontsize=17)
         ax.set_xlabel('Detector', fontsize=17)
 
-    ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.95), loc='upper center', ncol=3, alignment='left')
+    ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.95), loc='upper center', ncol=4, alignment='left')
 
     fig.tight_layout()
 

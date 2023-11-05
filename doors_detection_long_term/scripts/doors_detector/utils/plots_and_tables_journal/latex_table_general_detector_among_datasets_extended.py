@@ -56,7 +56,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0']):
     dataframes = [houses_detr, houses_yolo, houses_faster]
 
     X = np.arange(3)
-    ax.bar(X, [0 for _ in range(3)], width=0.2)
+    ax.bar(X, [0 for _ in range(3)], width=0.16)
 
     for i, (dataset, color) in enumerate(zip(datasets, colors[1:])):
 
