@@ -90,7 +90,7 @@ if __name__ == "__main__":
 
     # Train the general detector with multiple epochs
     epoch_count = 0
-    train, validation, labels, _ = get_igibson_dataset_all_scenes(doors_config='realistic')
+    train, validation, labels, _ = get_igibson_dataset_all_scenes(doors_config='realistic', step=None)
     print(f'Train set size: {len(train)}', f'Validation set size: {len(validation)}')
 
     data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
