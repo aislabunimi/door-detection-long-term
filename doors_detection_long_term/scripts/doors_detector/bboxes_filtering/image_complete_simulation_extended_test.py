@@ -44,7 +44,7 @@ confidence_threshold = 0.75
 confidence_threshold_metric = 0.38
 
 def fix_first_layer_of_background_network(n):
-    any([x in n for x in ['mask_network', 'fpn.bn1.weight', 'fpn.bn1.bias', 'fpn.layer1', ]])
+    return any([x in n for x in ['mask_network', 'fpn.bn1.weight', 'fpn.bn1.bias', 'fpn.layer1', ]])
 def fix_background_network(n):
     return any([x in n for x in ['mask_network', 'background_network', 'fpn.bn1.weight', 'fpn.bn1.bias', 'fpn.layer1']])
 
@@ -63,9 +63,9 @@ parameters_grad = [('fix_first_part_backbone', [fix_first_layer_of_background_ne
                    ('fix_fpn', [fix_only_fpn for _ in range(60)]),
                    ('fix_background_and_other_alternate'), [fix_background_network if i % 10 < 5 else fix_all_not_background_network for i in range(60)],
                    ]
-optimizers = [('SGD_0.01', lambda parameters: optim.SGD(params=parameters, lr=0.01)),
-              ('ADAM_0.001', lambda parameters: optim.Adam(params=parameters, lr=0.001)),
-              ('ADAMW_0.001', lambda parameters: optim.AdamW(params=parameters, lr=0.001))]
+optimizers = [('SGD_0.01_MOM_95', lambda parameters: optim.SGD(params=parameters, lr=0.01, momentum=0.95)),
+              ('SGD_0.001_MOM_90', lambda parameters: optim.SGD(params=parameters, lr=0.001, momentum=0.9)),
+              ('ADAM_0.001', lambda parameters: optim.Adam(params=parameters, lr=0.001, weight_decay=1e-5))]
 
 shuffle_box = [('shuffle_yes', True),
                ('shuffle_no', False)]
@@ -229,9 +229,11 @@ for td, bs, activate_s, pg, opt, sb, tt in [(t, b, a, p, o, s, ttt) for t in tra
         for epoch in range(60):
             for n, p in bbox_model.named_parameters():
                 if pg[1][epoch](n):
+                    print('entro')
                     p.requires_grad = False
                 else:
                     p.requires_grad = True
+
             if activate_s:
                 scheduler.step()
 
@@ -262,7 +264,8 @@ for td, bs, activate_s, pg, opt, sb, tt in [(t, b, a, p, o, s, ttt) for t in tra
                 loss_suppress = criterion_suppress(preds[1], confidences)
                 loss_confidence = criterion_confidence(preds[2], ious)
                 final_loss = loss_label + loss_suppress + loss_confidence
-
+                if torch.count_nonzero(torch.isnan(final_loss)) > 0:
+                    break
                 #print(final_loss.item())
                 optimizer.zero_grad()
                 final_loss.backward()
