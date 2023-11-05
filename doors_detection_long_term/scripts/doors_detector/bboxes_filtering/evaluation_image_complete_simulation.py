@@ -41,7 +41,7 @@ grid_dim = [(2**i, 2**i) for i in range(3, 6)][::-1]
 iou_threshold_matching_metric = 0.5
 iou_threshold_matching = 0.5
 confidence_threshold = 0.75
-confidence_threshold_metric = 0.38
+confidence_threshold_metric = 0.48
 
 dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_gibson_deep_doors_2')
 train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=True)
@@ -243,9 +243,9 @@ for epoch in range(1):
 
             # Filtering bboxes according to new labels
             detected_bboxes = torch.unbind(detected_bboxes, 0)
-            detected_bboxes = [b[i != 0, :] for b, i in zip(detected_bboxes, new_labels_indexes)]
+            #detected_bboxes = [b[i != 0, :] for b, i in zip(detected_bboxes, new_labels_indexes)]
 
-            detected_bboxes = [torch.cat([b[:, :5], p[i != 0][:, 1:]], dim=1) for b, p, i in zip(detected_bboxes, preds[0].to('cpu'), new_labels_indexes)]
+            #detected_bboxes = [torch.cat([b[:, :5], p[i != 0][:, 1:]], dim=1) for b, p, i in zip(detected_bboxes, preds[0].to('cpu'), new_labels_indexes)]
             # Delete bboxes according to the background network
 
             detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=0.0, iou_threshold=0.5, img_size=images.size()[::-1][:2])
@@ -262,18 +262,19 @@ for epoch in range(1):
             temp_losses_final['loss_suppress'].append(loss_suppress.item())
             temp_losses_final['loss_confidence'].append(loss_confidence.item())
 
-        metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
-        metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
+        for c in np.arange(0, 1, 0.1):
+            metrics = evaluator_complete_metric.get_metrics(confidence_threshold=c, iou_threshold=iou_threshold_matching_metric)
+            metrics_ap = evaluator_ap.get_metrics(confidence_threshold=c, iou_threshold=iou_threshold_matching_metric)
 
-        for label, values in metrics.items():
-            for k, v in values.items():
-                if len(net_performance['sim_train'][k]) == epoch:
-                    net_performance['sim_train'][k].append(v)
-                else:
-                    net_performance['sim_train'][k][-1] += v
+            for label, values in metrics.items():
+                for k, v in values.items():
+                    if len(net_performance['sim_train'][k]) == int(c*10):
+                        net_performance['sim_train'][k].append(v)
+                    else:
+                        net_performance['sim_train'][k][-1] += v
 
-        for label, v in metrics_ap['per_bbox'].items():
-            net_performance_ap['sim_train'][label].append(v['AP'])
+            for label, v in metrics_ap['per_bbox'].items():
+                net_performance_ap['sim_train'][label].append(v['AP'])
 
         logs['train']['loss_final'].append(sum(temp_losses_final['loss_final']) / len(temp_losses_final['loss_final']))
         logs['train']['loss_suppress'].append(sum(temp_losses_final['loss_suppress']) / len(temp_losses_final['loss_suppress']))
@@ -318,9 +319,9 @@ for epoch in range(1):
 
             # Filtering bboxes according to new labels
             detected_bboxes = torch.unbind(detected_bboxes, 0)
-            detected_bboxes = [b[i != 0, :] for b, i in zip(detected_bboxes, new_labels_indexes)]
+            #detected_bboxes = [b[i != 0, :] for b, i in zip(detected_bboxes, new_labels_indexes)]
             # Modify the label according to the new label assigned by the model
-            detected_bboxes = [torch.cat([b[:, :5], p[i != 0][:, 1:]], dim=1) for b, p, i in zip(detected_bboxes, preds[0].to('cpu'), new_labels_indexes)]
+            #detected_bboxes = [torch.cat([b[:, :5], p[i != 0][:, 1:]], dim=1) for b, p, i in zip(detected_bboxes, preds[0].to('cpu'), new_labels_indexes)]
 
             detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=0.0, iou_threshold=0.5, img_size=images.size()[::-1][:2])
             evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
@@ -338,18 +339,19 @@ for epoch in range(1):
 
             plot_results(epoch=epoch, count=i, env='simulation', images=images, bboxes=detected_bboxes, targets=target_boxes, confidence_threshold=confidence_threshold_metric)
 
-        metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
-        metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
+        for c in np.arange(0, 1, 0.1):
+            metrics = evaluator_complete_metric.get_metrics(confidence_threshold=c, iou_threshold=iou_threshold_matching_metric)
+            metrics_ap = evaluator_ap.get_metrics(confidence_threshold=c, iou_threshold=iou_threshold_matching_metric)
 
-        for label, values in metrics.items():
-            for k, v in values.items():
-                if len(net_performance['sim_test'][k]) == epoch:
-                    net_performance['sim_test'][k].append(v)
-                else:
-                    net_performance['sim_test'][k][-1] += v
+            for label, values in metrics.items():
+                for k, v in values.items():
+                    if len(net_performance['sim_test'][k]) == int(c*10):
+                        net_performance['sim_test'][k].append(v)
+                    else:
+                        net_performance['sim_test'][k][-1] += v
 
-        for label, v in metrics_ap['per_bbox'].items():
-            net_performance_ap['sim_test'][label].append(v['AP'])
+            for label, v in metrics_ap['per_bbox'].items():
+                net_performance_ap['sim_test'][label].append(v['AP'])
 
         logs['test']['loss_final'].append(sum(temp_losses_final['loss_final']) / len(temp_losses_final['loss_final']))
         logs['test']['loss_suppress'].append(sum(temp_losses_final['loss_suppress']) / len(temp_losses_final['loss_suppress']))
@@ -394,9 +396,9 @@ for epoch in range(1):
 
                 # Filtering bboxes according to new labels
                 detected_bboxes = torch.unbind(detected_bboxes, 0)
-                detected_bboxes = [b[i != 0, :] for b, i in zip(detected_bboxes, new_labels_indexes)]
+                #detected_bboxes = [b[i != 0, :] for b, i in zip(detected_bboxes, new_labels_indexes)]
                 # Modify the label according to the new label assigned by the model
-                detected_bboxes = [torch.cat([b[:, :5], p[i != 0][:, 1:]], dim=1) for b, p, i in zip(detected_bboxes, preds[0].to('cpu'), new_labels_indexes)]
+                #detected_bboxes = [torch.cat([b[:, :5], p[i != 0][:, 1:]], dim=1) for b, p, i in zip(detected_bboxes, preds[0].to('cpu'), new_labels_indexes)]
 
                 detected_bboxes = bbox_filtering_nms(detected_bboxes, confidence_threshold=.0, iou_threshold=0.5, img_size=images.size()[::-1][:2])
                 evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
@@ -419,17 +421,18 @@ for epoch in range(1):
             logs['test_real_world'][house]['loss_label'].append(sum(temp_losses_final['loss_label']) / len(temp_losses_final['loss_label']))
             logs['test_real_world'][house]['loss_confidence'].append(sum(temp_losses_final['loss_confidence']) / len(temp_losses_final['loss_confidence']))
 
-            metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
-            metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
+            for c in np.arange(0, 1, 0.1):
+                metrics = evaluator_complete_metric.get_metrics(confidence_threshold=c, iou_threshold=iou_threshold_matching_metric)
+                metrics_ap = evaluator_ap.get_metrics(confidence_threshold=c, iou_threshold=iou_threshold_matching_metric)
 
-            for label, values in metrics.items():
-                for k, v in values.items():
-                    if len(net_performance[house][k]) == epoch:
-                        net_performance[house][k].append(v)
-                    else:
-                        net_performance[house][k][-1] += v
-            for label, v in metrics_ap['per_bbox'].items():
-                net_performance_ap[house][label].append(v['AP'])
+                for label, values in metrics.items():
+                    for k, v in values.items():
+                        if len(net_performance[house][k]) == int(c*10):
+                            net_performance[house][k].append(v)
+                        else:
+                            net_performance[house][k][-1] += v
+                for label, v in metrics_ap['per_bbox'].items():
+                    net_performance_ap[house][label].append(v['AP'])
 
         print(logs['train'], logs['test'])
         #print(net_performance)
@@ -439,9 +442,9 @@ for epoch in range(1):
             plt.axhline(nms_performance[env]['FP'], label='nms FP', color='blue', linestyle='--')
             plt.axhline(nms_performance[env]['FPiou'], label='nms FPiou', color='red', linestyle='--')
 
-            plt.axhline(values['TP'][0], label='TP', color='green',)
-            plt.axhline(values['FP'][0], label='FP', color='blue')
-            plt.axhline(values['FPiou'][0], label='nms FPiou', color='red')
+            plt.plot([i for i in range(len(values['TP']))], values['TP'], label='TP', color='green')
+            plt.plot([i for i in range(len(values['TP']))], values['FP'], label='FP', color='blue')
+            plt.plot([i for i in range(len(values['TP']))], values['FPiou'], label='FPiou', color='red')
             plt.title('env')
             plt.legend()
             plt.savefig(f'evaluation/COMPLETE_METRIC_{env}.svg')
@@ -450,8 +453,8 @@ for epoch in range(1):
             fig = plt.figure()
             plt.axhline(nms_performance_ap[env]['0'], label='nms Closed', color='red', linestyle='--')
             plt.axhline(nms_performance_ap[env]['1'], label='nms Open', color='green', linestyle='--')
-            plt.axhline(values['0'][0], label='Closed', color='red', )
-            plt.axhline(values['1'][0], label='Open', color='green')
+            plt.plot([i for i in range(len(values['0']))], values['0'], label='Closed', color='red')
+            plt.plot([i for i in range(len(values['1']))], values['1'], label='Open', color='green')
 
             plt.title('env')
             plt.legend()
