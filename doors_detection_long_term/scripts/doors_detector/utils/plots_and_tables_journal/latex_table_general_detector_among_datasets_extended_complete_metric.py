@@ -21,6 +21,8 @@ houses['FP_p'] = ((houses['FP'] / houses['total_positives']) * 100).round()
 houses['FPiou_p'] = ((houses['FPiou'] / houses['total_positives']) * 100).round()
 houses_faster = houses
 houses_faster.loc[houses_faster['house'] == 'chemistryfloor0', 'house'] = 'chemistry_floor0'
+houses_faster.loc[houses_faster['house'] == 'housematteo', 'house'] = 'house_matteo'
+
 
 # YOLO
 houses = pd.read_excel('./../../../results/yolov5_complete_metric_real_data.xlsx')
@@ -34,6 +36,9 @@ houses['FP_p'] = ((houses['FP'] / houses['total_positives']) * 100).round()
 houses['FPiou_p'] = ((houses['FPiou'] / houses['total_positives']) * 100).round()
 houses_yolo = houses
 houses_yolo.loc[houses_yolo['house'] == 'chemistryfloor0', 'house'] = 'chemistry_floor0'
+houses_yolo.loc[houses_yolo['house'] == 'housematteo', 'house'] = 'house_matteo'
+
+
 # DETR
 houses = pd.read_excel('./../../../results/detr_complete_metrics_real_data.xlsx')
 
@@ -48,7 +53,7 @@ houses['FP_p'] = ((houses['FP'] / houses['total_positives']) * 100).round()
 houses['FPiou_p'] = ((houses['FPiou'] / houses['total_positives']) * 100).round()
 houses_detr = houses
 houses_detr.loc[houses_detr['house'] == 'chemistryfloor0', 'house'] = 'chemistry_floor0'
-
+houses_detr.loc[houses_detr['house'] == 'housematteo', 'house'] = 'house_matteo'
 
 model_names = ['DETR~\cite{detr}', 'YOLOv5~\cite{yolo}', 'Faster~R--CNN~\cite{fasterrcnn}']
 datasets = ['deep_doors_2', 'gibson', 'gibson_deep_doors_2']
@@ -61,7 +66,7 @@ datasets_name = ['DD2~\cite{deepdoors2}', 'Gibson', 'Gibson + DD2~\cite{deepdoor
 
 # Plots mean AP
 colors = ['#1F77B4', '#FF7F0E', '#2CA02C', '#D62728']
-for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0']):
+for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']):
     fig, ax = subplots(figsize=(10, 5))
     dataframes = [houses_detr, houses_yolo, houses_faster]
 

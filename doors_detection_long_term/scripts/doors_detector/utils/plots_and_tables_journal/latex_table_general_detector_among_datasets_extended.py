@@ -39,6 +39,7 @@ houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) |
 houses['dataset'] = houses['dataset'].str.lower()
 houses_detr = houses
 houses_detr.loc[houses_detr['house'] == 'chemistryfloor0', 'house'] = 'chemistry_floor0'
+houses_detr.loc[houses_detr['house'] == 'housematteo', 'house'] = 'house_matteo'
 
 model_names = ['DETR~\cite{detr}', 'YOLOv5~\cite{yolo}', 'Faster~R--CNN~\cite{fasterrcnn}']
 datasets = ['deep_doors_2', 'gibson', 'gibson_deep_doors_2']
@@ -51,7 +52,7 @@ datasets_name = ['DD2~\cite{deepdoors2}', 'Gibson', 'Gibson + DD2~\cite{deepdoor
 
 # Plots mean AP
 colors = ['#1F77B4', '#FF7F0E', '#2CA02C', '#D62728']
-for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0']):
+for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']):
     fig, ax = subplots(figsize=(10, 5))
     dataframes = [houses_detr, houses_yolo, houses_faster]
 
@@ -72,7 +73,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0']):
 
     ax.set_title(f'mAP results in $e_{env_number}$', fontsize=18)
 
-    ax.set_ylim([0, 50])
+    ax.set_ylim([0, 55])
 
     if env_number % 2 == 0:
         matplotlib.pyplot.tick_params(left=True)
