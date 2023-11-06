@@ -11,7 +11,7 @@ from doors_detection_long_term.doors_detector.models.model_names import FASTER_R
 from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_faster_rcnn, seed_everything
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 
-houses = ['floor1', 'floor4', 'chemistry_floor0']
+houses = ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']
 datasets = ['gibson', 'deep_doors_2', 'gibson_deep_doors_2']
 epochs_general_detector = [40, 60]
 epochs_qualified_detector = [20, 40]
@@ -81,6 +81,7 @@ def save_file(results, complete_results, file_name_1, file_name_2):
 
 
 model_names_general_detectors = [(globals()[f'EXP_GENERAL_DETECTOR_{dataset}_{epochs}_EPOCHS'.upper()], dataset, epochs) for dataset in datasets for epochs in epochs_general_detector]
+houses = ['floor1', 'floor4', 'chemistry_floor0']
 model_names_qualified_detectors = [(globals()[f'EXP_2_{house}_{dataset}_EPOCHS_GD_{epochs_general}_EPOCHS_QD_{epochs_qualified}_FINE_TUNE_{quantity}'.upper()], house, dataset, quantity, epochs_general, epochs_qualified) for house in houses for dataset in datasets for quantity in fine_tune_quantity for epochs_general in epochs_general_detector for epochs_qualified in epochs_qualified_detector]
 
 results = []
@@ -89,7 +90,7 @@ results_complete = []
 # General detectors
 for model_name, dataset, epochs, in model_names_general_detectors:
     print(model_name)
-
+    houses = ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']
     for house in houses:
         _, test, _, _ = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25)
         data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_faster_rcnn, drop_last=False, num_workers=4)

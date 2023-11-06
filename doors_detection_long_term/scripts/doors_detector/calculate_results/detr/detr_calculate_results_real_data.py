@@ -13,7 +13,7 @@ from doors_detection_long_term.doors_detector.utilities.collate_fn_functions imp
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import \
     get_final_doors_dataset_epoch_analysis, get_final_doors_dataset_real_data
 
-houses = ['floor1', 'floor4', 'chemistry_floor0']
+houses = ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']
 epochs_general_detector = [40, 60]
 epochs_qualified_detector = [20, 40]
 fine_tune_quantity = [15, 25, 50, 75]
@@ -99,7 +99,7 @@ for house, dataset, epochs_gd in [(h, d, e) for h in houses for d in datasets fo
         for label, values in sorted(complete_metric.items(), key=lambda v: v[0]):
             results_complete += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'GD', dataset, epochs_gd, epochs_gd, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
-
+houses = ['floor1', 'floor4', 'chemistry_floor0',]
 for house, dataset, epochs_gd, epochs_qd, fine_tune in [(h, d, e, eq, ft) for h in houses for d in datasets for e in [60] for eq in epochs_qualified_detector for ft in  fine_tune_quantity]:
     _, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25)
     data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn, drop_last=False, num_workers=4)
