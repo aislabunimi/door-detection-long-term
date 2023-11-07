@@ -78,7 +78,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
                width=0.16,  color=color, edgecolor='#000000',alpha=0.9,
                linewidth=2)
         ax.bar(X + i * 0.2 + 0.04, [d.loc[(d['dataset'] == dataset) & (d['house'] == house)]['FP_p'].iloc[0] for d in dataframes],
-               width=0.16,  color=color, edgecolor='#000000',alpha=0.9, hatch='/',
+               width=0.16, fc=(0, 0, 0, 0.0), edgecolor='#000000', hatch='/',
                linewidth=2)
 
         #plt.errorbar(x=X + (i + 1) * 0.2 + 0.04, y=[0.0 for _ in dataframes],
