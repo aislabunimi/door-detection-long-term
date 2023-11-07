@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
     model, compute_loss, optimizer, scheduler, scaler, start_epoch, nl, nw, nb, amp, nbs, accumulate, lf, logs = \
         prepare_model(
-            description=globals()[f'EXP_1_IGIBSON_ALL_SCENES_REALISTIC_MODE_EPOCHS_{epochs_general_detector[0]}'.upper()],
+            description=globals()[f'EXP_GENERAL_DETECTOR_IGIBSON_{epochs_general_detector[0]}_EPOCHS'.upper()],
             reload_model=False,
             restart_checkpoint=False,
             epochs=epochs_general_detector[-1]
@@ -215,4 +215,4 @@ if __name__ == "__main__":
         # Change the model description on each epoch step
         if epoch == epochs_general_detector[epoch_count] - 1 and epoch_count < len(epochs_general_detector) -1:
             epoch_count += 1
-            model.set_description(globals()[f'EXP_1_IGIBSON_ALL_SCENES_REALISTIC_MODE_EPOCHS_{epochs_general_detector[epoch_count]}'.upper()])
+            model.set_description(globals()[f'EXP_GENERAL_DETECTOR_IGIBSON_{epochs_general_detector[epoch_count]}_EPOCHS'.upper()])
