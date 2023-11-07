@@ -4,7 +4,8 @@ import time
 from torch.optim import lr_scheduler
 from tqdm import tqdm
 
-from doors_detection_long_term.doors_detector.dataset.torch_dataset import DEEP_DOORS_2_LABELLED, FINAL_DOORS_DATASET
+from doors_detection_long_term.doors_detector.dataset.torch_dataset import DEEP_DOORS_2_LABELLED, FINAL_DOORS_DATASET, \
+    IGIBSON_DATASET
 import numpy as np
 import torch.optim
 from torch.utils.data import DataLoader
@@ -30,7 +31,7 @@ params = {
     'seed': 0
 }
 def prepare_model(description, reload_model, restart_checkpoint):
-    model = FasterRCNN(model_name=FASTER_RCNN, n_labels=len(labels.keys()) + 1, pretrained=reload_model, dataset_name=FINAL_DOORS_DATASET, description=description)
+    model = FasterRCNN(model_name=FASTER_RCNN, n_labels=len(labels.keys()) + 1, pretrained=reload_model, dataset_name=IGIBSON_DATASET, description=description)
 
     logs = {'train': [], 'train_after_backpropagation': [], 'validation': [], 'test': [], 'time': []}
     optimizer_state_dict = {}

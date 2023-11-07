@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
 from doors_detection_long_term.doors_detector.models.detr_door_detector import *
-from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
+from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET, IGIBSON_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.models.detr_door_detector import DetrDoorDetector
 from doors_detection_long_term.doors_detector.models.model_names import DETR_RESNET50
@@ -17,13 +17,17 @@ houses = ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']
 epochs_general_detector = [40, 60]
 epochs_qualified_detector = [20, 40]
 fine_tune_quantity = [15, 25, 50, 75]
-datasets = ['GIBSON', 'DEEP_DOORS_2', 'GIBSON_DEEP_DOORS_2']
+datasets = ['GIBSON', 'DEEP_DOORS_2', 'GIBSON_DEEP_DOORS_2', 'IGIBSON']
 device = 'cuda'
 
 seed_everything(seed=0)
 
-def compute_results(model_name, data_loader_test, COLORS):
-    model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=model_name)
+def compute_results(model_name, data_loader_test, COLORS, dataset=None):
+    if dataset == 'IGIBSON':
+        dataset_type = IGIBSON_DATASET
+    else:
+        dataset_type = FINAL_DOORS_DATASET
+    model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=True, dataset_name=dataset_type, description=model_name)
     model.eval()
     model.to(device)
 
@@ -89,7 +93,7 @@ for house, dataset, epochs_gd in [(h, d, e) for h in houses for d in datasets fo
 
     model_name = globals()[f'EXP_GENERAL_DETECTOR_2_layers_BACKBONE_{dataset}_{epochs_gd}_EPOCHS'.upper()]
 
-    metrics, complete_metrics = compute_results(model_name, data_loader_test, COLORS)
+    metrics, complete_metrics = compute_results(model_name, data_loader_test, COLORS, dataset=dataset)
 
     for (iou_threshold, confidence_threshold), metric in metrics.items():
         for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
@@ -100,6 +104,7 @@ for house, dataset, epochs_gd in [(h, d, e) for h in houses for d in datasets fo
             results_complete += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'GD', dataset, epochs_gd, epochs_gd, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
 houses = ['floor1', 'floor4', 'chemistry_floor0',]
+datasets = ['GIBSON', 'DEEP_DOORS_2', 'GIBSON_DEEP_DOORS_2']
 for house, dataset, epochs_gd, epochs_qd, fine_tune in [(h, d, e, eq, ft) for h in houses for d in datasets for e in [60] for eq in epochs_qualified_detector for ft in  fine_tune_quantity]:
     _, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25)
     data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn, drop_last=False, num_workers=4)

@@ -42,8 +42,8 @@ houses_detr.loc[houses_detr['house'] == 'chemistryfloor0', 'house'] = 'chemistry
 houses_detr.loc[houses_detr['house'] == 'housematteo', 'house'] = 'house_matteo'
 
 model_names = ['DETR~\cite{detr}', 'YOLOv5~\cite{yolo}', 'Faster~R--CNN~\cite{fasterrcnn}']
-datasets = ['deep_doors_2', 'gibson', 'gibson_deep_doors_2']
-datasets_name = ['DD2~\cite{deepdoors2}', 'Gibson', 'Gibson + DD2~\cite{deepdoors2}']
+datasets = ['igibson', 'deep_doors_2', 'gibson', 'gibson_deep_doors_2']
+datasets_name = ['IGibson', 'DD2~\cite{deepdoors2}', 'Gibson', 'Gibson + DD2~\cite{deepdoors2}']
 
 #print(houses_detr.mean().index.tolist())
 
@@ -57,14 +57,14 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
     dataframes = [houses_detr, houses_yolo, houses_faster]
 
     X = np.arange(3)
-    ax.bar(X, [0 for _ in range(3)], width=0.16)
+    #ax.bar(X, [0 for _ in range(3)], width=0.16)
 
-    for i, (dataset, color) in enumerate(zip(datasets, colors[1:])):
+    for i, (dataset, color) in enumerate(zip(datasets, colors)):
 
-        ax.bar(X + (i + 1) * 0.2 + 0.04, [d.loc[(d['dataset'] == dataset) & (d["label"] == 0) & (d['house'] == house)]['AP'].iloc[0] / 2 for d in dataframes],
+        ax.bar(X + i * 0.2 + 0.04, [d.loc[(d['dataset'] == dataset) & (d["label"] == 0) & (d['house'] == house)]['AP'].iloc[0] / 2 for d in dataframes],
                width=0.16,  color=color, edgecolor='#000000',alpha=0.9, hatch='/',
                linewidth=2)
-        ax.bar(X + (i + 1) * 0.2 + 0.04, [d.loc[(d['dataset'] == dataset) & (d["label"] == 1) & (d['house'] == house)]['AP'].iloc[0] / 2 for d in dataframes],
+        ax.bar(X + i * 0.2 + 0.04, [d.loc[(d['dataset'] == dataset) & (d["label"] == 1) & (d['house'] == house)]['AP'].iloc[0] / 2 for d in dataframes],
                bottom=[d.loc[(d['dataset'] == dataset) & (d["label"] == 0) & (d['house'] == house)]['AP'].iloc[0] / 2 for d in dataframes],
                width=0.16, color=color, edgecolor='#000000', alpha=0.9,
                linewidth=2)
