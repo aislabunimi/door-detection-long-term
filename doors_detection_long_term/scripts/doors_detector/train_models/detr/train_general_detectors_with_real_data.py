@@ -17,7 +17,7 @@ from doors_detection_long_term.doors_detector.utilities.collate_fn_functions imp
 
 device = 'cuda'
 
-houses = ['floor1', 'floor4', 'chemistry_floor0']
+houses = ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']
 epochs_general_detector = [40, 60]
 datasets = ['gibson', 'deep_doors_2', 'gibson_deep_doors_2']
 fine_tune_quantity = [15, 25, 50, 75]
@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
     # Qualify the general detectors trained before
     for house, epochs_general, dataset, quantity in [(h, e, d, q) for h in houses for e in epochs_general_detector for d in datasets for q in fine_tune_quantity]:
-        epochs_fine_tune = [40, 60]
+        epochs_fine_tune = [20, 40]
         print(f'{house}, general detectors trained for {epochs_general} epochs on {dataset}, fine tune train set: {quantity}')
         train, test, labels, _ = get_final_doors_dataset_real_data(folder_name=house, train_size=quantity / 100)
         print(f'Train set size: {len(train)}', f'Test set size: {len(test)}')
