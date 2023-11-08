@@ -77,21 +77,22 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
         ax.bar(X + i * 0.2 + 0.04, [d.loc[(d['dataset'] == dataset) & (d['house'] == house)]['TP_p'].iloc[0] for d in dataframes],
                width=0.16,  color=color, edgecolor='#000000',alpha=0.9,
                linewidth=2)
-        ax.bar(X + i * 0.2 + 0.04, [d.loc[(d['dataset'] == dataset) & (d['house'] == house)]['FP_p'].iloc[0] for d in dataframes],
+        ax.bar(X + i * 0.2 + 0.04, [d.loc[(d['dataset'] == dataset) & (d['house'] == house)]['FP_p'].iloc[0] * -1 for d in dataframes],
                width=0.16, fc=(0, 0, 0, 0.0), edgecolor='#000000', hatch='/',
                linewidth=2)
 
         #plt.errorbar(x=X + (i + 1) * 0.2 + 0.04, y=[0.0 for _ in dataframes],
          #            yerr=[[0 for _ in dataframes], [d.loc[(d['dataset'] == dataset) & (d['house'] == house)]['FPiou_p'].iloc[0] for d in dataframes]],
           #           color='#000000', elinewidth=4, capsize=4, capthick=5)
-        plt.vlines(x=X + i * 0.2 + 0.04, ymin=[0 for _ in dataframes], ymax=[d.loc[(d['dataset'] == dataset) & (d['house'] == house)]['FPiou_p'].iloc[0] for d in dataframes], colors='#000000', ls='-', lw=4)
-        plt.plot(X + i * 0.2 + 0.04, [d.loc[(d['dataset'] == dataset) & (d['house'] == house)]['FPiou_p'].iloc[0] for d in dataframes], color='#000000', marker='o', linestyle='None')
+
+        plt.vlines(x=X + i * 0.2 + 0.04, ymin=[0 for _ in dataframes], ymax=[d.loc[(d['dataset'] == dataset) & (d['house'] == house)]['FPiou_p'].iloc[0] * -1 for d in dataframes], colors='#000000', ls='-', lw=4)
+        plt.plot(X + i * 0.2 + 0.04, [d.loc[(d['dataset'] == dataset) & (d['house'] == house)]['FPiou_p'].iloc[0] * -1 for d in dataframes], color='#000000', marker='o', linestyle='None')
 
 
 
     ax.set_title(f'Extended metric results in $e_{env_number}$', fontsize=18)
-
-    ax.set_ylim([0, 70])
+    ax.axhline(y=0.0, linewidth=1, color='black')
+    ax.set_ylim([-55, 70])
 
     if env_number % 2 == 0:
         matplotlib.pyplot.tick_params(left=True)
@@ -108,8 +109,8 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
         ax.set_xticklabels(model_names, fontsize=17)
         ax.set_xlabel('Detector', fontsize=17)
 
-    ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.95), loc='upper center', ncol=4, alignment='left')
-
+    ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.97), loc='upper center', ncol=4, alignment='left')
+    ax.set_yticklabels([item.get_text().replace(chr(8722), '') for item in ax.get_yticklabels()])
     fig.tight_layout()
 
     def tikzplotlib_fix_ncols(obj):
@@ -119,7 +120,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
             tikzplotlib_fix_ncols(child)
     tikzplotlib_fix_ncols(fig)
     chart_code = tikzplotlib.get_tikz_code().replace('\\begin{tikzpicture}', '\\begin{tikzpicture}[scale=0.725]')
-    chart_code = chart_code.replace('\\begin{axis}[', '\\begin{axis}[\nwidth=12cm,\nheight=7cm,')
+    chart_code = chart_code.replace('\\begin{axis}[', '\\begin{axis}[\nwidth=12cm,\nheight=8cm,')
     chart_code = chart_code.replace('legend style={\n', 'legend cell align={left},\nlegend style={\n/tikz/every even column/.append style={column sep=0.3cm},\n')
     chart_code = chart_code.replace('ybar legend', 'area legend')
     chart_code = chart_code.replace('\\end{axis}', '\\input{graphics/legend_extended_metric_general_detector}\n\\end{axis}')
