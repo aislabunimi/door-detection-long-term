@@ -23,7 +23,7 @@ from doors_detection_long_term.doors_detector.utilities.collate_fn_functions imp
 
 device = 'cuda'
 
-houses = ['floor1', 'floor4', 'chemistry_floor0']
+houses = ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']
 epochs_general_detector = [60]
 epochs_qualified_detectors = [40]
 fine_tune_quantity = [15, 25, 50, 75]
