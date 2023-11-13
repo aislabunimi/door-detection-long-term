@@ -51,7 +51,7 @@ datasets_name = ['IGibson', 'DD2~\cite{deepdoors2}', 'Gibson', 'Gibson + DD2~\ci
 
 
 # Plots mean AP
-colors = ['#1F77B4', '#FF7F0E', '#2CA02C', '#D62728']
+colors = ['#1F77B4', '#2CA02C', '#FF7F0E',  '#D62728']
 for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']):
     fig, ax = subplots(figsize=(10, 5))
     dataframes = [houses_detr, houses_yolo, houses_faster]
