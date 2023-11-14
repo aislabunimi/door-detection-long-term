@@ -125,7 +125,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
 
 
 # Plots comparison between dataset
-colors = ['#1F77B4','#2CA02C', '#D62728']
+colors = ['#2CA02C', '#FF7F0E', '#D62728',]
 datasets = ['deep_doors_2', 'gibson', 'gibson_deep_doors_2']
 detectors_labels = ['$GD$', '$QD_{e}^{15}$', '$QD_{e}^{25}$', '$QD_{e}^{50}$', '$QD_{e}^{75}$']
 for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']):

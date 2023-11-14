@@ -128,7 +128,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
     chart_code = chart_code.replace('\\begin{axis}[', '\\begin{axis}[\nwidth=12cm,\nheight=8cm,')
     chart_code = chart_code.replace('legend style={\n', 'legend cell align={left},\nlegend style={\n/tikz/every even column/.append style={column sep=0.3cm},\n')
     chart_code = chart_code.replace('ybar legend', 'area legend')
-    chart_code = chart_code.replace('\\end{axis}', '\\input{graphics/legend_extended_metric_general_detector}\n\\end{axis}')
+    #chart_code = chart_code.replace('\\end{axis}', '\\input{graphics/legend_extended_metric_general_detector}\n\\end{axis}')
     chart_code = chart_code.replace('mark size=3', 'mark size=2')
     text_file = open(f"../latex_plots/qualified_detectors_stacked_complete_metric_e{env_number}.tex", "w")
 
@@ -147,27 +147,31 @@ detectors = ['GD', 'QD_15', 'QD_25', 'QD_50', 'QD_75']
 
 for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']):
     fig, ax = subplots(figsize=(10, 5))
-    dataframes = [houses_detr,
-                  houses_yolo,
-                  houses_faster]
+    dataframes = [houses_detr.loc[houses_detr['dataset'] == 'gibson_deep_doors_2'],
+                  houses_yolo.loc[houses_yolo['dataset'] == 'gibson_deep_doors_2'],
+                  houses_faster.loc[houses_faster['dataset'] == 'gibson_deep_doors_2']]
 
     X = np.arange(3)
     #ax.bar(X, [0 for _ in range(3)], width=0.16)
 
     for data_count, data in enumerate(dataframes):
-        ax.errorbar([i + 5*data_count for i in range(5)], [data.loc[(data['detector'] == detector) & (data['house'] == house)]['TP_p'].mean() for detector in detectors],
-               color='#2CA02C', capsize=3, marker='o', yerr=[data.loc[(data['detector'] == detector) & (data['house'] == house)]['TP_p'].std() for detector in detectors])
-        ax.errorbar([i+ 5*data_count for i in range(5)], [data.loc[(data['detector'] == detector) & (data['house'] == house)]['FP_p'].mean() for detector in detectors],
-               yerr=[data.loc[(data['detector'] == detector) & (data['house'] == house)]['FP_p'].std() for detector in detectors],
-               color='#D62728', marker='^', capsize=3)
-        ax.errorbar([i+ 5*data_count for i in range(5)], [data.loc[(data['detector'] == detector) & (data['house'] == house)]['FPiou_p'].mean() for detector in detectors],
-                    yerr=[data.loc[(data['detector'] == detector) & (data['house'] == house)]['FPiou_p'].std() for detector in detectors],
-               color='#FF7F0E', marker='*', capsize=3)
+        ax.plot([i + 5*data_count for i in range(5)], [data.loc[(data['detector'] == detector) & (data['house'] == house)]['TP_p'].iloc[0] for detector in detectors],
+               color='#2CA02C', marker='o',markersize=7)
+        ax.fill_between([i + 5*data_count for i in range(5)], [data.loc[(data['detector'] == detector) & (data['house'] == house)]['TP_p'].iloc[0] for detector in detectors], 0,
+                        color='#2CA02C', alpha=.2)
+        ax.plot([i+ 5*data_count for i in range(5)], [data.loc[(data['detector'] == detector) & (data['house'] == house)]['FP_p'].iloc[0] for detector in detectors],
+               color='#D62728', marker='^',markersize=7 )
+        ax.fill_between([i+ 5*data_count for i in range(5)], [data.loc[(data['detector'] == detector) & (data['house'] == house)]['FP_p'].iloc[0] for detector in detectors], 0,
+                        color='#D62728', alpha=.2)
+        ax.plot([i+ 5*data_count for i in range(5)], [data.loc[(data['detector'] == detector) & (data['house'] == house)]['FPiou_p'].iloc[0] for detector in detectors],
+               color='#FF7F0E', marker='d',markersize=7)
+        ax.fill_between([i+ 5*data_count for i in range(5)], [data.loc[(data['detector'] == detector) & (data['house'] == house)]['FPiou_p'].iloc[0] for detector in detectors], 0,
+                        color='#FF7F0E', alpha=.2)
 
 
     ax.set_title(f'Extended metric results in $e_{env_number}$', fontsize=18)
     ax.axhline(y=0.0, linewidth=1, color='black')
-    ax.set_ylim([0, 120])
+    ax.set_ylim([0, 100])
 
     if env_number % 2 == 0:
         matplotlib.pyplot.tick_params(left=True)
@@ -180,7 +184,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
         matplotlib.pyplot.tick_params(bottom=False)
     if env_number >1:
         matplotlib.pyplot.tick_params(bottom=True)
-        ax.set_xticks([(i+0.34) * 5 for i in range(3)])
+        ax.set_xticks([(i * 5) + 2 for i in range(3)])
         ax.set_xticklabels(model_names, fontsize=17)
         ax.set_xlabel('Detector', fontsize=17)
 
