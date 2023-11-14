@@ -93,7 +93,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
 
     ax.set_title(f'Extended metric results in $e_{env_number}$', fontsize=18)
     ax.axhline(y=0.0, linewidth=1, color='black')
-    ax.set_ylim([-55, 70])
+    ax.set_ylim([-50, 50])
 
     if env_number % 2 == 0:
         matplotlib.pyplot.tick_params(left=True)
@@ -124,7 +124,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
     chart_code = chart_code.replace('\\begin{axis}[', '\\begin{axis}[\nwidth=12cm,\nheight=8cm,')
     chart_code = chart_code.replace('legend style={\n', 'legend cell align={left},\nlegend style={\n/tikz/every even column/.append style={column sep=0.3cm},\n')
     chart_code = chart_code.replace('ybar legend', 'area legend')
-    chart_code = chart_code.replace('\\end{axis}', '\\input{graphics/legend_extended_metric_general_detector}\n\\end{axis}')
+    #chart_code = chart_code.replace('\\end{axis}', '\\input{graphics/legend_extended_metric_general_detector}\n\\end{axis}')
     chart_code = chart_code.replace('mark size=3', 'mark size=2')
     text_file = open(f"../latex_plots/general_detector_stacked_complete_metric_e{env_number}.tex", "w")
 

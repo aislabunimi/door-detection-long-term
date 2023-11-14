@@ -127,6 +127,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
 # Plots comparison between dataset
 colors = ['#1F77B4','#2CA02C', '#D62728']
 datasets = ['deep_doors_2', 'gibson', 'gibson_deep_doors_2']
+detectors_labels = ['$GD$', '$QD_{e}^{15}$', '$QD_{e}^{25}$', '$QD_{e}^{50}$', '$QD_{e}^{75}$']
 for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']):
     fig, ax = subplots(figsize=(10, 5))
     #ax.bar(X, [0 for _ in range(3)], width=0.16)
@@ -150,9 +151,9 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
 
 
 
-    ax.set_title(f'Results in the real world with {env_number}', fontsize=18)
+    ax.set_title(f'mAP results over the detectors in $e_{env_number}$', fontsize=18)
 
-    ax.set_ylim([0, 130])
+    ax.set_ylim([0, 100])
 
     if env_number % 2 == 0:
         matplotlib.pyplot.tick_params(left=True)
@@ -165,8 +166,8 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
         matplotlib.pyplot.tick_params(bottom=False)
     if env_number >1:
         matplotlib.pyplot.tick_params(bottom=True)
-        ax.set_xticks([i+0.34 for i in range(3)])
-        #ax.set_xticklabels(model_names, fontsize=17)
+        ax.set_xticks([i+0.27 for i in range(5)])
+        ax.set_xticklabels(detectors_labels, fontsize=17)
         ax.set_xlabel('Qualification rounds', fontsize=17)
 
     ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.95), loc='upper center', ncol=3, alignment='left')
@@ -183,7 +184,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
     chart_code = chart_code.replace('\\begin{axis}[', '\\begin{axis}[\nwidth=12cm,\nheight=7cm,')
     chart_code = chart_code.replace('legend style={\n', 'legend cell align={left},\nlegend style={\n/tikz/every even column/.append style={column sep=0.3cm},\n')
     chart_code = chart_code.replace('ybar legend', 'area legend')
-    chart_code = chart_code.replace('\\end{axis}', '\\input{graphics/legend_ap_general_detector_over_dataset}\n\\end{axis}')
+    #chart_code = chart_code.replace('\\end{axis}', '\\input{graphics/legend_ap_general_detector_over_dataset}\n\\end{axis}')
     text_file = open(f"../latex_plots/qualified_detector_over_datasets_mAP_d_{env_number}.tex", "w")
 
     #write string to file
