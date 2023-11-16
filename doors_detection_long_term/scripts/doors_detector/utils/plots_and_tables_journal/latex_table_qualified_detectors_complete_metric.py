@@ -68,6 +68,8 @@ houses_faster = houses_faster.loc[houses_faster['dataset'] != 'igibson']
 # Plots mean AP
 colors = ['#1F77B4','#2CA02C', '#FF7F0E', '#D62728', '#8C564B']
 detectors = ['GD', 'QD_15', 'QD_25', 'QD_50', 'QD_75']
+detectors_labels = ['$GD$', '$QD_{e}^{15}$', '$QD_{e}^{25}$', '$QD_{e}^{50}$', '$QD_{e}^{75}$']
+
 for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']):
     fig, ax = subplots(figsize=(10, 5))
     dataframes = [houses_detr.loc[houses_detr['dataset'] == 'gibson_deep_doors_2'],
@@ -171,7 +173,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
 
     ax.set_title(f'Extended metric results in $e_{env_number}$', fontsize=18)
     ax.axhline(y=0.0, linewidth=1, color='black')
-    ax.set_ylim([0, 100])
+    ax.set_ylim([0, 120])
 
     if env_number % 2 == 0:
         matplotlib.pyplot.tick_params(left=True)
@@ -184,9 +186,13 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
         matplotlib.pyplot.tick_params(bottom=False)
     if env_number >1:
         matplotlib.pyplot.tick_params(bottom=True)
-        ax.set_xticks([(i * 5) + 2 for i in range(3)])
-        ax.set_xticklabels(model_names, fontsize=17)
+        ax.set_xticks([i*5 + 2 for i in range(3)])
+        labels = detectors_labels + detectors_labels + detectors_labels
+
+        ax.set_xticklabels(model_names, fontsize=5)
         ax.set_xlabel('Detector', fontsize=17)
+        for c, l in enumerate(labels):
+            ax.text(c, 110, l, rotation=-45, fontsize=15)
 
     ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.97), loc='upper center', ncol=4, alignment='left')
     ax.set_yticklabels([item.get_text().replace(chr(8722), '') for item in ax.get_yticklabels()])
