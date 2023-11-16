@@ -173,11 +173,13 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
 
     ax.set_title(f'Extended metric results in $e_{env_number}$', fontsize=18)
     ax.axhline(y=0.0, linewidth=1, color='black')
-    ax.set_ylim([0, 120])
+    ax.set_ylim([0, 115])
 
     if env_number % 2 == 0:
         matplotlib.pyplot.tick_params(left=True)
         ax.tick_params(axis='y', labelsize=16)
+        ax.set_yticks([20 * i for i in range(5)])
+        ax.set_yticklabels([f'{20 * i}' for i in range(5)])
         ax.set_ylabel('%', fontsize=17)
     else:
         matplotlib.pyplot.tick_params(left=False)
@@ -187,12 +189,16 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
     if env_number >1:
         matplotlib.pyplot.tick_params(bottom=True)
         ax.set_xticks([i*5 + 2 for i in range(3)])
-        labels = detectors_labels + detectors_labels + detectors_labels
 
         ax.set_xticklabels(model_names, fontsize=5)
         ax.set_xlabel('Detector', fontsize=17)
-        for c, l in enumerate(labels):
-            ax.text(c, 110, l, rotation=-45, fontsize=15)
+
+    labels = detectors_labels + detectors_labels + detectors_labels
+    for c, l in enumerate(labels):
+        ax.text(c, 107, l, rotation=45, fontsize=15, horizontalalignment='center', verticalalignment='center')
+
+    ax.vlines(x = 4.5, ymin = 0, ymax = 115, color='gray', linestyle='--',alpha=0.7)
+    ax.vlines(x = 9.5, ymin = 0, ymax = 115, color='gray', linestyle='--', alpha=0.7)
 
     ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.97), loc='upper center', ncol=4, alignment='left')
     ax.set_yticklabels([item.get_text().replace(chr(8722), '') for item in ax.get_yticklabels()])

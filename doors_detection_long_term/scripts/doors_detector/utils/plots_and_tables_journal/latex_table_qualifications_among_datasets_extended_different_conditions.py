@@ -91,7 +91,7 @@ for env_number, house in enumerate(['floor1', 'floor4',]): # 'chemistry_floor0',
 
     if env_number<=1:
         matplotlib.pyplot.tick_params(bottom=False)
-    if env_number >1:
+    if env_number >-1:
         matplotlib.pyplot.tick_params(bottom=True)
         ax.set_xticks([i+0.34 for i in range(3)])
         ax.set_xticklabels(model_names, fontsize=17)
@@ -164,11 +164,11 @@ for env_number, house in enumerate(['floor1', 'floor4',]): # 'chemistry_floor0',
 
     if env_number<=1:
         matplotlib.pyplot.tick_params(bottom=False)
-    if env_number >1:
+    if env_number >-1:
         matplotlib.pyplot.tick_params(bottom=True)
         ax.set_xticks([i+0.27 for i in range(5)])
         ax.set_xticklabels(detectors_labels, fontsize=17)
-        ax.set_xlabel('Qualification rounds', fontsize=17)
+        ax.set_xlabel('Detector', fontsize=17)
 
     ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.95), loc='upper center', ncol=3, alignment='left')
 
