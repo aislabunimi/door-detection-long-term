@@ -143,8 +143,8 @@ ax.set_ylim([0, 120])
 
 matplotlib.pyplot.tick_params(left=True)
 ax.tick_params(axis='y', labelsize=16)
-ax.set_yticks([i * 20 for i in range(6)])
-ax.set_yticklabels([f'{i * 20}' for i in range(6)], fontsize=17)
+ax.set_yticks([i * 20 for i in range(5)])
+ax.set_yticklabels([f'{i * 20}' for i in range(5)])
 ax.set_ylabel('mAP', fontsize=17)
 
 
