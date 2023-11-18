@@ -124,7 +124,7 @@ for house, dataset, epochs_gd in [(h, d, e) for h in houses for d in datasets fo
     for (iou_threshold, confidence_threshold), complete_metric in complete_metrics.items():
         for label, values in sorted(complete_metric.items(), key=lambda v: v[0]):
             results_complete += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'GD', dataset, epochs_gd, epochs_gd, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
-    save_file(results, results_complete, 'detr_ap_real_data_onnx.xlsx', 'detr_complete_metrics_real_data_onnx.xlsx')
+
 datasets = ['GIBSON', 'DEEP_DOORS_2', 'GIBSON_DEEP_DOORS_2']
 for house, dataset, epochs_gd, epochs_qd, fine_tune in [(h, d, e, eq, ft) for h in houses for d in datasets for e in [60] for eq in epochs_qualified_detector for ft in  fine_tune_quantity]:
     _, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25)
