@@ -55,12 +55,12 @@ def compute_results(model_name, data_loader_test, description, dataset=None):
     with torch.no_grad():
         for images, targets, converted_boxes in tqdm(data_loader_test, total=len(data_loader_test), desc=description):
 
-            ort_inputs = {ort_session.get_inputs()[0].name: images.cpu().numpy()}
+            ort_inputs = {ort_session.get_inputs()[0].name: images.cpu().numpy().astype(np.float16)}
             ort_outs = ort_session.run(None, ort_inputs)
             preds = torch.tensor(ort_outs[0]).float()
 
             #print(preds.size(), train_out[0].size(), train_out[1].size(), train_out[2].size())
-            preds,_ = model.model(images)
+
             preds = non_max_suppression(preds,
                                         0.01,
                                         0.5,
