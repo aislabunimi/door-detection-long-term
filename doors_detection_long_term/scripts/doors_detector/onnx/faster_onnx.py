@@ -43,20 +43,17 @@ if __name__ == '__main__':
 
     ort_session = onnxruntime.InferenceSession("model_onnx.onnx", providers=providers)
 
-
+    io_binding = ort_session.io_binding()
+    io_binding.bind_cpu_input('input', to_numpy(input_tensor))
+    io_binding.bind_output('output')
 
     # compute ONNX Runtime output prediction
     times = []
     for i in range(200):
-        ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(input_tensor)}
         t = time.time()
-        ort_outs = ort_session.run(None, ort_inputs)
+        ort_outs = ort_session.run_with_iobinding(io_binding)
         times.append(time.time() - t)
-        print(ort_outs)
-    print(1/(sum(times) / len(times)))
-    torch_out = model.model(input_tensor)
-    torch_out = [torch_out['pred_logits'], torch_out['pred_boxes']]
-    #np.testing.assert_allclose(to_numpy(torch_out[1]), ort_outs[1], rtol=1e-03, atol=1e-05)
+    print(f'FPS: {1/(sum(times) / len(times))}')
 
 
 

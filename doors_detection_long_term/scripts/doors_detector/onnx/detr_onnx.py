@@ -26,7 +26,7 @@ if __name__ == '__main__':
         'device_id': 0,
         'cudnn_conv_algo_search': 'DEFAULT',
     })]
-    input_tensor = torch.ones(1, 3, 320, 320)
+    input_tensor = torch.ones(1, 3, 240, 320)
     torch.onnx.export(model.model, input_tensor, model_path, input_names=['input'],
                       output_names=['output'], export_params=True, do_constant_folding=True)
 
@@ -36,20 +36,18 @@ if __name__ == '__main__':
     onnx.checker.check_model(onnx_model)
     ort_session = onnxruntime.InferenceSession("model_onnx.onnx", providers=providers)
 
-
+    io_binding = ort_session.io_binding()
+    io_binding.bind_cpu_input('input', to_numpy(input_tensor))
+    io_binding.bind_output('output')
 
     # compute ONNX Runtime output prediction
     times = []
     for i in range(200):
-        ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(input_tensor)}
         t = time.time()
-        ort_outs = ort_session.run(None, ort_inputs)
+        ort_outs = ort_session.run_with_iobinding(io_binding)
         times.append(time.time() - t)
-        print(ort_outs)
-    print(1/(sum(times) / len(times)))
-    torch_out = model.model(input_tensor)
-    torch_out = [torch_out['pred_logits'], torch_out['pred_boxes']]
-    #np.testing.assert_allclose(to_numpy(torch_out[1]), ort_outs[1], rtol=1e-03, atol=1e-05)
+    print(f'FPS: {1/(sum(times) / len(times))}')
+
 
 
 
