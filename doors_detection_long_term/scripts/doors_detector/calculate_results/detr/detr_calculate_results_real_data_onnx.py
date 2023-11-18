@@ -48,17 +48,17 @@ def compute_results(model_name, data_loader_test, COLORS, dataset=None):
 
     onnx_model = onnx.load("model_onnx.onnx")
     onnx_model = float16.convert_float_to_float16(onnx_model)
+    onnx.save(onnx_model, "model_onnx.onnx")
     onnx.checker.check_model(onnx_model)
-
     ort_session = onnxruntime.InferenceSession("model_onnx.onnx", providers=providers)
 
 
     for images, targets in tqdm(data_loader_test, total=len(data_loader_test), desc='Evaluate model'):
-        ort_inputs = {ort_session.get_inputs()[0].name: images.cpu().numpy()}
+        ort_inputs = {ort_session.get_inputs()[0].name: images.cpu().numpy().astype(np.float16)}
         ort_outs = ort_session.run(None, ort_inputs)
         #outputs = model(images)
         #print(outputs, ort_outs)
-        outputs = {'pred_logits': torch.tensor(ort_outs[0]), 'pred_boxes': torch.tensor(ort_outs[1])}
+        outputs = {'pred_logits': torch.tensor(ort_outs[0]).float(), 'pred_boxes': torch.tensor(ort_outs[1]).float()}
         evaluator.add_predictions(targets=targets, predictions=outputs, img_size=images.size()[2:][::-1])
         evaluator_complete_metric.add_predictions(targets=targets, predictions=outputs, img_size=images.size()[2:][::-1])
 
@@ -124,7 +124,7 @@ for house, dataset, epochs_gd in [(h, d, e) for h in houses for d in datasets fo
     for (iou_threshold, confidence_threshold), complete_metric in complete_metrics.items():
         for label, values in sorted(complete_metric.items(), key=lambda v: v[0]):
             results_complete += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'GD', dataset, epochs_gd, epochs_gd, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
-
+    save_file(results, results_complete, 'detr_ap_real_data_onnx.xlsx', 'detr_complete_metrics_real_data_onnx.xlsx')
 datasets = ['GIBSON', 'DEEP_DOORS_2', 'GIBSON_DEEP_DOORS_2']
 for house, dataset, epochs_gd, epochs_qd, fine_tune in [(h, d, e, eq, ft) for h in houses for d in datasets for e in [60] for eq in epochs_qualified_detector for ft in  fine_tune_quantity]:
     _, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house, train_size=0.25)

@@ -4,6 +4,7 @@ import numpy as np
 import onnx
 import onnxruntime
 import torch
+from onnxconverter_common import float16
 
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 
@@ -12,7 +13,7 @@ from doors_detection_long_term.doors_detector.models.detr_door_detector import \
 from doors_detection_long_term.doors_detector.models.model_names import DETR_RESNET50
 
 def to_numpy(tensor):
-    return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
+    return tensor.detach().cpu().numpy().astype(np.float16) if tensor.requires_grad else tensor.cpu().numpy().astype(np.float16)
 
 if __name__ == '__main__':
     print(onnxruntime.get_device())
@@ -30,8 +31,9 @@ if __name__ == '__main__':
                       output_names=['output'], export_params=True, do_constant_folding=True)
 
     onnx_model = onnx.load("model_onnx.onnx")
+    onnx_model = float16.convert_float_to_float16(onnx_model)
+    onnx.save(onnx_model, "model_onnx.onnx")
     onnx.checker.check_model(onnx_model)
-
     ort_session = onnxruntime.InferenceSession("model_onnx.onnx", providers=providers)
 
 
