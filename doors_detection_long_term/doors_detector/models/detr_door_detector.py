@@ -898,7 +898,6 @@ class DetrDoorDetector(GenericModel):
 
     def forward(self, x):
         x = self.model(x)
-
         """
         It returns a dict with the following elements:
                - "pred_logits": the classification logits (including no-object) for all queries.
