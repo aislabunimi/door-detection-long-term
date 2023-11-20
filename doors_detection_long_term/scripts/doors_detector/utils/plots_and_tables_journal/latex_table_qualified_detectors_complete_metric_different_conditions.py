@@ -188,13 +188,15 @@ for env_number, house in enumerate(['floor1', 'floor4',]):
         matplotlib.pyplot.tick_params(bottom=False)
     if env_number >-1:
         matplotlib.pyplot.tick_params(bottom=True)
-        ax.set_xticks([(i * 5) + 2 for i in range(3)])
-        ax.set_xticklabels(model_names, fontsize=17)
-        ax.set_xlabel('Detector', fontsize=17)
+        ax.set_xticks([i for i in range(15)])
+        l = ['0', '15', '25', '50', '75']
+        l = l+l+l
+        ax.set_xticklabels(l, fontsize=5)
+        ax.set_xlabel('\\% of qualification data', fontsize=17)
 
     labels = detectors_labels + detectors_labels + detectors_labels
-    for c, l in enumerate(labels):
-        ax.text(c, 88, l, rotation=45, fontsize=15, horizontalalignment='center', verticalalignment='center')
+    for i, m in enumerate(model_names):
+        ax.text(2 + 5*i, 88, m, fontsize=20, horizontalalignment='center', verticalalignment='center')
 
     ax.vlines(x = 4.5, ymin = 0, ymax = 115, color='gray', linestyle='--',alpha=0.7)
     ax.vlines(x = 9.5, ymin = 0, ymax = 115, color='gray', linestyle='--', alpha=0.7)

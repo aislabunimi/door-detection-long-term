@@ -12,7 +12,7 @@ confidence_threshold = 0.75
 
 houses = pd.read_excel('./../../../results/faster_rcnn_complete_metric_real_data.xlsx')
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
-                    (houses['iou_threshold'] == iou_threshold) & (houses['confidence_threshold'] == confidence_threshold)]
+                    (houses['iou_threshold'] == iou_threshold)]
 
 houses= houses.groupby(['iou_threshold', 'confidence_threshold', 'house', 'detector', 'dataset', 'epochs_gd', 'epochs_qd'], as_index=False).sum()
 houses['TP_p'] = ((houses['TP'] / houses['total_positives']) * 100).round()
@@ -27,7 +27,7 @@ houses_faster.loc[houses_faster['house'] == 'housematteo', 'house'] = 'house_mat
 houses = pd.read_excel('./../../../results/yolov5_complete_metric_real_data.xlsx')
 
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
-                    (houses['iou_threshold'] == iou_threshold) & (houses['confidence_threshold'] == confidence_threshold)]
+                    (houses['iou_threshold'] == iou_threshold)]
 
 houses= houses.groupby(['iou_threshold', 'confidence_threshold', 'house', 'detector', 'dataset', 'epochs_gd', 'epochs_qd'], as_index=False).sum()
 houses['TP_p'] = ((houses['TP'] / houses['total_positives']) * 100).round()
@@ -42,7 +42,7 @@ houses_yolo.loc[houses_yolo['house'] == 'housematteo', 'house'] = 'house_matteo'
 houses = pd.read_excel('./../../../results/detr_complete_metrics_real_data.xlsx')
 
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
-                    (houses['iou_threshold'] == iou_threshold) & (houses['confidence_threshold'] == confidence_threshold)]
+                    (houses['iou_threshold'] == iou_threshold)]
 
 
 houses['dataset'] = houses['dataset'].str.lower()
@@ -75,39 +75,40 @@ detectors = ['GD', 'QD_15', 'QD_25', 'QD_50', 'QD_75']
 
 
 fig, ax = subplots(figsize=(10, 5))
-dataframes = [houses_detr.loc[houses_detr['dataset'] == 'gibson_deep_doors_2'],
-              houses_yolo.loc[houses_yolo['dataset'] == 'gibson_deep_doors_2'],
-              houses_faster.loc[houses_faster['dataset'] == 'gibson_deep_doors_2']]
+dataframes = [houses_detr.loc[(houses_detr['dataset'] == 'gibson_deep_doors_2') & (houses_detr['detector']=='QD_15')],
+              houses_yolo.loc[(houses_yolo['dataset'] == 'gibson_deep_doors_2') & (houses_yolo['detector']=='QD_15')],
+              houses_faster.loc[(houses_faster['dataset'] == 'gibson_deep_doors_2') & (houses_faster['detector']=='QD_15')]]
 
 X = np.arange(3)
 #ax.bar(X, [0 for _ in range(3)], width=0.16)
 
 for data_count, data in enumerate(dataframes):
-    means = np.array([data.loc[(data['detector'] == detector)]['TP_p'].mean() for detector in detectors])
-    stds = np.array([data.loc[(data['detector'] == detector)]['TP_p'].std() for detector in detectors])
-    ax.plot([i + 5*data_count for i in range(5)], means,
+    means = np.array([data.loc[(data['confidence_threshold'] == round(conf, 2))]['TP_p'].mean() for conf in np.arange(0.5, 0.96, 0.05)])
+    stds = np.array([data.loc[(data['confidence_threshold'] == round(conf, 2))]['TP_p'].std() for conf in np.arange(0.5, 0.96, 0.05)])
+    ax.plot([i + 10*data_count for i in range(10)], means,
            color='#2CA02C', marker='o',markersize=7)
-    ax.fill_between([i + 5*data_count for i in range(5)], means + stds, means - stds,
+    ax.fill_between([i + 10*data_count for i in range(10)], means + stds, means - stds,
                     color='#2CA02C', alpha=.2)
 
-    means = np.array([data.loc[(data['detector'] == detector)]['FP_p'].mean() for detector in detectors])
-    stds = np.array([data.loc[(data['detector'] == detector)]['FP_p'].std() for detector in detectors])
-    ax.plot([i+ 5*data_count for i in range(5)], means,
+    means = np.array([data.loc[(data['confidence_threshold'] == round(conf, 2))]['FP_p'].mean() for conf in np.arange(0.5, 0.96, 0.05)])
+    stds = np.array([data.loc[(data['confidence_threshold'] == round(conf, 2))]['FP_p'].std() for conf in np.arange(0.5, 0.96, 0.05)])
+    ax.plot([i+ 10*data_count for i in range(10)], means,
            color='#D62728', marker='^',markersize=7 )
-    ax.fill_between([i+ 5*data_count for i in range(5)], means + stds, means - stds,
+    ax.fill_between([i+ 10*data_count for i in range(10)], means + stds, means - stds,
                     color='#D62728', alpha=.2)
 
-    means = np.array([data.loc[(data['detector'] == detector)]['FPiou_p'].mean() for detector in detectors])
-    stds = np.array([data.loc[(data['detector'] == detector)]['FPiou_p'].std() for detector in detectors])
-    ax.plot([i+ 5*data_count for i in range(5)], means,
+    means = np.array([data.loc[(data['confidence_threshold'] == round(conf, 2))]['FPiou_p'].mean() for conf in np.arange(0.5, 0.96, 0.05)])
+    stds = np.array([data.loc[(data['confidence_threshold'] == round(conf, 2))]['FPiou_p'].std() for conf in np.arange(0.5, 0.96, 0.05)])
+    ax.plot([i+ 10*data_count for i in range(10)], means,
            color='#FF7F0E', marker='d',markersize=7)
-    ax.fill_between([i+ 5*data_count for i in range(5)], means + stds, means - stds,
+    ax.fill_between([i+ 10*data_count for i in range(10)], means + stds, means - stds,
                     color='#FF7F0E', alpha=.2)
 
 
-ax.set_title(f'Extended metric results in $', fontsize=18)
+ax.set_title('Performance of $QD_e^{15}$ with different confidence threshold', fontsize=18)
 ax.axhline(y=0.0, linewidth=1, color='black')
 ax.set_ylim([0, 140])
+ax.set_xlim([-0.5, 29.5])
 
 
 matplotlib.pyplot.tick_params(left=True)
@@ -119,18 +120,18 @@ ax.set_ylabel('%', fontsize=17)
 
 
 matplotlib.pyplot.tick_params(bottom=True)
-ax.set_xticks([i for i in range(15)])
-l = ['0', '15', '25', '50', '75']
+ax.set_xticks([i for i in range(30)])
+l = [f'{round(i*100)}' for i in np.arange(0.5, 0.96, 0.05)]
 l = l+l+l
 ax.set_xticklabels(l, fontsize=5)
 ax.set_xlabel('\\% of qualification data', fontsize=17)
 
 labels = detectors_labels + detectors_labels + detectors_labels
 for i, m in enumerate(model_names):
-    ax.text(2 + 5*i, 107, m, fontsize=20, horizontalalignment='center', verticalalignment='center')
+    ax.text(5 + 10*i, 107, m, fontsize=20, horizontalalignment='center', verticalalignment='center')
 
-ax.vlines(x = 4.5, ymin = 0, ymax = 115, color='gray', linestyle='--',alpha=0.7)
-ax.vlines(x = 9.5, ymin = 0, ymax = 115, color='gray', linestyle='--', alpha=0.7)
+ax.vlines(x = 9.5, ymin = 0, ymax = 115, color='gray', linestyle='--',alpha=0.7)
+ax.vlines(x = 19.5, ymin = 0, ymax = 115, color='gray', linestyle='--', alpha=0.7)
 
 ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.95), loc='upper center', ncol=4, alignment='left')
 ax.set_yticklabels([item.get_text().replace(chr(8722), '') for item in ax.get_yticklabels()])
@@ -148,7 +149,7 @@ chart_code = chart_code.replace('legend style={\n', 'legend cell align={left},\n
 chart_code = chart_code.replace('ybar legend', 'area legend')
 chart_code = chart_code.replace('\\end{axis}', '\\input{graphics/legend_comparison_extended_metric}\n\\end{axis}')
 chart_code = chart_code.replace('mark size=3', 'mark size=2')
-text_file = open(f"../latex_plots/qualified_detectors_comparison_extended_metric.tex", "w")
+text_file = open(f"../latex_plots/qualified_15_confidences.tex", "w")
 
 #write string to file
 text_file.write(chart_code)
