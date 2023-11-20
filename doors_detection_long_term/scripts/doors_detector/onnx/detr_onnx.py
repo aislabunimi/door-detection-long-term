@@ -13,7 +13,7 @@ from doors_detection_long_term.doors_detector.models.detr_door_detector import \
 from doors_detection_long_term.doors_detector.models.model_names import DETR_RESNET50
 
 def to_numpy(tensor):
-    return tensor.detach().cpu().numpy().astype(np.float16) if tensor.requires_grad else tensor.cpu().numpy().astype(np.float16)
+    return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
 
 if __name__ == '__main__':
     print(onnxruntime.get_device())
@@ -22,18 +22,15 @@ if __name__ == '__main__':
     model.eval()
     model_path = 'model_onnx.onnx'
 
-    providers = [('CUDAExecutionProvider', {
-        'device_id': 0,
-        'cudnn_conv_algo_search': 'DEFAULT',
-    })]
+    providers = ['CUDAExecutionProvider']
     input_tensor = torch.ones(1, 3, 240, 320)
     torch.onnx.export(model.model, input_tensor, model_path, input_names=['input'],
-                      output_names=['output'], export_params=True, do_constant_folding=True)
+                      output_names=['output'], export_params=True, do_constant_folding=True, opset_version=11)
 
     onnx_model = onnx.load("model_onnx.onnx")
-    onnx_model = float16.convert_float_to_float16(onnx_model)
-    onnx.save(onnx_model, "model_onnx.onnx")
-    onnx.checker.check_model(onnx_model)
+    #onnx_model = float16.convert_float_to_float16(onnx_model)
+    #onnx.save(onnx_model, "model_onnx.onnx")
+    #onnx.checker.check_model(onnx_model)
     ort_session = onnxruntime.InferenceSession("model_onnx.onnx", providers=providers)
 
     io_binding = ort_session.io_binding()
@@ -43,10 +40,11 @@ if __name__ == '__main__':
     # compute ONNX Runtime output prediction
     times = []
     for i in range(200):
+        print(i)
         t = time.time()
         ort_outs = ort_session.run_with_iobinding(io_binding)
         times.append(time.time() - t)
-    print(f'FPS: {1/(sum(times) / len(times))}')
+    print(f'FPS: {1/(sum(times[2:]) / (len(times)-2))}')
 
 
 
