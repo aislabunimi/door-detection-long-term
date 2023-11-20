@@ -22,10 +22,7 @@ epochs_qualified_detector = [40]
 fine_tune_quantity = [15, 25, 50, 75]
 device = 'cuda'
 model_path = 'model_onnx.onnx'
-providers = [('CUDAExecutionProvider', {
-    'device_id': 0,
-    'cudnn_conv_algo_search': 'DEFAULT',
-})]
+providers = ['CUDAExecutionProvider']
 
 seed_everything(seed=0)
 
@@ -43,8 +40,8 @@ def compute_results(model_name, data_loader_test, description, dataset=None):
                       output_names=['output'], export_params=True, do_constant_folding=True)
 
     onnx_model = onnx.load("model_onnx.onnx")
-    onnx_model = float16.convert_float_to_float16(onnx_model)
-    onnx.save(onnx_model, "model_onnx.onnx")
+    #onnx_model = float16.convert_float_to_float16(onnx_model)
+    #onnx.save(onnx_model, "model_onnx.onnx")
     onnx.checker.check_model(onnx_model)
     ort_session = onnxruntime.InferenceSession("model_onnx.onnx", providers=providers)
 
@@ -55,7 +52,7 @@ def compute_results(model_name, data_loader_test, description, dataset=None):
     with torch.no_grad():
         for images, targets, converted_boxes in tqdm(data_loader_test, total=len(data_loader_test), desc=description):
 
-            ort_inputs = {ort_session.get_inputs()[0].name: images.cpu().numpy().astype(np.float16)}
+            ort_inputs = {ort_session.get_inputs()[0].name: images.cpu().numpy()}
             ort_outs = ort_session.run(None, ort_inputs)
             preds = torch.tensor(ort_outs[0]).float()
 
