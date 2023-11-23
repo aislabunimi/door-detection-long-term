@@ -56,31 +56,27 @@ def fix_all_not_background_network(n):
 
 
 training_datasets = [('dataset_complete', 'yolov5_general_detector_gibson_deep_doors_2_door_nodoor'), ('dataset_only_door', 'yolov5_general_detector_gibson_deep_doors_2')]
-batch_sizes = [(f'batch_size_{2**i}', 2**i) for i in range(2, 7)]
-activate_scheduler = [('scheduler_yes', True), ('scheduler_no', False)]
+batch_sizes = [(f'batch_size_{2**i}', 2**i) for i in range(3, 7)]
+#activate_scheduler = [('scheduler_yes', True), ('scheduler_no', False)]
 parameters_grad = [('fix_first_part_backbone', [fix_first_layer_of_background_network for _ in range(60)]),
     ('background_network_fixed', [fix_background_network for _ in range(60)]),
                    ('fix_fpn', [fix_only_fpn for _ in range(60)]),
-                   ('fix_background_and_other_alternate'), [fix_background_network if i % 10 < 5 else fix_all_not_background_network for i in range(60)],
+                   ('fix_background_and_other_alternate', [fix_background_network if i % 10 < 5 else fix_all_not_background_network for i in range(60)]),
                    ]
 optimizers = [('SGD_0.01_MOM_95', lambda parameters: optim.SGD(params=parameters, lr=0.01, momentum=0.95)),
-              ('SGD_0.001_MOM_90', lambda parameters: optim.SGD(params=parameters, lr=0.001, momentum=0.9)),
               ('ADAM_0.001', lambda parameters: optim.Adam(params=parameters, lr=0.001, weight_decay=1e-5))]
-
-shuffle_box = [('shuffle_yes', True),
-               ('shuffle_no', False)]
 
 transform_train = [('transform_yes', True),
                                  ('transform_no', False)]
 
-for td, bs, activate_s, pg, opt, sb, tt in [(t, b, a, p, o, s, ttt) for t in training_datasets for b in batch_sizes for a in activate_scheduler for p in parameters_grad for o in optimizers for s in shuffle_box for ttt in transform_train]:
-    save_path = './image_complete/' + f'{td[0]}_{bs[0]}_{activate_s[0]}_{pg[0]}_{opt[0]}_{sb[0]}_{tt[0]}'.upper()
+for td, bs, pg, opt, tt in [(t, b, p, o, ttt) for t in training_datasets for b in batch_sizes for p in parameters_grad for o in optimizers for ttt in transform_train]:
+    save_path = './image_complete/' + f'{td[0]}_{bs[0]}_{pg[0]}_{opt[0]}_{tt[0]}'.upper()
     if not os.path.exists(save_path):
         os.mkdir(save_path)
 
     try:
         dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name=td[1])
-        train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=tt[1], shuffle_boxes=sb[1])
+        train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=tt[1], shuffle_boxes=True)
 
         print(len(train_bboxes), len(test_bboxes))
         train_dataset_bboxes = DataLoader(train_bboxes, batch_size=bs[1], collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
@@ -233,7 +229,7 @@ for td, bs, activate_s, pg, opt, sb, tt in [(t, b, a, p, o, s, ttt) for t in tra
                 else:
                     p.requires_grad = True
 
-            if activate_s:
+            if False:
                 scheduler.step()
 
             bbox_model.train()
