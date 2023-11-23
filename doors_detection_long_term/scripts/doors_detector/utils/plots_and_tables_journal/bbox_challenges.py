@@ -6,8 +6,7 @@ from tqdm import tqdm
 
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
-from doors_detection_long_term.doors_detector.models.faster_rcnn import FasterRCNN, \
-    EXP_GENERAL_DETECTOR_GIBSON_DEEP_DOORS_2_60_EPOCHS, apply_nms
+from doors_detection_long_term.doors_detector.models.faster_rcnn import *
 from doors_detection_long_term.doors_detector.models.model_names import FASTER_RCNN
 from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_faster_rcnn
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import get_final_doors_dataset_real_data
@@ -57,7 +56,7 @@ for house in ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']:
 
     v_gd = classify(model, data_loader_test)
 
-    model = FasterRCNN(model_name=FASTER_RCNN, n_labels=3, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=globals()[f'EXP_2_{house}_GIBSON_DEEP_DOORS_2_EPOCHS_GD_60_EPOCHS_QD_40_FINE_TUNE_15'])
+    model = FasterRCNN(model_name=FASTER_RCNN, n_labels=3, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=globals()[f'EXP_2_{house}_GIBSON_DEEP_DOORS_2_EPOCHS_GD_60_EPOCHS_QD_40_FINE_TUNE_15'.upper()])
     model.eval()
     model.to(device)
 
