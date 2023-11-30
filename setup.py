@@ -76,8 +76,9 @@ setup(
         'seaborn',
         'openpyxl',
         'PyCuda',
-        'tensorrt'
-
+        'tensorrt',
+        'scikit-image',
+        'trimesh'
     ],
     entry_points={
         'console_scripts': [
