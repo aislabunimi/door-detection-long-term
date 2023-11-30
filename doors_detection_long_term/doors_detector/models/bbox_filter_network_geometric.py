@@ -91,8 +91,9 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         self.shared_mlp_background_2 = SharedMLP(channels=[128, 256, 512, 1024])
 
         self.shared_mlp_mix_background = SharedMLP(channels=[1024+128, 1024, 512, 256])
-        self.shared_mlp_suppress_background = SharedMLP(channels=[256, 128, 64, 32, 1], last_activation=nn.Sigmoid())
-
+        self.shared_mlp_suppress_background = SharedMLP(channels=[256, 128, 64, 32, 1], last_activation=None)
+        self.batch_norm = nn.BatchNorm1d(num_features=1)
+        self.sigmoid = nn.Sigmoid()
         # Geometric
         self.shared_mlp_geometric_1 = SharedMLP(channels=[initial_channels, 16, 32, 64, 128])
         self.shared_mlp_geometric_2 = SharedMLP(channels=[128, 256, 512, 1024])
@@ -134,7 +135,8 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         mixed_features_background = self.shared_mlp_mix_background(mixed_features_background)
 
         # Output suppress background
-        suppress_background = self.shared_mlp_suppress_background(mixed_features_background)
+        suppress_background = self.sigmoid(torch.clamp(self.batch_norm(self.shared_mlp_suppress_background(mixed_features_background)),
+            min=-1e1, max=1e1))
         suppress_background = torch.squeeze(suppress_background, dim=1)
 
         # Geometric part
@@ -169,15 +171,18 @@ class BboxFilterNetworkGeometricLabelLoss(nn.Module):
         labels_loss = torch.nan_to_num(torch.log(labels_features)) * label_targets #* torch.tensor([[0.20, 1, 1]], device='cuda')
         labels_loss = torch.mean(torch.mean(torch.sum(labels_loss, 2) * -1, 1))
 
+        #print('Label loss', labels_features, label_targets)
+
         return labels_loss
 
 
 class BboxFilterNetworkGeometricSuppressLoss(nn.Module):
     def forward(self, suppress_features, confidences):
-
+        #suppress_features = torch.clamp(suppress_features, min=1e-10, max=1 - 1e-10)
         #confidence_loss = torch.mean(torch.mean(torch.abs(scores_features - confidences), dim=1))
         #print(-torch.sum(torch.log(scores_features) * confidences + torch.log(1-scores_features) * (1-confidences), dim=1).size())
-        confidence_loss = torch.mean(-torch.mean(torch.nan_to_num(torch.log(suppress_features) * confidences + torch.log(1-suppress_features) * (1-confidences)), dim=1))
+        confidence_loss = torch.mean(-torch.mean(torch.log(suppress_features) * confidences + torch.log(1-suppress_features) * (1-confidences), dim=1))
+        #print('SUPPRESS LOSS', suppress_features, confidences)
         return confidence_loss
 
 class BboxFilterNetworkGeometricConfidenceLoss(nn.Module):
@@ -185,10 +190,9 @@ class BboxFilterNetworkGeometricConfidenceLoss(nn.Module):
 
         #confidence_loss = torch.mean(torch.mean(torch.abs(scores_features - confidences), dim=1))
         #print(-torch.sum(torch.log(scores_features) * confidences + torch.log(1-scores_features) * (1-confidences), dim=1).size())
-        confidence_loss = torch.mean(torch.mean(torch.sum(torch.abs(confidence_features - ious), dim=2), dim=1))
-        if torch.count_nonzero(torch.isnan(confidence_loss)):
-            print(confidence_features, ious)
+        confidence_loss = torch.mean(torch.mean(torch.sum(torch.abs(torch.clamp(confidence_features - ious, min=1e-15)), dim=2), dim=1))
         #confidence_loss = torch.mean(torch.mean(-torch.sum(torch.log(confidence_features) * ious + torch.log(1-confidence_features) * (1-ious), dim=2), dim=1))
+        #print('CONFIDENCE LOSS', confidence_features, ious)
         return confidence_loss
 
 
