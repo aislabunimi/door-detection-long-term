@@ -55,7 +55,7 @@ houses_detr = houses
 houses_detr.loc[houses_detr['house'] == 'chemistryfloor0', 'house'] = 'chemistry_floor0'
 houses_detr.loc[houses_detr['house'] == 'housematteo', 'house'] = 'house_matteo'
 
-model_names = ['DETR~\cite{detr}', 'YOLOv5~\cite{yolo}', 'Faster~R--CNN~\cite{fasterrcnn}']
+model_names = ['DETR~\cite{detr}', 'YOLOv5~\cite{yolov5}', 'Faster~R--CNN~\cite{fasterrcnn}']
 datasets = ['igibson', 'deep_doors_2', 'gibson', 'gibson_deep_doors_2']
 datasets_name = ['IGibson', 'DD2~\cite{deepdoors2}', 'Gibson', 'Gibson + DD2~\cite{deepdoors2}']
 

@@ -9,7 +9,7 @@ import tikzplotlib
 iou_threshold = 0.5
 confidence_threshold = 0.75
 
-houses = pd.read_excel('./../../results/faster_rcnn_ap_real_data.xlsx')
+houses = pd.read_excel('./../../../results/faster_rcnn_ap_real_data.xlsx')
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
@@ -23,7 +23,7 @@ houses_faster = houses_faster.groupby(['dataset', 'label', ], as_index=False)
 
 
 # YOLO
-houses = pd.read_excel('./../../results/yolov5_ap_real_data.xlsx')
+houses = pd.read_excel('./../../../results/yolov5_ap_real_data.xlsx')
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
@@ -36,7 +36,7 @@ houses_yolo = houses_yolo.groupby(['dataset', 'label', ], as_index=False)
 
 
 # DETR
-houses = pd.read_excel('./../../results/detr_ap_real_data.xlsx')
+houses = pd.read_excel('./../../../results/detr_ap_real_data.xlsx')
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
@@ -51,7 +51,7 @@ houses_detr = houses_detr.groupby(['dataset', 'label', ], as_index=False)
 
 concatenation = concatenation.groupby(['label', 'dataset'], as_index=False)
 
-model_names = ['DETR~\cite{detr}', 'YOLOv5~\cite{yolo}', 'Faster~R--CNN~\cite{fasterrcnn}', 'Average']
+model_names = ['DETR~\cite{detr}', 'YOLOv5~\cite{yolov5}', 'Faster~R--CNN~\cite{fasterrcnn}', 'Average']
 datasets = ['deep_doors_2', 'gibson', 'gibson_deep_doors_2']
 datasets_name = ['DD2~\cite{deepdoors2}', 'Gibson', 'Gibson + DD2~\cite{deepdoors2}']
 
@@ -111,7 +111,7 @@ for label in [0, 1]:
         for child in obj.get_children():
             tikzplotlib_fix_ncols(child)
     tikzplotlib_fix_ncols(fig)
-    tikzplotlib.save(f"latex_plots/general_detector_{label}.tex", axis_height='7cm', axis_width='12cm')
+    tikzplotlib.save(f"../latex_plots/general_detector_{label}.tex", axis_height='7cm', axis_width='12cm')
     plt.show()
 
 
