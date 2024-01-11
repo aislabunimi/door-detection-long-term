@@ -73,7 +73,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
 
     ax.set_title(f'mAP results in $e_{env_number}$', fontsize=18)
 
-    ax.set_ylim([0, 40])
+    ax.set_ylim([0, 50])
 
     if env_number % 2 == 0:
         matplotlib.pyplot.tick_params(left=True)
