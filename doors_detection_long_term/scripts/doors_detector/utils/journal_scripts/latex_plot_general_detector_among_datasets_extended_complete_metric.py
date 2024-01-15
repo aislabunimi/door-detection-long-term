@@ -93,7 +93,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
 
     ax.set_title(f'Extended metric results in $e_{env_number}$', fontsize=18)
     ax.axhline(y=0.0, linewidth=1, color='black')
-    ax.set_ylim([-50, 50])
+    ax.set_ylim([-50, 60])
 
     if env_number % 2 == 0:
         matplotlib.pyplot.tick_params(left=True)
