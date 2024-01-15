@@ -226,3 +226,90 @@ for env_number, house in enumerate(['floor1', 'floor4',]):
 
     #tikzplotlib.save(f"../latex_plots/general_detector_{label}_e{env_number}.tex", axis_height='7cm', axis_width='12cm')
     plt.show()
+
+dataset_names = ['\\DDDtwo', '\\DG', '\\DDDtwoG']
+
+for env_number, house in enumerate(['floor1', 'floor4']):
+    fig, ax = subplots(figsize=(10, 5))
+    performance = pd.concat([houses_detr.reset_index(), houses_yolo.reset_index(), houses_faster.reset_index()], axis=0)
+    #dataframes = [houses_detr.loc[houses_detr['dataset'] == 'gibson_deep_doors_2'],
+    #             houses_yolo.loc[houses_yolo['dataset'] == 'gibson_deep_doors_2'],
+    #            houses_faster.loc[houses_faster['dataset'] == 'gibson_deep_doors_2']]
+
+    X = np.arange(3)
+    #ax.bar(X, [0 for _ in range(3)], width=0.16)
+
+    for data_count, dataset in enumerate(datasets[1:]):
+        ax.plot([i + 5*data_count for i in range(5)], [performance.loc[(performance['dataset'] == dataset) & (performance['detector'] == detector) & (performance['house'] == house)]['TP_p'].mean() for detector in detectors],
+                color='#2CA02C', marker='o',markersize=7)
+        ax.fill_between([i + 5*data_count for i in range(5)], np.array([performance.loc[(performance['dataset'] == dataset) & (performance['detector'] == detector) & (performance['house'] == house)]['TP_p'].mean() for detector in detectors]) + np.array([performance.loc[(performance['dataset'] == dataset) & (performance['detector'] == detector) & (performance['house'] == house)]['TP_p'].std() for detector in detectors]),
+                        np.array([performance.loc[(performance['dataset'] == dataset) & (performance['detector'] == detector) & (performance['house'] == house)]['TP_p'].mean() for detector in detectors]) - np.array([performance.loc[(performance['dataset'] == dataset) & (performance['detector'] == detector) & (performance['house'] == house)]['TP_p'].std() for detector in detectors]),
+                        color='#2CA02C', alpha=.2)
+        ax.plot([i+ 5*data_count for i in range(5)], [performance.loc[(performance['dataset'] == dataset) & (performance['detector'] == detector) & (performance['house'] == house)]['FP_p'].mean() for detector in detectors],
+                color='#D62728', marker='^',markersize=7 )
+        ax.fill_between([i+ 5*data_count for i in range(5)], np.array([performance.loc[(performance['dataset'] == dataset) & (performance['detector'] == detector) & (performance['house'] == house)]['FP_p'].mean() for detector in detectors]) + np.array([performance.loc[(performance['dataset'] == dataset) & (performance['detector'] == detector) & (performance['house'] == house)]['FP_p'].std() for detector in detectors]),
+                        np.array([performance.loc[(performance['dataset'] == dataset) & (performance['detector'] == detector) & (performance['house'] == house)]['FP_p'].mean() for detector in detectors]) - np.array([performance.loc[(performance['dataset'] == dataset) & (performance['detector'] == detector) & (performance['house'] == house)]['FP_p'].std() for detector in detectors]),
+                        color='#D62728', alpha=.2)
+        ax.plot([i+ 5*data_count for i in range(5)], np.array([performance.loc[(performance['dataset'] == dataset) & (performance['detector'] == detector) & (performance['house'] == house)]['FPiou_p'].mean() for detector in detectors]),
+                color='#FF7F0E', marker='d',markersize=7)
+        ax.fill_between([i+ 5*data_count for i in range(5)], np.array([performance.loc[(performance['dataset'] == dataset) & (performance['detector'] == detector) & (performance['house'] == house)]['FPiou_p'].mean() for detector in detectors]) + np.array([performance.loc[(performance['dataset'] == dataset) & (performance['detector'] == detector) & (performance['house'] == house)]['FPiou_p'].std() for detector in detectors]),
+                        np.array([performance.loc[(performance['dataset'] == dataset) & (performance['detector'] == detector) & (performance['house'] == house)]['FPiou_p'].mean() for detector in detectors]) - np.array([performance.loc[(performance['dataset'] == dataset) & (performance['detector'] == detector) & (performance['house'] == house)]['FPiou_p'].std() for detector in detectors]),
+                        color='#FF7F0E', alpha=.2)
+
+
+    ax.set_title(f'Extended metric results in $e_{env_number}$', fontsize=18)
+    ax.axhline(y=0.0, linewidth=1, color='black')
+    ax.set_ylim([0, 95])
+
+    if env_number % 2 == 0:
+        matplotlib.pyplot.tick_params(left=True)
+        ax.tick_params(axis='y', labelsize=16)
+        ax.set_yticks([20 * i for i in range(5)])
+        ax.set_yticklabels([f'{20 * i}' for i in range(5)])
+        ax.set_ylabel('%', fontsize=17)
+    else:
+        matplotlib.pyplot.tick_params(left=False)
+
+    if env_number<=1:
+        matplotlib.pyplot.tick_params(bottom=False)
+
+    matplotlib.pyplot.tick_params(bottom=True)
+    ax.set_xticks([i for i in range(15)])
+    l = ['0', '15', '25', '50', '75']
+    l = l+l+l
+    ax.set_xticklabels(l, fontsize=5)
+    ax.set_xlabel('\\% of qualification data', fontsize=17)
+
+    labels = detectors_labels + detectors_labels + detectors_labels
+    for i, m in enumerate(dataset_names):
+        ax.text(2 + 5*i, 87, m, fontsize=20, horizontalalignment='center', verticalalignment='center')
+
+    ax.vlines(x = 4.5, ymin = 0, ymax = 115, color='gray', linestyle='--',alpha=0.7)
+    ax.vlines(x = 9.5, ymin = 0, ymax = 115, color='gray', linestyle='--', alpha=0.7)
+
+    ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.97), loc='upper center', ncol=4, alignment='left')
+    ax.set_yticklabels([item.get_text().replace(chr(8722), '') for item in ax.get_yticklabels()])
+    fig.tight_layout()
+
+    def tikzplotlib_fix_ncols(obj):
+        if hasattr(obj, "_ncols"):
+            obj._ncol = obj._ncols
+        for child in obj.get_children():
+            tikzplotlib_fix_ncols(child)
+    tikzplotlib_fix_ncols(fig)
+    chart_code = tikzplotlib.get_tikz_code().replace('\\begin{tikzpicture}', '\\begin{tikzpicture}[scale=0.725]')
+    chart_code = chart_code.replace('\\begin{axis}[', '\\begin{axis}[\nwidth=12cm,\nheight=8cm,')
+    chart_code = chart_code.replace('legend style={\n', 'legend cell align={left},\nlegend style={\n/tikz/every even column/.append style={column sep=0.3cm},\n')
+    chart_code = chart_code.replace('ybar legend', 'area legend')
+    #chart_code = chart_code.replace('\\end{axis}', '\\input{graphics/legend_extended_metric_general_detector}\n\\end{axis}')
+    chart_code = chart_code.replace('mark size=3', 'mark size=2')
+    text_file = open(f"../latex_plots/qualified_detectors_mean_complete_metric_e{env_number}_type_2_different_conditions.tex", "w")
+
+    #write string to file
+    text_file.write(chart_code)
+
+    #close file
+    text_file.close()
+
+    #tikzplotlib.save(f"../latex_plots/general_detector_{label}_e{env_number}.tex", axis_height='7cm', axis_width='12cm')
+    plt.show()

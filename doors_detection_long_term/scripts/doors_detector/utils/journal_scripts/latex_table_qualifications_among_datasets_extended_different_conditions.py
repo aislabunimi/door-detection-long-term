@@ -12,7 +12,7 @@ confidence_threshold = 0.75
 
 
 # Extended metric
-houses = pd.read_excel('./../../../results/faster_rcnn_complete_metric_real_data.xlsx')
+houses = pd.read_excel('./../../../results/faster_rcnn_complete_metric_real_data_different_conditions.xlsx')
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
                     (houses['iou_threshold'] == iou_threshold) & (houses['confidence_threshold'] == confidence_threshold) ]
 
@@ -25,7 +25,7 @@ houses_faster.loc[houses_faster['house'] == 'chemistryfloor0', 'house'] = 'chemi
 houses_faster.loc[houses_faster['house'] == 'housematteo', 'house'] = 'house_matteo'
 
 # YOLO
-houses = pd.read_excel('./../../../results/yolov5_complete_metric_real_data.xlsx')
+houses = pd.read_excel('./../../../results/yolov5_complete_metric_real_data_different_condition.xlsx')
 
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
                     (houses['iou_threshold'] == iou_threshold) & (houses['confidence_threshold'] == confidence_threshold)]
@@ -40,7 +40,7 @@ houses_yolo.loc[houses_yolo['house'] == 'housematteo', 'house'] = 'house_matteo'
 
 
 # DETR
-houses = pd.read_excel('./../../../results/detr_complete_metrics_real_data.xlsx')
+houses = pd.read_excel('./../../../results/detr_complete_metrics_real_data_different_conditions.xlsx')
 
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
                     (houses['iou_threshold'] == iou_threshold) & (houses['confidence_threshold'] == confidence_threshold)]
@@ -65,7 +65,7 @@ performance_extended = pd.concat([houses_detr.groupby(['house', 'detector', 'dat
 # mAP
 
 
-houses = pd.read_excel('./../../../results/faster_rcnn_ap_real_data.xlsx')
+houses = pd.read_excel('./../../../results/faster_rcnn_ap_real_data_different_conditions.xlsx')
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
@@ -74,7 +74,7 @@ houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) |
 houses_faster_ap = houses
 
 # YOLO
-houses = pd.read_excel('./../../../results/yolov5_ap_real_data.xlsx')
+houses = pd.read_excel('./../../../results/yolov5_ap_real_data_different_condition.xlsx')
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
@@ -83,7 +83,7 @@ houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) |
 houses_yolo_ap = houses
 
 # DETR
-houses = pd.read_excel('./../../../results/detr_ap_real_data.xlsx')
+houses = pd.read_excel('./../../../results/detr_ap_real_data_different_conditions.xlsx')
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
@@ -120,25 +120,25 @@ detectors_labels = ['$GD$', '$QD_{e}^{15}$', '$QD_{e}^{25}$', '$QD_{e}^{50}$', '
 means = []
 stds =[]
 
-for house_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']):
+for house_number, house in enumerate(['floor1', 'floor4']):
     for detector_count, (detector, detectors_label) in enumerate(zip(detectors, detectors_labels)):
         line_map = []
         line_std = []
         for dataset in ['deep_doors_2', 'gibson', 'gibson_deep_doors_2']:
             mAPs = performance_ap.loc[(performance_ap['house'] == house) & (performance_ap['dataset'] == dataset) & (performance_ap['detector'] == detector)]['AP']
-            mAP = round(mAPs.mean())
-            mAPstd = round(mAPs.std())
+            mAP = mAPs.mean()
+            mAPstd = mAPs.std()
 
             TP_s = performance_extended.loc[(performance_extended['house'] == house) & (performance_extended['dataset'] == dataset) & (performance_extended['detector'] == detector)]['TP_p']
-            TP_mean = round(TP_s.mean())
-            TP_std = round(TP_s.std())
+            TP_mean = TP_s.mean()
+            TP_std = TP_s.std()
 
             FP_s = performance_extended.loc[(performance_extended['house'] == house) & (performance_extended['dataset'] == dataset) & (performance_extended['detector'] == detector)]['FP_p']
-            FP_mean = round(FP_s.mean())
-            FP_std = round(FP_s.std())
+            FP_mean = FP_s.mean()
+            FP_std = FP_s.std()
             FPiou_s = performance_extended.loc[(performance_extended['house'] == house) & (performance_extended['dataset'] == dataset) & (performance_extended['detector'] == detector)]['FPiou_p']
-            FPiou_mean = round(FPiou_s.mean())
-            FPiou_std = round(FPiou_s.std())
+            FPiou_mean = FPiou_s.mean()
+            FPiou_std = FPiou_s.std()
 
             line_map += [mAP,TP_mean, FP_mean, FPiou_mean]
             line_std += [mAPstd, TP_std, FP_std, FPiou_std]
@@ -156,14 +156,16 @@ for c, (line_map, line_std) in enumerate(zip(means, stds)):
 
         if i < 2:
             firsts = np.argsort(v)[-2:]
+
         else:
             firsts = np.argsort(v)[:2][::-1]
+
 
         line_map[firsts[1]*4+i] = '\\textbf{' + str(int(round(line_map[firsts[1]*4+i],0))) +'}'
 
     for m, s in zip(line_map, line_std):
 
-        table += f'&${int(round(m,0)) if isinstance(m, float) else m} \\pm {int(round(s,0))} $'
+        table += f'&${int(round(m,0)) if isinstance(m, float) else m} \\pm {int(round(s, 0))} $'
     table += '\\\\[2pt]\n'
     if c%5 == 4:
         table+='\\hline\n'

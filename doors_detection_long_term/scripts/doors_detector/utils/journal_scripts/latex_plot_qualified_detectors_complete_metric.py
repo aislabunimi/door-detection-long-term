@@ -69,7 +69,7 @@ houses_faster = houses_faster.loc[houses_faster['dataset'] != 'igibson']
 colors = ['#1F77B4','#2CA02C', '#FF7F0E', '#D62728', '#8C564B']
 detectors = ['GD', 'QD_15', 'QD_25', 'QD_50', 'QD_75']
 detectors_labels = ['$GD$', '$QD_{e}^{15}$', '$QD_{e}^{25}$', '$QD_{e}^{50}$', '$QD_{e}^{75}$']
-dataset_names = ['$\mathcal{D}_{dd2}$', '$\mathcal{D}_{g}$', '$\mathcal{D}_{g+dd2}$']
+dataset_names = ['\\DDDtwo', '\\DG', '\\DDDtwoG']
 
 for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']):
     fig, ax = subplots(figsize=(10, 5))
