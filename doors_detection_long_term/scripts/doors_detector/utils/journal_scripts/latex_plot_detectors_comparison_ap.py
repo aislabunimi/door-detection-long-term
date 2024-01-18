@@ -59,11 +59,11 @@ X = np.arange(4)
 
 for i, (dataframe, color) in enumerate(zip(dataframes, colors)):
 
-    ax.bar(X + i * 0.2 + 0.04, [dataframe.loc[(dataframe['dataset'] == 'gibson_deep_doors_2') & (dataframe["label"] == 0) & (dataframe['house'] == house) & (dataframe['detector'] == 'GD')]['AP'].iloc[0] / 2 for house in houses],
+    ax.bar(X + i * 0.2 + 0.04, [dataframe.loc[(dataframe['dataset'] == 'gibson') & (dataframe["label"] == 0) & (dataframe['house'] == house) & (dataframe['detector'] == 'GD')]['AP'].iloc[0] / 2 for house in houses],
                width=0.16,  color=color, edgecolor='#000000',alpha=0.9, hatch='/',
                linewidth=2)
-    ax.bar(X + i * 0.2 + 0.04, [dataframe.loc[(dataframe['dataset'] == 'gibson_deep_doors_2') & (dataframe["label"] == 1) & (dataframe['house'] == house) & (dataframe['detector'] == 'GD')]['AP'].iloc[0] / 2 for house in houses],
-               bottom=[dataframe.loc[(dataframe['dataset'] == 'gibson_deep_doors_2') & (dataframe["label"] == 0) & (dataframe['house'] == house) & (dataframe['detector'] == 'GD')]['AP'].iloc[0] / 2 for house in houses],
+    ax.bar(X + i * 0.2 + 0.04, [dataframe.loc[(dataframe['dataset'] == 'gibson') & (dataframe["label"] == 1) & (dataframe['house'] == house) & (dataframe['detector'] == 'GD')]['AP'].iloc[0] / 2 for house in houses],
+               bottom=[dataframe.loc[(dataframe['dataset'] == 'gibson') & (dataframe["label"] == 0) & (dataframe['house'] == house) & (dataframe['detector'] == 'GD')]['AP'].iloc[0] / 2 for house in houses],
                width=0.16, color=color, edgecolor='#000000', alpha=0.9,
                linewidth=2)
 
@@ -122,15 +122,15 @@ X = np.arange(5)
 
 for i, (dataframe, color) in enumerate(zip(dataframes, colors)):
 
-    ax.bar(X + i * 0.25 + 0.02, [dataframe.loc[(dataframe['dataset'] == 'gibson_deep_doors_2') & (dataframe["label"] == 0) & (dataframe['detector'] == detector)]['AP'].mean() / 2 for detector in detectors],
+    ax.bar(X + i * 0.25 + 0.02, [dataframe.loc[(dataframe['dataset'] == 'gibson') & (dataframe["label"] == 0) & (dataframe['detector'] == detector)]['AP'].mean() / 2 for detector in detectors],
            width=0.2,  color=color, edgecolor='#000000',alpha=0.9, hatch='/',
            linewidth=2)
 
     mAP = dataframe.groupby(['house', 'detector', 'dataset'], as_index=False).mean(numeric_only=False)
 
-    ax.bar(X + i * 0.25 + 0.02, [dataframe.loc[(dataframe['dataset'] == 'gibson_deep_doors_2') & (dataframe["label"] == 1) & (dataframe['detector'] == detector)]['AP'].mean() / 2 for detector in detectors],
-           bottom=[dataframe.loc[(dataframe['dataset'] == 'gibson_deep_doors_2') & (dataframe["label"] == 0) & (dataframe['detector'] == detector)]['AP'].mean() / 2 for detector in detectors],
-           yerr=[mAP.loc[(mAP['detector'] == detector) & (mAP['dataset'] == 'gibson_deep_doors_2')]['AP'].std() for detector in detectors],
+    ax.bar(X + i * 0.25 + 0.02, [dataframe.loc[(dataframe['dataset'] == 'gibson') & (dataframe["label"] == 1) & (dataframe['detector'] == detector)]['AP'].mean() / 2 for detector in detectors],
+           bottom=[dataframe.loc[(dataframe['dataset'] == 'gibson') & (dataframe["label"] == 0) & (dataframe['detector'] == detector)]['AP'].mean() / 2 for detector in detectors],
+           yerr=[mAP.loc[(mAP['detector'] == detector) & (mAP['dataset'] == 'gibson')]['AP'].std() for detector in detectors],
            width=0.2, color=color, edgecolor='#000000', alpha=0.9,
            linewidth=2, capsize=3)
 
@@ -138,7 +138,7 @@ for i, (dataframe, color) in enumerate(zip(dataframes, colors)):
 
 ax.set_title(f'mAP of the three detectors in real worlds', fontsize=18)
 
-ax.set_ylim([0, 120])
+ax.set_ylim([0, 115])
 
 
 matplotlib.pyplot.tick_params(left=True)
@@ -153,7 +153,7 @@ ax.set_xticks([i + 0.27 for i in range(5)])
 ax.set_xticklabels(detectors_labels, fontsize=17)
 ax.set_xlabel('Environment', fontsize=17)
 
-ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.95), loc='upper center', ncol=5, alignment='left')
+ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.98), loc='upper center', ncol=5, alignment='left')
 
 fig.tight_layout()
 

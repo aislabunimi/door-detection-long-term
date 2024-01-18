@@ -54,7 +54,7 @@ houses_detr = houses
 houses_detr.loc[houses_detr['house'] == 'chemistryfloor0', 'house'] = 'chemistry_floor0'
 houses_detr.loc[houses_detr['house'] == 'housematteo', 'house'] = 'house_matteo'
 
-model_names = ['DETR~\cite{detr}', 'YOLOv5~\cite{yolo}', 'Faster~R--CNN~\cite{fasterrcnn}']
+model_names = ['DETR~\cite{detr}', 'YOLOv5~\cite{yolov5}', 'Faster~R--CNN~\cite{fasterrcnn}']
 datasets = ['igibson', 'deep_doors_2', 'gibson', 'gibson_deep_doors_2']
 datasets_name = ['IGibson', 'DD2~\cite{deepdoors2}', 'Gibson', 'Gibson + DD2~\cite{deepdoors2}']
 
@@ -75,9 +75,9 @@ detectors = ['GD', 'QD_15', 'QD_25', 'QD_50', 'QD_75']
 
 
 fig, ax = subplots(figsize=(10, 5))
-dataframes = [houses_detr.loc[houses_detr['dataset'] == 'gibson_deep_doors_2'],
-              houses_yolo.loc[houses_yolo['dataset'] == 'gibson_deep_doors_2'],
-              houses_faster.loc[houses_faster['dataset'] == 'gibson_deep_doors_2']]
+dataframes = [houses_detr.loc[houses_detr['dataset'] == 'gibson'],
+              houses_yolo.loc[houses_yolo['dataset'] == 'gibson'],
+              houses_faster.loc[houses_faster['dataset'] == 'gibson']]
 
 X = np.arange(3)
 #ax.bar(X, [0 for _ in range(3)], width=0.16)
@@ -107,7 +107,7 @@ for data_count, data in enumerate(dataframes):
 
 ax.set_title(f'Extended metric results in $', fontsize=18)
 ax.axhline(y=0.0, linewidth=1, color='black')
-ax.set_ylim([0, 140])
+ax.set_ylim([0, 135])
 
 
 matplotlib.pyplot.tick_params(left=True)
@@ -132,7 +132,7 @@ for i, m in enumerate(model_names):
 ax.vlines(x = 4.5, ymin = 0, ymax = 115, color='gray', linestyle='--',alpha=0.7)
 ax.vlines(x = 9.5, ymin = 0, ymax = 115, color='gray', linestyle='--', alpha=0.7)
 
-ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.95), loc='upper center', ncol=4, alignment='left')
+ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.98), loc='upper center', ncol=4, alignment='left')
 ax.set_yticklabels([item.get_text().replace(chr(8722), '') for item in ax.get_yticklabels()])
 fig.tight_layout()
 
@@ -148,6 +148,7 @@ chart_code = chart_code.replace('legend style={\n', 'legend cell align={left},\n
 chart_code = chart_code.replace('ybar legend', 'area legend')
 chart_code = chart_code.replace('\\end{axis}', '\\input{graphics/legend_comparison_extended_metric}\n\\end{axis}')
 chart_code = chart_code.replace('mark size=3', 'mark size=2')
+chart_code = chart_code.replace('ytick style={color=black}', 'ytick style={color=black},\nytick=\\empty,\nextra y ticks={0, 20, 40, 60, 80, 100}')
 text_file = open(f"../latex_plots/qualified_detectors_comparison_extended_metric.tex", "w")
 
 #write string to file
