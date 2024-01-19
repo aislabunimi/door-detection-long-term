@@ -14,5 +14,7 @@ Code:
 * The source code of the object detectors (DETR, YOLOv5, and Faster R-CNN) used in the experimental campaign can be found in the [here](doors_detection_long_term/doors_detector/models)
 * The scripts to perform the training and the evaluation of the models are in the [train_models](doors_detection_long_term/scripts/doors_detector/train_models) and [calculate results](doors_detection_long_term/scripts/doors_detector/calculate_results) packages respectively.
 
+![](images/example.gif)  
+
 
 
