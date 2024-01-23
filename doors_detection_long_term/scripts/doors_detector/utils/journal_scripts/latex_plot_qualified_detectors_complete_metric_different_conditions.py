@@ -228,6 +228,7 @@ for env_number, house in enumerate(['floor1', 'floor4',]):
     plt.show()
 
 dataset_names = ['\\DDDtwo', '\\DG', '\\DDDtwoG']
+titles = ['\\Classrooms', '\\Offices', '\\Laboratories', '\\House']
 
 for env_number, house in enumerate(['floor1', 'floor4']):
     fig, ax = subplots(figsize=(10, 5))
@@ -257,7 +258,7 @@ for env_number, house in enumerate(['floor1', 'floor4']):
                         color='#FF7F0E', alpha=.2)
 
 
-    ax.set_title(f'Extended metric results in $e_{env_number}$', fontsize=18)
+    ax.set_title(f'$e_{env_number+1}$ -- ' + titles[env_number], fontsize=18)
     ax.axhline(y=0.0, linewidth=1, color='black')
     ax.set_ylim([0, 95])
 

@@ -75,9 +75,9 @@ detectors = ['GD', 'QD_15', 'QD_25', 'QD_50', 'QD_75']
 
 
 fig, ax = subplots(figsize=(10, 5))
-dataframes = [houses_detr.loc[(houses_detr['dataset'] == 'gibson_deep_doors_2') & (houses_detr['detector']=='QD_15')],
-              houses_yolo.loc[(houses_yolo['dataset'] == 'gibson_deep_doors_2') & (houses_yolo['detector']=='QD_15')],
-              houses_faster.loc[(houses_faster['dataset'] == 'gibson_deep_doors_2') & (houses_faster['detector']=='QD_15')]]
+dataframes = [houses_detr.loc[(houses_detr['dataset'] == 'gibson') & (houses_detr['detector']=='QD_15')],
+              houses_yolo.loc[(houses_yolo['dataset'] == 'gibson') & (houses_yolo['detector']=='QD_15')],
+              houses_faster.loc[(houses_faster['dataset'] == 'gibson') & (houses_faster['detector']=='QD_15')]]
 
 X = np.arange(3)
 #ax.bar(X, [0 for _ in range(3)], width=0.16)
@@ -124,7 +124,7 @@ ax.set_xticks([i for i in range(30)])
 l = [f'{round(i*100)}' for i in np.arange(0.5, 0.96, 0.05)]
 l = l+l+l
 ax.set_xticklabels(l, fontsize=5)
-ax.set_xlabel('\\% of qualification data', fontsize=17)
+ax.set_xlabel('$\\rho_c$', fontsize=17)
 
 labels = detectors_labels + detectors_labels + detectors_labels
 for i, m in enumerate(model_names):

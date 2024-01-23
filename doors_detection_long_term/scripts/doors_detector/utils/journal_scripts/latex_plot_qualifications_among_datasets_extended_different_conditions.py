@@ -122,6 +122,7 @@ for env_number, house in enumerate(['floor1', 'floor4',]): # 'chemistry_floor0',
 
     #tikzplotlib.save(f"../latex_plots/general_detector_{label}_e{env_number}.tex", axis_height='7cm', axis_width='12cm')
     plt.show()
+titles = ['\\Classrooms', '\\Offices', '\\Laboratories', '\\House']
 
 
 # Plots comparison between dataset
@@ -151,7 +152,7 @@ for env_number, house in enumerate(['floor1', 'floor4',]): # 'chemistry_floor0',
 
 
 
-    ax.set_title(f'mAP results over the detectors in $e_{env_number}$', fontsize=18)
+    ax.set_title(f'$e_{env_number +1}$ -- ' + titles[env_number], fontsize=18)
 
     ax.set_ylim([0, 80])
 
@@ -168,7 +169,7 @@ for env_number, house in enumerate(['floor1', 'floor4',]): # 'chemistry_floor0',
         matplotlib.pyplot.tick_params(bottom=True)
         ax.set_xticks([i+0.27 for i in range(5)])
         ax.set_xticklabels(detectors_labels, fontsize=17)
-        ax.set_xlabel('Detector', fontsize=17)
+        ax.set_xlabel('Model', fontsize=17)
 
     ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.95), loc='upper center', ncol=3, alignment='left')
 

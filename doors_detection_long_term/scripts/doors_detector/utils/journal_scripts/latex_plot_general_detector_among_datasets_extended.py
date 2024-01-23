@@ -49,7 +49,7 @@ datasets_name = ['IGibson', 'DD2~\cite{deepdoors2}', 'Gibson', 'Gibson + DD2~\ci
 
 
 
-
+titles = ['\\Classrooms', '\\Offices', '\\Laboratories', '\\House']
 # Plots mean AP
 colors = ['#1F77B4', '#2CA02C', '#FF7F0E',  '#D62728']
 for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']):
@@ -71,7 +71,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
 
 
 
-    ax.set_title(f'mAP results in $e_{env_number}$', fontsize=18)
+    ax.set_title(f'$e_{env_number + 1}$ -- ' + titles[env_number], fontsize=18)
 
     ax.set_ylim([0, 50])
 
@@ -88,7 +88,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
         matplotlib.pyplot.tick_params(bottom=True)
         ax.set_xticks([i+0.34 for i in range(3)])
         ax.set_xticklabels(model_names, fontsize=17)
-        ax.set_xlabel('Detector', fontsize=17)
+        ax.set_xlabel('Model', fontsize=17)
 
     ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.95), loc='upper center', ncol=3, alignment='left')
 

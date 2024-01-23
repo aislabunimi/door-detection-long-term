@@ -70,6 +70,7 @@ colors = ['#1F77B4','#2CA02C', '#FF7F0E', '#D62728', '#8C564B']
 detectors = ['GD', 'QD_15', 'QD_25', 'QD_50', 'QD_75']
 detectors_labels = ['$GD$', '$QD_{e}^{15}$', '$QD_{e}^{25}$', '$QD_{e}^{50}$', '$QD_{e}^{75}$']
 dataset_names = ['\\DDDtwo', '\\DG', '\\DDDtwoG']
+titles = ['\\Classrooms', '\\Offices', '\\Laboratories', '\\House']
 
 for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']):
     fig, ax = subplots(figsize=(10, 5))
@@ -258,7 +259,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
                         color='#FF7F0E', alpha=.2)
 
 
-    ax.set_title(f'Extended metric results in $e_{env_number}$', fontsize=18)
+    ax.set_title(f'$e_{env_number+1}$ -- ' + titles[env_number], fontsize=18)
     ax.axhline(y=0.0, linewidth=1, color='black')
     ax.set_ylim([0, 115])
 
