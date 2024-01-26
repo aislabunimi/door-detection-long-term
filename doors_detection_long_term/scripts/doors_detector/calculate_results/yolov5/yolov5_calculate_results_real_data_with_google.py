@@ -65,12 +65,12 @@ def compute_results(model_name, data_loader_test, description, with_goggle):
 
             if with_goggle == 1:
                 images = apply_goggle(images)
-                #target_image = images.to('cpu')[0]
-                #target_image = target_image * torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
-                #target_image = target_image + torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
-                #target_image = cv2.cvtColor(np.transpose(np.array(target_image), (1, 2, 0)), cv2.COLOR_RGB2BGR)
+                target_image = images.to('cpu')[0]
+                target_image = target_image * torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
+                target_image = target_image + torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
+                target_image = cv2.cvtColor(np.transpose(np.array(target_image), (1, 2, 0)), cv2.COLOR_RGB2BGR)
 
-                #cv2.imshow('frame',target_image)
+                cv2.imshow('frame',target_image)
                 #cv2.waitKey()
 
             preds, train_out = model.model(images)
