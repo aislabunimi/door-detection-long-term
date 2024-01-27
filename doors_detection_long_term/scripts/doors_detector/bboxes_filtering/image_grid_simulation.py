@@ -5,7 +5,7 @@ from tqdm import tqdm
 from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetLoaderBBoxes import DatasetLoaderBBoxes
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.models.background_grid_network import IMAGE_GRID_NETWORK, \
-    ImageGridNetwork, ImageGridNetworkLoss, IMAGE_GRID_NETWORK_GIBSON_DD2
+    ImageGridNetwork, ImageGridNetworkLoss, IMAGE_GRID_NETWORK_GIBSON_DD2, IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL
 from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, IMAGE_BACKGROUND_NETWORK
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_yolov5, collate_fn_bboxes
@@ -40,7 +40,7 @@ with torch.no_grad():
         datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
 
 #check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold, scale_number=(32, 32))
-bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=grid_dim, n_labels=3, model_name=IMAGE_BACKGROUND_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK_GIBSON_DD2)
+bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=grid_dim, n_labels=3, model_name=IMAGE_BACKGROUND_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL)
 bbox_model.to('cuda')
 
 criterion = ImageGridNetworkLoss()
