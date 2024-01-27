@@ -1,4 +1,5 @@
 import os
+import time
 from collections import OrderedDict
 from typing import Tuple, List
 
@@ -26,16 +27,18 @@ class ResNet18FPN(ResNet):
     def __init__(self):
         super(ResNet18FPN, self).__init__(BasicBlock, [2, 2, 2, 2])
 
-        state_dict = load_state_dict_from_url('https://download.pytorch.org/models/resnet18-5c106cde.pth', progress=True)
-        self.load_state_dict(state_dict)
+        #state_dict = load_state_dict_from_url('https://download.pytorch.org/models/resnet18-5c106cde.pth', progress=True)
+        #self.load_state_dict(state_dict)
+        self.layer4 = nn.Identity()
+        self.avgpool = nn.Identity()
+        self.fc = nn.Identity()
 
     def _forward_impl(self, x: torch.Tensor) -> tuple:
-        ordered_dict = OrderedDict()
 
         x = self.conv1(x)
         x = self.bn1(x)
-        x0 = self.relu(x)
-        x = self.maxpool(x0)
+        x = self.relu(x)
+        x = self.maxpool(x)
 
         x1 = self.layer1(x)
 
@@ -43,9 +46,9 @@ class ResNet18FPN(ResNet):
 
         x3 = self.layer3(x2)
 
-        x4 = self.layer4(x3)
+        #x4 = self.layer4(x3)
 
-        return x2, x3, x4
+        return x1, x2, x3
 
 
 class MultipleConvolutions(nn.Module):
@@ -82,7 +85,6 @@ class MultipleConvolutions(nn.Module):
 class FPNBackbone(nn.Module):
     def __init__(self, start_size: int, end_size: int, image_grid_dimensions: List[Tuple[int, int]]):
         super(FPNBackbone, self).__init__()
-        print(len(image_grid_dimensions))
         self.backbone = nn.Sequential(*[nn.Sequential() for _ in range(len(image_grid_dimensions))])
         self.upsample = nn.Sequential()
 
@@ -111,7 +113,7 @@ class ImageGridNetwork(GenericModel):
         super(ImageGridNetwork, self).__init__(model_name, dataset_name, description)
         self._image_grid_dimensions = image_grid_dimensions
         self.fpn = ResNet18FPN()
-        self.fpn_backbone = FPNBackbone(start_size=128, end_size=32, image_grid_dimensions=image_grid_dimensions)
+        self.fpn_backbone = FPNBackbone(start_size=64, end_size=16, image_grid_dimensions=image_grid_dimensions)
 
         self.conv_x0 = nn.Sequential(
             nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[0]),
@@ -120,12 +122,12 @@ class ImageGridNetwork(GenericModel):
         )
         self.conv_x1 = nn.Sequential(
             nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[1]),
-            MultipleConvolutions(original_size=256, start_size=128, end_size=128),
+            MultipleConvolutions(original_size=128, start_size=128, end_size=64),
             #nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
         )
         self.conv_x2 = nn.Sequential(
             nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[2]),
-            MultipleConvolutions(original_size=512, start_size=128, end_size=128),
+            MultipleConvolutions(original_size=256, start_size=256, end_size=64),
             #nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
         )
 
@@ -134,8 +136,8 @@ class ImageGridNetwork(GenericModel):
         self.upsample_x2 = nn.Upsample(size=image_grid_dimensions[2], mode='nearest')
 
         self.final_convolution = nn.Sequential(
-            MultipleConvolutions(original_size=96, start_size=128, end_size=16),
-            nn.Conv2d(in_channels=16, out_channels=1, kernel_size=1, padding=0),
+            MultipleConvolutions(original_size=48, start_size=32, end_size=8),
+            nn.Conv2d(in_channels=8, out_channels=1, kernel_size=1, padding=0),
             nn.BatchNorm2d(1),
             nn.Sigmoid()
         )
@@ -176,21 +178,28 @@ class ImageGridNetworkLoss(nn.Module):
             p = 0.3 if torch.count_nonzero(image_grid.bool()) == 0 else 1.0
             loss_background.append(torch.nan_to_num(-torch.log(1-torch.mean(prediction[~image_grid.bool()]))))
 
-
         loss_background = torch.stack(loss_background)
         loss_target = torch.stack(loss_target)
 
         loss = torch.mean(loss_background, dim=0) + torch.mean(loss_target, dim=0)
         return loss
 """
-image = torch.rand(4, 3, 240, 320)
+image = torch.rand(1, 3, 240, 320)
 
 bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=[(2**i, 2**i) for i in range(3, 6)][::-1], n_labels=3, model_name=IMAGE_GRID_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
-model_parameters = filter(lambda p: p.requires_grad, bbox_model.parameters())
-params = sum([np.prod(p.size()) for p in model_parameters])
-print(f'I PARAMTETRI SONO: {params}')
-bbox_model(image)
+
+print(f'I PARAMTETRI SONO: {sum([np.prod(p.size()) for p in bbox_model.parameters()])}')
+fpn_backbone = FPNBackbone(start_size=64, end_size=16, image_grid_dimensions=[(2**i, 2**i) for i in range(3, 6)][::-1])
+print(f'I PARAMTETRI SONO: {sum([np.prod(p.size()) for p in fpn_backbone.parameters()])}')
+total = 0
+
+for i in range(100):
+    t = time.time()
+    bbox_model(image)
+    total+= time.time() - t
+print(1/(total/100))
 """
+
 
 
 
