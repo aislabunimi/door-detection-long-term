@@ -1,14 +1,17 @@
 import os
 from typing import List, Tuple
 
+import numpy as np
 import torch
 import torchvision.ops
 from torch import nn
 
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import DATASET, FINAL_DOORS_DATASET
-from doors_detection_long_term.doors_detector.models.background_grid_network import ImageGridNetwork
+from doors_detection_long_term.doors_detector.models.background_grid_network import ImageGridNetwork, \
+    IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL
 from doors_detection_long_term.doors_detector.models.generic_model import DESCRIPTION, GenericModel
-from doors_detection_long_term.doors_detector.models.model_names import ModelName, IMAGE_BACKGROUND_NETWORK
+from doors_detection_long_term.doors_detector.models.model_names import ModelName, IMAGE_BACKGROUND_NETWORK, \
+    BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import trained_models_path
 
 TEST: DESCRIPTION = 0
@@ -87,21 +90,21 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
 
         self.mask_network = MaskNetwork(image_size=image_grid_dimensions[0])
 
-        self.shared_mlp_background_1 = SharedMLP(channels=[16, 32, 64, 128])
-        self.shared_mlp_background_2 = SharedMLP(channels=[128, 256, 512, 1024])
+        self.shared_mlp_background_1 = SharedMLP(channels=[8, 16, 32, 64, 128])
+        self.shared_mlp_background_2 = SharedMLP(channels=[128, 256, 512])
 
-        self.shared_mlp_mix_background = SharedMLP(channels=[1024+128, 1024, 512, 256])
-        self.shared_mlp_suppress_background = SharedMLP(channels=[256, 128, 64, 32, 1], last_activation=None)
+        self.shared_mlp_mix_background = SharedMLP(channels=[512+128, 512, 256, 128])
+        self.shared_mlp_suppress_background = SharedMLP(channels=[128, 64, 32, 16, 1], last_activation=None)
         self.batch_norm = nn.BatchNorm1d(num_features=1)
         self.sigmoid = nn.Sigmoid()
         # Geometric
         self.shared_mlp_geometric_1 = SharedMLP(channels=[initial_channels, 16, 32, 64, 128])
-        self.shared_mlp_geometric_2 = SharedMLP(channels=[128, 256, 512, 1024])
-        self.shared_mlp_mix_geometric = SharedMLP(channels=[1024+128, 1024, 512, 256])
-        self.shared_mlp_new_labels = SharedMLP(channels=[512, 256, 128, 64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
+        self.shared_mlp_geometric_2 = SharedMLP(channels=[128, 256, 512])
+        self.shared_mlp_mix_geometric = SharedMLP(channels=[512+128, 512, 256, 128])
+        self.shared_mlp_new_labels = SharedMLP(channels=[256, 128, 64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
 
         # Mixed
-        self.shared_mlp_new_confidences = SharedMLP(channels=[512, 256, 128, 64, 32, 10], last_activation=nn.Softmax(dim=1))
+        self.shared_mlp_new_confidences = SharedMLP(channels=[256, 128, 64, 32, 10], last_activation=nn.Softmax(dim=1))
 
 
         if pretrained:
@@ -212,8 +215,7 @@ def bbox_filtering_nms(bboxes, img_size, iou_threshold=.1, confidence_threshold=
         filtered_bboxes.append(image_bboxes[keep])
     return filtered_bboxes
 
-"""
-mask_network = MaskNetwork(image_size=(4, 4))
-print(mask_network(torch.rand(30*16, 4)))
+grid_dim = [(2**i, 2**i) for i in range(3, 6)][::-1]
+bbox_model = BboxFilterNetworkGeometricBackground(initial_channels=7, image_grid_dimensions=grid_dim, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_NETWORK_GEOMETRIC_BACKGROUND, description_background=IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL)
 
-"""
+print(f'I PARAMTETRI SONO: {sum([np.prod(p.size()) for p in bbox_model.parameters()])}')

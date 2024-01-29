@@ -20,7 +20,7 @@ from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
 from doors_detection_long_term.doors_detector.models.background_grid_network import IMAGE_GRID_NETWORK, \
-    IMAGE_GRID_NETWORK_GIBSON_DD2
+    IMAGE_GRID_NETWORK_GIBSON_DD2, IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL
 from doors_detection_long_term.doors_detector.models.bbox_filter_network_geometric import \
     BboxFilterNetworkGeometricBackground, IMAGE_NETWORK_GEOMETRIC_BACKGROUND, bbox_filtering_nms, \
     BboxFilterNetworkGeometricLabelLoss, BboxFilterNetworkGeometricSuppressLoss, \
@@ -156,7 +156,7 @@ for env, values in nms_performance_ap.items():
     plt.savefig(f'image_complete/AP_{env}.svg')
 
 
-bbox_model = BboxFilterNetworkGeometricBackground(initial_channels=7, image_grid_dimensions=grid_dim, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_NETWORK_GEOMETRIC_BACKGROUND, description_background=IMAGE_GRID_NETWORK_GIBSON_DD2)
+bbox_model = BboxFilterNetworkGeometricBackground(initial_channels=7, image_grid_dimensions=grid_dim, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_NETWORK_GEOMETRIC_BACKGROUND, description_background=IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL)
 bbox_model.to('cuda')
 
 
