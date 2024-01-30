@@ -100,17 +100,20 @@ def get_final_doors_dataset_real_data(folder_name: str, train_size: float = 0.1,
 
     return train, test, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
 
-def get_final_doors_dataset_hybrid(folder_name_to_exclude: str, transform_train=True):
-    dataset_creator = DatasetsCreatorGibsonAndDeepDoors2(dataset_path_gibson=final_doors_dataset_path, dataset_path_deep_doors_2=deep_doors_2_labelled_dataset_path)
-    train_total, test_total = dataset_creator.creates_dataset(half=False)
+def get_final_doors_dataset_real_hybrid(folder_name_to_exclude: str, transform_train=False):
+
+    train_total, test_total = None, None
     manager = DatasetManager(dataset_path=real_final_doors_dataset_path, sample_class=DoorSample)
     dataset_folders = [env for env in manager.get_folder_names() if 'evening' not in env and env != folder_name_to_exclude]
     for folder_name in dataset_folders:
-
         dataset_creator = DatasetsCreatorRealData(dataset_path=real_final_doors_dataset_path)
         train, test = dataset_creator.create_datasets(folder_name=folder_name, train_size=0.75, transform_train=transform_train)
-        train_total += train
-        test_total += test
+        if train_total is None and test_total is None:
+            train_total = train
+            test_total = test
+        else:
+            train_total += train
+            test_total += test
     labels = dataset_creator.get_labels()
     return train_total, test_total, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
 

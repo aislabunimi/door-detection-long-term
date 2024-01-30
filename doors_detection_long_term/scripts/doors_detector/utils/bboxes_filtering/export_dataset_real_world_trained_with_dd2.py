@@ -10,7 +10,7 @@ from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetCrea
 from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL_DOORS_DATASET
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
-from doors_detection_long_term.doors_detector.models.model_names import YOLOv5, BBOX_FILTER_NETWORK_GEOMETRIC
+from doors_detection_long_term.doors_detector.models.model_names import YOLOv5
 from doors_detection_long_term.doors_detector.models.yolov5 import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
 from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_yolov5, collate_fn_bboxes
@@ -19,7 +19,7 @@ from doors_detection_long_term.scripts.doors_detector.dataset_configurator impor
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 num_bboxes = 20
 
-houses = ['floor1', 'floor4', 'chemistry_floor0']
+houses = ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']
 
 for house in houses:
 
