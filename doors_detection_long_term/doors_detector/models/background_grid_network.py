@@ -113,7 +113,7 @@ class FPNBackbone(nn.Module):
             # Sum feature maps
             for feature_count in range(len(features) - 1):
                 if not isinstance(backbones[feature_count + 1], nn.Identity):
-                    features[feature_count + 1] += self.upsample[feature_count](features[feature_count])
+                    features[feature_count + 1] = features[feature_count + 1] + self.upsample[feature_count](features[feature_count])
 
             for layer_count, layer in enumerate(backbones):
                 features[layer_count] = layer(features[layer_count])
