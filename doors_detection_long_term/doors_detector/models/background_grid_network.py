@@ -88,53 +88,52 @@ class MultipleConvolutions(nn.Module):
 
 
 class FPNBackbone(nn.Module):
-    def __init__(self, start_size: int, end_size: int, image_grid_dimensions: List[Tuple[int, int]]):
+    def __init__(self, start_sizes: List[int], end_size: int,  image_grid_dimensions: List[Tuple[int, int]]):
         super(FPNBackbone, self).__init__()
         self.backbone = nn.Sequential(*[nn.Sequential() for _ in range(len(image_grid_dimensions))])
         self.upsample = nn.Sequential()
 
-        for size in image_grid_dimensions[:-1]:
+        for size in image_grid_dimensions[1:]:
             self.upsample.append(nn.Upsample(size=size, mode='nearest'))
 
+        start_size = start_sizes[0]
         while start_size > end_size:
-            for sequential in self.backbone:
-                sequential.append(
-                    MultipleConvolutions(original_size=start_size, start_size=start_size, end_size=start_size // 2),
-                )
+            for max_size, sequential in zip(start_sizes, self.backbone):
+                if start_size <= max_size:
+                    sequential.append(
+                        MultipleConvolutions(original_size=start_size, start_size=start_size, end_size=start_size // 2),
+                    )
+                else:
+                    sequential.append(nn.Identity())
             start_size //= 2
 
     def forward(self, features):
         for backbones in zip(*self.backbone):
-            for i, backbone in enumerate(backbones):
-                features[i] = backbone(features[i])
-                if i > 0:
-                    features[i - 1] = features[i - 1] + self.upsample[i - 1](features[i])
+
+            # Sum feature maps
+            for feature_count in range(len(features) - 1):
+                if not isinstance(backbones[feature_count + 1], nn.Identity):
+                    features[feature_count + 1] += self.upsample[feature_count](features[feature_count])
+
+            for layer_count, layer in enumerate(backbones):
+                features[layer_count] = layer(features[layer_count])
 
         return features
 
+
+tensors = [torch.randn(2, 256, 8, 8), torch.randn(2, 128, 16, 16), torch.randn(2, 64, 32, 32)]
+fpn = FPNBackbone(start_sizes=[256, 128, 64], end_size=16, image_grid_dimensions=[(8, 8),  (16, 16),(32, 32) ])
 
 class ImageGridNetwork(GenericModel):
     def __init__(self, fpn_channels: int, image_grid_dimensions: List[Tuple[int, int]], model_name: ModelName, pretrained: bool, n_labels: int, dataset_name: DATASET, description: DESCRIPTION):
         super(ImageGridNetwork, self).__init__(model_name, dataset_name, description)
         self._image_grid_dimensions = image_grid_dimensions
         self.fpn = ResNet18FPN()
-        self.fpn_backbone = FPNBackbone(start_size=64, end_size=16, image_grid_dimensions=image_grid_dimensions)
+        self.fpn_backbone = FPNBackbone(start_sizes=[256, 128, 64], end_size=16, image_grid_dimensions=image_grid_dimensions[::-1])
 
-        self.conv_x0 = nn.Sequential(
-            nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[0]),
-            #MultipleConvolutions(original_size=128, start_size=128, end_size=64),
-            #nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
-        )
-        self.conv_x1 = nn.Sequential(
-            nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[1]),
-            MultipleConvolutions(original_size=128, start_size=128, end_size=64),
-            #nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
-        )
-        self.conv_x2 = nn.Sequential(
-            nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[2]),
-            MultipleConvolutions(original_size=256, start_size=256, end_size=64),
-            #nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
-        )
+        self.adaptive_max_pooling_x0 = nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[0])
+        self.adaptive_max_pooling_x1 = nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[1])
+        self.adaptive_max_pooling_x2 = nn.AdaptiveMaxPool2d(output_size=image_grid_dimensions[2])
 
         self.upsample_x0 = nn.Upsample(size=image_grid_dimensions[0], mode='nearest')
         self.upsample_x1 = nn.Upsample(size=image_grid_dimensions[1], mode='nearest')
@@ -157,11 +156,11 @@ class ImageGridNetwork(GenericModel):
 
     def forward(self, images):
         x0, x1, x2 = self.fpn(images)
-        x0 = self.conv_x0(x0)
-        x1 = self.conv_x1(x1)
-        x2 = self.conv_x2(x2)
+        x0 = self.adaptive_max_pooling_x0(x0)
+        x1 = self.adaptive_max_pooling_x1(x1)
+        x2 = self.adaptive_max_pooling_x2(x2)
 
-        x0, x1, x2 = self.fpn_backbone([x0, x1, x2])
+        x2, x1, x0 = self.fpn_backbone([x2, x1, x0])
         x0 = self.upsample_x0(x0)
         x1 = self.upsample_x0(x1)
         x2 = self.upsample_x0(x2)
@@ -194,7 +193,7 @@ image = torch.rand(1, 3, 240, 320)
 bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=[(2**i, 2**i) for i in range(3, 6)][::-1], n_labels=3, model_name=IMAGE_GRID_NETWORK, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK)
 
 print(f'I PARAMTETRI SONO: {sum([np.prod(p.size()) for p in bbox_model.parameters()])}')
-fpn_backbone = FPNBackbone(start_size=64, end_size=16, image_grid_dimensions=[(2**i, 2**i) for i in range(3, 6)][::-1])
+fpn_backbone = FPNBackbone(start_sizes=[256, 128, 64], end_size=16, image_grid_dimensions=[(2**i, 2**i) for i in range(3, 6)])
 print(f'I PARAMTETRI SONO: {sum([np.prod(p.size()) for p in fpn_backbone.parameters()])}')
 total = 0
 
@@ -204,6 +203,7 @@ for i in range(100):
     total+= time.time() - t
 print(1/(total/100))
 """
+
 
 
 
