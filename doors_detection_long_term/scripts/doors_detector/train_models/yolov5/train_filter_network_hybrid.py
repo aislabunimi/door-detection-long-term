@@ -30,7 +30,7 @@ from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering im
 
 torch.autograd.set_detect_anomaly(True)
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-num_bboxes = 30
+num_bboxes = 20
 
 grid_dim = [(2**i, 2**i) for i in range(3, 6)][::-1]
 
@@ -169,7 +169,7 @@ for env in ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']:
     criterion_suppress.to('cuda')
     criterion_confidence.to('cuda')
 
-    optimizer = optim.Adam(bbox_model.parameters(), lr=0.001)
+    optimizer = optim.SGD(bbox_model.parameters(), lr=0.01)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
 
     for n, p in bbox_model.named_parameters():

@@ -42,7 +42,7 @@ class TorchDatasetBBoxes(Dataset):
         self._max_bboxes = max_bboxes
         self._iou_threshold_matching = iou_threshold_matching
 
-        scales = [256 + i * 32 for i in range(11)]
+        scales = [256 + i * 32 for i in range(5)]
 
         if set_type == TEST_SET:
             self._transform = T.Compose([

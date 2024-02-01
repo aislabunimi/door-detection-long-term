@@ -1,3 +1,4 @@
+import copy
 import os
 import time
 from collections import OrderedDict
@@ -34,6 +35,12 @@ class ResNet18FPN(ResNet):
 
         #state_dict = load_state_dict_from_url('https://download.pytorch.org/models/resnet18-5c106cde.pth', progress=True)
         #self.load_state_dict(state_dict)
+        self.layer0 = copy.deepcopy(self.layer1)
+        self.layer1[0].conv1 = nn.Conv2d(64, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        self.layer1[0].downsample = nn.Sequential(
+            nn.Conv2d(64, 64, kernel_size=(1, 1), stride=(2, 2), bias=False),
+            nn.BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        )
         self.layer4 = nn.Identity()
         self.avgpool = nn.Identity()
         self.fc = nn.Identity()
@@ -44,6 +51,8 @@ class ResNet18FPN(ResNet):
         x = self.bn1(x)
         x = self.relu(x)
         x = self.maxpool(x)
+
+        x = self.layer0(x)
 
         x1 = self.layer1(x)
 
@@ -119,10 +128,6 @@ class FPNBackbone(nn.Module):
                 features[layer_count] = layer(features[layer_count])
 
         return features
-
-
-tensors = [torch.randn(2, 256, 8, 8), torch.randn(2, 128, 16, 16), torch.randn(2, 64, 32, 32)]
-fpn = FPNBackbone(start_sizes=[256, 128, 64], end_size=16, image_grid_dimensions=[(8, 8),  (16, 16),(32, 32) ])
 
 class ImageGridNetwork(GenericModel):
     def __init__(self, fpn_channels: int, image_grid_dimensions: List[Tuple[int, int]], model_name: ModelName, pretrained: bool, n_labels: int, dataset_name: DATASET, description: DESCRIPTION):

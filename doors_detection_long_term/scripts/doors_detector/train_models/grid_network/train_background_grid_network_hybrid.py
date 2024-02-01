@@ -57,7 +57,7 @@ for env in ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']:
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.5)
     criterion.to('cuda')
     for n, p in bbox_model.named_parameters():
-        if any([x in n for x in ['fpn.conv1' 'fpn.bn1',]]):
+        if any([x in n for x in ['fpn.conv1' 'fpn.bn1', 'fpn.layer0']]):
             p.requires_grad = False
             #print(n)
 
@@ -72,7 +72,7 @@ for env in ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']:
     test_accuracy = {0: [], 1: []}
     real_world_accuracy = {h: {0: [], 1: []} for h in houses}
 
-    for epoch in range(20):
+    for epoch in range(40):
         scheduler.step()
         bbox_model.train()
         criterion.train()
