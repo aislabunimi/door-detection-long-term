@@ -72,7 +72,7 @@ for env in ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']:
     test_accuracy = {0: [], 1: []}
     real_world_accuracy = {h: {0: [], 1: []} for h in houses}
 
-    for epoch in range(40):
+    for epoch in range(20):
         scheduler.step()
         bbox_model.train()
         criterion.train()
