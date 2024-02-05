@@ -270,3 +270,56 @@ class DatasetCreatorBBoxes:
             detected_boxes = sorted(detected_boxes, key=lambda x: x.get_confidence(), reverse=True)[:self._max_bboxes]
             bboxes_dict['bboxes'].append(detected_boxes)
             img_count_temp += 1
+
+    def add_faster_rcnn_bboxes(self, images, targets, preds, bboxes_type: ExampleType):
+        if bboxes_type == ExampleType.TEST:
+            bboxes_dict = self._test_bboxes
+        elif bboxes_type == ExampleType.TRAINING:
+            bboxes_dict = self._training_bboxes
+
+        img_size = images.size()[2:][::-1]
+        for image in images:
+            image = image.to('cpu')
+            image = image * torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
+            image = image + torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
+            image = cv2.cvtColor(np.transpose(np.array(image), (1, 2, 0)), cv2.COLOR_RGB2BGR)
+            bboxes_dict['images'].append(image)
+
+
+        img_count_temp = self._img_count
+        for target in targets:
+            gt_boxes = []
+            for label, [x, y, w, h] in zip(target['labels'].tolist(), target['boxes'].tolist()):
+                gt_boxes.append(BoundingBox(
+                    image_name=str(self._img_count),
+                    class_id=str(label),
+                    coordinates=(x, y, w, h),
+                    bb_type=BBType.GROUND_TRUTH,
+                    format=BBFormat.XYWH,
+                    img_size=img_size,
+                    type_coordinates=CoordinatesType.RELATIVE,
+                ))
+            bboxes_dict['gt_bboxes'].append(gt_boxes)
+            self._img_count += 1
+
+        for prediction in preds:
+            detected_boxes = []
+            print(len(prediction['boxes']))
+            for [x1, y1, x2, y2], label, score in zip(prediction['boxes'].tolist(), prediction['labels'].tolist(), prediction['scores'].tolist()):
+
+                if label >= 0:
+                    box = BoundingBox(
+                            image_name=str(img_count_temp),
+                            class_id=str(label),
+                            coordinates=(x1, y1, x2 - x1, y2 - y1),
+                            bb_type=BBType.DETECTED,
+                            format=BBFormat.XYWH,
+                            confidence=score
+                        )
+
+                    x1, y1, x2, y2 = box.get_absolute_bounding_box(BBFormat.XYX2Y2)
+                    if x2 > x1 + 1 and y2 > y1 + 1:
+                        detected_boxes.append(box)
+            img_count_temp += 1
+            detected_boxes = sorted(detected_boxes, key=lambda x: x.get_confidence(), reverse=True)[:self._max_bboxes]
+            bboxes_dict['bboxes'].append(detected_boxes)

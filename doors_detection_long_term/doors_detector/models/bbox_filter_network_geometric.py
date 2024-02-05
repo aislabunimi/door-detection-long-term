@@ -218,8 +218,9 @@ def bbox_filtering_nms(bboxes, img_size, iou_threshold=.1, confidence_threshold=
         keep = torchvision.ops.nms(boxes=coords, scores=image_bboxes[:, 4], iou_threshold=iou_threshold)
         filtered_bboxes.append(image_bboxes[keep])
     return filtered_bboxes
-
+"""
 grid_dim = [(2**i, 2**i) for i in range(3, 6)][::-1]
 bbox_model = BboxFilterNetworkGeometricBackground(initial_channels=7, image_grid_dimensions=grid_dim, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND, pretrained=False, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_NETWORK_GEOMETRIC_BACKGROUND, description_background=IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL)
 
 print(f'I PARAMTETRI SONO: {sum([np.prod(p.size()) for p in bbox_model.parameters()])}')
+"""

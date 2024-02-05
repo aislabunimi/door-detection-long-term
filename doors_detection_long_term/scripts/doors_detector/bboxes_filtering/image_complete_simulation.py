@@ -20,7 +20,7 @@ from doors_detection_long_term.doors_detector.dataset.torch_dataset import FINAL
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
 from doors_detection_long_term.doors_detector.models.background_grid_network import IMAGE_GRID_NETWORK, \
-    IMAGE_GRID_NETWORK_GIBSON_DD2, IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL
+    IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL
 from doors_detection_long_term.doors_detector.models.bbox_filter_network_geometric import \
     BboxFilterNetworkGeometricBackground, IMAGE_NETWORK_GEOMETRIC_BACKGROUND, bbox_filtering_nms, \
     BboxFilterNetworkGeometricLabelLoss, BboxFilterNetworkGeometricSuppressLoss, \
@@ -52,7 +52,7 @@ test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_f
 #check_bbox_dataset(test_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=(32, 32))
 
 # Calculate Metrics in real worlds
-houses = ['floor1', 'floor4', 'chemistry_floor0']
+houses = ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']
 
 datasets_real_worlds = {}
 with torch.no_grad():
@@ -98,8 +98,8 @@ for data in test_dataset_bboxes:
     evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
     evaluator_ap.add_predictions_bboxes_filtering(bboxes=detected_bboxes, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
 
-metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=iou_threshold_matching_metric)
-metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold, iou_threshold=iou_threshold_matching_metric)
+metrics = evaluator_complete_metric.get_metrics(confidence_threshold=0.75, iou_threshold=0.5)
+metrics_ap = evaluator_ap.get_metrics(confidence_threshold=0.75, iou_threshold=0.5)
 
 
 for label, values in metrics.items():
@@ -134,6 +134,7 @@ for house in houses:
                 nms_performance[house][k] = v
             else:
                 nms_performance[house][k] += v
+    print(f'{house} ->', metrics)
     for label, v in metrics_ap['per_bbox'].items():
         nms_performance_ap[house][label] = v['AP']
 
