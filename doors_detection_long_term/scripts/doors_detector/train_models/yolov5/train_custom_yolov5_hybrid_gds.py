@@ -97,7 +97,7 @@ if __name__ == '__main__':
     houses = ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']
     # Train the general detector mixing gibson, deep_doors_2 and 3 of the real four environments
     for house in houses:
-        train, validation, labels, _ = get_final_doors_dataset_hybrid(folder_name_to_exclude='floor1')
+        train, validation, labels, _ = get_final_doors_dataset_hybrid(folder_name_to_exclude=house)
         epoch_count = 0
         print(f'Train set size: {len(train)}', f'Validation set size: {len(validation)}')
         data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, shuffle=True, num_workers=4)

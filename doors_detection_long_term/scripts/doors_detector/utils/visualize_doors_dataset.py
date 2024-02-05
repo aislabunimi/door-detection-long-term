@@ -27,7 +27,7 @@ if __name__ == '__main__':
     #train, test, labels, COLORS = get_final_doors_dataset(2, 'house1', train_size=0.25, use_negatives=False)
     #train, validation, labels, COLORS = get_final_doors_dataset_all_envs()
 
-    for i in range(8500, 9000):
+    for i in range(8000, 9000):
         img, target, door_sample = train[i]
 
         cv_image = door_sample.get_bgr_image()
