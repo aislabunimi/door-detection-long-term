@@ -61,6 +61,7 @@ datasets_name = ['IGibson', 'DD2~\cite{deepdoors2}', 'Gibson', 'Gibson + DD2~\ci
 
 #print(houses_detr.mean().index.tolist())
 
+titles = ['\\Classrooms', '\\Offices', '\\Laboratories', '\\House']
 
 
 
@@ -91,9 +92,9 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
 
 
 
-    ax.set_title(f'Extended metric results in $e_{env_number}$', fontsize=18)
+    ax.set_title(f'$e_{env_number+1}$ -- ' + titles[env_number], fontsize=18)
     ax.axhline(y=0.0, linewidth=1, color='black')
-    ax.set_ylim([-50, 50])
+    ax.set_ylim([-50, 60])
 
     if env_number % 2 == 0:
         matplotlib.pyplot.tick_params(left=True)
@@ -108,7 +109,7 @@ for env_number, house in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'hou
         matplotlib.pyplot.tick_params(bottom=True)
         ax.set_xticks([i+0.34 for i in range(3)])
         ax.set_xticklabels(model_names, fontsize=17)
-        ax.set_xlabel('Detector', fontsize=17)
+        ax.set_xlabel('Model', fontsize=17)
 
     ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.97), loc='upper center', ncol=4, alignment='left')
     ax.set_yticklabels([item.get_text().replace(chr(8722), '') for item in ax.get_yticklabels()])

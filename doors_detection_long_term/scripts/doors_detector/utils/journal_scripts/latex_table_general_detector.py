@@ -91,7 +91,7 @@ houses_detr.loc[houses_detr['house'] == 'housematteo', 'house'] = 'house_matteo'
 
 model_names = ['DETR~\cite{detr}', 'YOLOv5~\cite{yolov5}', 'Faster~R--CNN~\cite{fasterrcnn}']
 datasets = ['igibson', 'deep_doors_2', 'gibson', 'gibson_deep_doors_2']
-datasets_name = ['$\mathcal{D}_{ig}$', '$\mathcal{D}_{dd2}$', '$\mathcal{D}_{g}$', '$\mathcal{D}_{dd2+g}$']
+datasets_name = ['\\DiG', '\\DDDtwo', '\\DG', '\\DDDtwoG']
 
 table=''
 for env_count, env in enumerate(['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']):
