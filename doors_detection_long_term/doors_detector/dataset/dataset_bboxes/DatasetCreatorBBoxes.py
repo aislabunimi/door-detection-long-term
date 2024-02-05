@@ -304,7 +304,7 @@ class DatasetCreatorBBoxes:
 
         for prediction in preds:
             detected_boxes = []
-            print(len(prediction['boxes']))
+
             for [x1, y1, x2, y2], label, score in zip(prediction['boxes'].tolist(), prediction['labels'].tolist(), prediction['scores'].tolist()):
 
                 if label >= 0:

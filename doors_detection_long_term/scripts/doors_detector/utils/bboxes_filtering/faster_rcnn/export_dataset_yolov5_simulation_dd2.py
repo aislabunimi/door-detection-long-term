@@ -21,7 +21,7 @@ num_bboxes = 20
 
 dataset_creator_bboxes = DatasetCreatorBBoxes()
 dataset_creator_bboxes.set_folder_name('faster_rcnn_general_detector_gibson_deep_doors_2')
-houses = ['house_1', ]#'house_2', 'house_7', 'house_9', 'house_10', 'house_13', 'house_15', 'house_20', 'house_21', 'house_22']
+houses = ['house_1', 'house_2', 'house_7', 'house_9', 'house_10', 'house_13', 'house_15', 'house_20', 'house_21', 'house_22']
 
 for house in houses:
     train, test, labels, _ = get_final_doors_dataset_bbox_filter_one_house(folder_name=house.replace('_', ''), use_negatives=False)
@@ -41,6 +41,8 @@ for house in houses:
         for images, targets, converted_boxes in tqdm(data_loader_train, total=len(data_loader_train)):
             images = images.to('cuda')
             preds = model.model(images)
+            for pred in preds:
+                pred['labels'] = pred['labels']-1
 
             dataset_creator_bboxes.add_faster_rcnn_bboxes(images, targets, preds, ExampleType.TRAINING)
 
@@ -48,6 +50,8 @@ for house in houses:
         for i, (images, targets, converted_boxes) in tqdm(enumerate(data_loader_test), total=len(data_loader_test)):
             images = images.to('cuda')
             preds = model.model(images)
+            for pred in preds:
+                pred['labels'] = pred['labels']-1
 
             dataset_creator_bboxes.add_faster_rcnn_bboxes(images, targets, preds, ExampleType.TEST if i > c else ExampleType.TRAINING)
 
@@ -65,12 +69,15 @@ with torch.no_grad():
     for images, targets, converted_boxes in tqdm(data_loader_train, total=len(data_loader_train)):
         images = images.to('cuda')
         preds = model.model(images)
+        for pred in preds:
+            pred['labels'] = pred['labels']-1
         dataset_creator_bboxes.add_faster_rcnn_bboxes(images, targets, preds, ExampleType.TRAINING)
 
     for images, targets, converted_boxes in tqdm(data_loader_test, total=len(data_loader_test)):
         images = images.to('cuda')
         preds = model.model(images)
-
+        for pred in preds:
+            pred['labels'] = pred['labels']-1
         dataset_creator_bboxes.add_faster_rcnn_bboxes(images, targets, preds, ExampleType.TEST)
 
     dataset_creator_bboxes.export_dataset()
