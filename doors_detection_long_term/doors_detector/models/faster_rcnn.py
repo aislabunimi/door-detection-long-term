@@ -345,7 +345,7 @@ EXP_2_CHEMISTRY_FLOOR0_GIBSON_EPOCHS_GD_60_EPOCHS_QD_40_FINE_TUNE_75: DESCRIPTIO
 
 
 class FasterRCNN(GenericModel):
-    def __init__(self, model_name: ModelName, n_labels: int, pretrained: bool, dataset_name: DATASET, description: DESCRIPTION):
+    def __init__(self, model_name: ModelName, n_labels: int, pretrained: bool, dataset_name: DATASET, description: DESCRIPTION, box_score_thresh=0.05, box_nms_thresh=0.5, box_detections_per_img=100):
         """
 
         :param model_name: the name of the detr base model
@@ -355,7 +355,7 @@ class FasterRCNN(GenericModel):
         """
         super(FasterRCNN, self).__init__(model_name, dataset_name, description)
 
-        self.model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True)
+        self.model = torchvision.models.detection.fasterrcnn_resnet50_fpn(pretrained=True, max_size=400, min_size=250, box_score_thresh=box_score_thresh, box_nms_thresh=box_nms_thresh, box_detections_per_img=box_detections_per_img, rpn_nms_thresh=0.0, rpn_score_thresh=0.0)
 
         # get number of input features for the classifier
         in_features = self.model.roi_heads.box_predictor.cls_score.in_features
