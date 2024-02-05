@@ -100,6 +100,28 @@ def get_final_doors_dataset_real_data(folder_name: str, train_size: float = 0.1,
 
     return train, test, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
 
+
+def get_final_doors_dataset_hybrid(folder_name_to_exclude: str, transform_train=False):
+    dataset_creator = DatasetsCreatorAllEnvs(dataset_path=final_doors_dataset_path)
+    train_total, validation_total = dataset_creator.create_datasets()
+
+    dataset_creator = DatasetsCreatorDeepDoors2LabelledGD(dataset_path=deep_doors_2_labelled_dataset_path)
+    train, validation = dataset_creator.creates_dataset()
+
+    train_total += train
+    validation_total += validation
+
+    manager = DatasetManager(dataset_path=real_final_doors_dataset_path, sample_class=DoorSample)
+    dataset_folders = [env for env in manager.get_folder_names() if 'evening' not in env and env != folder_name_to_exclude]
+    for folder_name in dataset_folders:
+        dataset_creator = DatasetsCreatorRealData(dataset_path=real_final_doors_dataset_path)
+        train, validation = dataset_creator.create_datasets(folder_name=folder_name, train_size=0.75, transform_train=transform_train)
+
+        train_total += train
+        validation_total += validation
+    labels = dataset_creator.get_labels()
+    return train_total, validation_total, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
+
 def get_final_doors_dataset_real_hybrid(folder_name_to_exclude: str, transform_train=False):
 
     train_total, test_total = None, None
