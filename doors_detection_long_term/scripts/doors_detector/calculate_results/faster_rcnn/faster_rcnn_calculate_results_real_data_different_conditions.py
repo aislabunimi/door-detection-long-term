@@ -99,7 +99,7 @@ for model_name, dataset, epochs, in model_names_general_detectors:
     print(model_name)
 
     for house in houses:
-        train, test, _, _ = get_final_doors_dataset_real_data(folder_name=house + '_evening', train_size=0.75)
+        train, test, _, _ = get_final_doors_dataset_real_data(folder_name=house + '_evening', train_size=0.75, transform_train=False)
         data_loader_train = DataLoader(train, batch_size=1, collate_fn=collate_fn_faster_rcnn, drop_last=False, num_workers=4)
 
         data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn_faster_rcnn, drop_last=False, num_workers=4)

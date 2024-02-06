@@ -9,7 +9,7 @@ from doors_detection_long_term.positions_extractor.gibson_environments_data impo
 from doors_detection_long_term.positions_extractor.gibson_run_config import GibsonConfigRun
 from doors_detection_long_term.positions_extractor.voronoi_graph_generator import VoronoiGraphGenerator
 
-env_name = 'house11'
+env_name = 'house1'
 
 config_file = GibsonConfigRun(simulation_env=TurtlebotNavigateNoPhysicsEnv, world_name=env_name, floor=0) \
     .is_discrete(False).write_to_file()
@@ -24,10 +24,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Create the dataset
-    dataset_path = '/home/michele/myfiles/doors_dataset'
+    dataset_path = '/home/antonazzi/myfiles/doors_dataset'
 
     folder_manager = DatasetFolderManager(dataset_path=dataset_path, folder_name=env_name, sample_class=DoorSample, max_treads=8)
-
+    print('Be patient, the simulator is loading the world...')
     # Start Gibson
     env = TurtlebotNavigateNoPhysicsEnv(config=args.config)
     env.reset()

@@ -1,6 +1,6 @@
 import numpy as np
-from generic_dataset.dataset_manager import DatasetManager
-
+import math
+from random import shuffle
 from doors_detection_long_term.doors_detector.dataset.dataset_deep_doors_2_labelled.datasets_creator_deep_doors_2_labelled import DatasetsCreatorDeepDoors2Labelled
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.dataset_creator_all_envs import \
     DatasetsCreatorAllEnvs
@@ -21,17 +21,23 @@ from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datase
     DatasetsCreatorDoorsFinalEpochAnalysis
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_no_door_task import \
     DatasetsCreatorDoorsNoDoorTask
-from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.door_sample_real_data import DoorSample
+from doors_detection_long_term.doors_detector.dataset.dataset_igibson.dataset_creators.dataset_creator_all_scenes import \
+    DatasetCreatorAllScenes as IGibsonDatasetCreatorAllScenes
+from doors_detection_long_term.doors_detector.dataset.dataset_igibson.dataset_creators.dataset_creator_single_scene import \
+    DatasetCreatorSingleScene as IGibsonDatasetCreatorSingleScene
+from doors_detection_long_term.doors_detector.dataset.dataset_igibson.dataset_creators.dataset_creator_epoch_analysis import \
+    DatasetCreatorScenesEpochAnalysis as IGibsonDatasetCreatorScenesEpochAnalysis
+from doors_detection_long_term.doors_detector.dataset.dataset_igibson.dataset_creators.dataset_creator_mixed import \
+    DatasetCreatorMixed as IGibsonGibsonDatasetCreator
 
 # The path in which the trained model are saved and loaded
 # If the string is empty, they are saved in a folder in this repository (/models/train_params/)
-trained_models_path = "/home/michele/myfiles/trained_models"
+trained_models_path = "/home/antonazzi/myfiles/trained_models"
 
-deep_doors_2_labelled_dataset_path = '/home/michele/myfiles/deep_doors_2_labelled'
-final_doors_dataset_path = '/home/michele/myfiles/final_doors_dataset/'
-real_final_doors_dataset_path = '/home/michele/myfiles/final_doors_dataset_real'
-box_filtering_dataset_path = '/home/michele/myfiles/box_filtering_dataset'
-
+deep_doors_2_labelled_dataset_path = '/home/antonazzi/myfiles/deep_doors_2_labelled'
+final_doors_dataset_path = '/home/antonazzi/myfiles/final_doors_dataset/'
+real_final_doors_dataset_path = '/home/antonazzi/myfiles/final_doors_dataset_real'
+igibson_doors_dataset_path = '/media/antonazzi/New Volume/igibson_dataset'
 
 
 def get_deep_doors_2_labelled_sets():
@@ -160,3 +166,34 @@ def get_final_doors_dataset_real_data_bbox_filter(folder_name: str, train_size: 
 
     return train, control, fine_tune, test, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
 
+## iGibson datasets
+
+def get_igibson_dataset_all_scenes(doors_config:str = None, step:int = None):
+    dataset_creator = IGibsonDatasetCreatorAllScenes(dataset_path=igibson_doors_dataset_path)
+    train_set, validation_set = dataset_creator.create_datasets(doors_config, step)
+    labels = dataset_creator.get_labels()
+
+    return train_set, validation_set, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
+
+def get_igibson_dataset_scene(scene_name:str, doors_config:str = None):
+    dataset_creator = IGibsonDatasetCreatorSingleScene(dataset_path=igibson_doors_dataset_path)
+    train_set, validation_set = dataset_creator.create_datasets(scene_name, doors_config)
+    labels = dataset_creator.get_labels()
+
+    return train_set, validation_set, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
+
+def get_igibson_dataset_epoch_analysis(experiment: int, folder_name: str, scene_name:str = None, doors_config:str = None, train_size: float = 0.1, use_negatives: bool = False):
+    dataset_creator = IGibsonDatasetCreatorScenesEpochAnalysis(dataset_path=igibson_doors_dataset_path)
+    dataset_creator.set_experiment_number(experiment=experiment, folder_name=folder_name)
+    dataset_creator.use_negatives(use_negatives=use_negatives)
+    train, validation, test = dataset_creator.create_datasets(scene_name, doors_config, train_size=train_size)
+    labels = dataset_creator.get_labels()
+
+    return train, validation, test, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
+
+def get_mixed_gibson_igibson_dataset(split:float = 0.5, max_samples:int = 10000, doors_config:str = None):
+    dataset_creator = IGibsonGibsonDatasetCreator(igibson_dataset_path=igibson_doors_dataset_path, gibson_dataset_path=final_doors_dataset_path)
+    train_set, validation_set = dataset_creator.create_datasets(split, max_samples, doors_config)
+    labels = dataset_creator.get_labels()
+
+    return train_set, validation_set, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)

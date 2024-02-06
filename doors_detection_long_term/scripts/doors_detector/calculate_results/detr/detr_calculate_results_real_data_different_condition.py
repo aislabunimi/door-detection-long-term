@@ -90,7 +90,7 @@ results_complete = []
 # General detectors
 for house, dataset, epochs_gd in [(h, d, e) for h in houses for d in datasets for e in epochs_general_detector]:
 
-    train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house + '_evening', train_size=0.75)
+    train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name=house + '_evening', train_size=0.75, transform_train=False)
     data_loader_train = DataLoader(train, batch_size=1, collate_fn=collate_fn, drop_last=False, num_workers=4)
     data_loader_test = DataLoader(test, batch_size=1, collate_fn=collate_fn, drop_last=False, num_workers=4)
 

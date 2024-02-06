@@ -13,7 +13,7 @@ params = {
     'seed': 0
 }
 
-path = '/home/antonazzi/Downloads/floor4_qd75'
+path = '/home/antonazzi/Downloads/detr_qd15'
 
 if __name__ == '__main__':
 
@@ -27,11 +27,11 @@ if __name__ == '__main__':
     #train, test, labels, COLORS = get_deep_doors_2_labelled_sets()
     #train, test, labels, COLORS = get_final_doors_dataset(2, 'house1', train_size=0.25, use_negatives=False)
     #train, validation, test, labels, COLORS = get_final_doors_dataset_epoch_analysis(experiment=2, folder_name='house21', train_size=0.75, use_negatives=False)
-    train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name='floor4', train_size=0.25)
+    train, test, labels, COLORS = get_final_doors_dataset_real_data(folder_name='house_matteo', train_size=0.25)
 
     print(f'Train set size: {len(train)}', f'Test set size: {len(test)}')
 
-    model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_2_FLOOR4_GIBSON_60_FINE_TUNE_75_EPOCHS_40)
+    model = DetrDoorDetector(model_name=DETR_RESNET50, n_labels=len(labels.keys()), pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_2_HOUSE_MATTEO_GIBSON_60_FINE_TUNE_15_EPOCHS_40)
     model.eval()
 
     for i in range(len(test)):
@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
         for image_data in processed_data:
             # keep only predictions with 0.7+ confidence
-            keep = image_data['scores'] > 0.75
+            keep = image_data['scores'] >= 0.75
 
             # Show image with bboxes
             save_image =door_sample.get_bgr_image().copy()

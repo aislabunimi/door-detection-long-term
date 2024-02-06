@@ -868,7 +868,6 @@ EXP_2_HOUSE_MATTEO_GIBSON_DEEP_DOORS_2_60_FINE_TUNE_50_EPOCHS_40: DESCRIPTION = 
 EXP_2_HOUSE_MATTEO_GIBSON_DEEP_DOORS_2_60_FINE_TUNE_75_EPOCHS_20: DESCRIPTION = 792
 EXP_2_HOUSE_MATTEO_GIBSON_DEEP_DOORS_2_60_FINE_TUNE_75_EPOCHS_40: DESCRIPTION = 793
 
-
 class DetrDoorDetector(GenericModel):
     """
     This class builds a door detector starting from a detr pretrained module.
@@ -899,7 +898,6 @@ class DetrDoorDetector(GenericModel):
 
     def forward(self, x):
         x = self.model(x)
-
         """
         It returns a dict with the following elements:
                - "pred_logits": the classification logits (including no-object) for all queries.
