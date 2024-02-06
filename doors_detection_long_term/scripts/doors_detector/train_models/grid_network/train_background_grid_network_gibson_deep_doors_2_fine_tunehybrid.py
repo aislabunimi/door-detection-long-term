@@ -30,11 +30,11 @@ for env in ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']:
     save_path = os.path.dirname(__file__) + '/results/gibson_dd2_finetuned_hybrid/' + env
 
     dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='yolov5_general_detector_hybrid_only_real_' + env)
-    train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
+    train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=False, shuffle_boxes=False)
 
     print(len(train_bboxes), len(test_bboxes))
-    train_dataset_bboxes = DataLoader(train_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=True)
-    test_dataset_bboxes = DataLoader(test_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
+    train_dataset_bboxes = DataLoader(train_bboxes, batch_size=2, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=True)
+    test_dataset_bboxes = DataLoader(test_bboxes, batch_size=2, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
     #check_bbox_dataset(test_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=(8, 8))
 
     # Calculate Metrics in real worlds
