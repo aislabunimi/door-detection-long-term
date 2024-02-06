@@ -41,6 +41,7 @@ deep_doors_2_labelled_dataset_path = '/home/antonazzi/myfiles/deep_doors_2_label
 final_doors_dataset_path = '/home/antonazzi/myfiles/final_doors_dataset/'
 real_final_doors_dataset_path = '/home/antonazzi/myfiles/final_doors_dataset_real'
 igibson_doors_dataset_path = '/media/antonazzi/New Volume/igibson_dataset'
+box_filtering_dataset_path = '/home/antonazzi/myfiles/box_filtering_dataset'
 
 
 def get_deep_doors_2_labelled_sets():
