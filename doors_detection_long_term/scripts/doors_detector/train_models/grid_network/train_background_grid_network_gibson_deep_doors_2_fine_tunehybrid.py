@@ -49,7 +49,7 @@ for env in ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']:
 
     #check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold, scale_number=(32, 32))
     bbox_model = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=grid_dim, n_labels=3, model_name=IMAGE_BACKGROUND_NETWORK, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL)
-    bbox_model.set_description(globals()[('IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL_'+env).upper()])
+    bbox_model.set_description(globals()[('IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL_FINE_TUNE_HYBRID_'+env).upper()])
     bbox_model.to('cuda')
 
     criterion = ImageGridNetworkLoss()
@@ -73,7 +73,7 @@ for env in ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']:
     test_accuracy = {0: [], 1: []}
     real_world_accuracy = {h: {0: [], 1: []} for h in houses}
 
-    for epoch in range(60):
+    for epoch in range(30):
         scheduler.step()
         bbox_model.train()
         criterion.train()
