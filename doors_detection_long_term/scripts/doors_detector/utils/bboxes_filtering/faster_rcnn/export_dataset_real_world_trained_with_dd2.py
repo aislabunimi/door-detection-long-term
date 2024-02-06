@@ -40,14 +40,18 @@ for house in houses:
     with torch.no_grad():
         for images, targets, converted_boxes in tqdm(data_loader_train, total=len(data_loader_train)):
             images = images.to('cuda')
-            preds, train_out = model.model(images)
+            preds = model.model(images)
+            for pred in preds:
+                pred['labels'] = pred['labels']-1
 
             dataset_creator_bboxes.add_faster_rcnn_bboxes(images, targets, preds, ExampleType.TRAINING)
 
         #c = int((3/5) * len(data_loader_test))
         for i, (images, targets, converted_boxes) in tqdm(enumerate(data_loader_test), total=len(data_loader_test)):
             images = images.to('cuda')
-            preds, train_out = model.model(images)
+            preds = model.model(images)
+            for pred in preds:
+                pred['labels'] = pred['labels']-1
 
             dataset_creator_bboxes.add_faster_rcnn_bboxes(images, targets, preds, ExampleType.TEST)
 
