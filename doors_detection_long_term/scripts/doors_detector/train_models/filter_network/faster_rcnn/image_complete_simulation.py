@@ -34,7 +34,7 @@ from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering im
 
 torch.autograd.set_detect_anomaly(True)
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-num_bboxes = 50
+num_bboxes = 30
 
 grid_dim = [(2**i, 2**i) for i in range(3, 6)][::-1]
 
@@ -49,7 +49,7 @@ dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='faster_rcnn_general_det
 train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=False, shuffle_boxes=False)
 
 print(len(train_bboxes), len(test_bboxes))
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=4, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=True)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=8, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=True)
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
 #check_bbox_dataset(test_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=(32, 32))
 
