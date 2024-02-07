@@ -88,7 +88,7 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         self._image_grid_dimensions = image_grid_dimensions
         self._initial_channels = initial_channels
 
-        self.background_network = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=image_grid_dimensions, n_labels=3, model_name=IMAGE_BACKGROUND_NETWORK, pretrained=pretrained, dataset_name=FINAL_DOORS_DATASET, description=description_background)
+        self.background_network = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=image_grid_dimensions, n_labels=3, model_name=IMAGE_BACKGROUND_NETWORK, pretrained=grid_network_pretrained, dataset_name=FINAL_DOORS_DATASET, description=description_background)
 
         self.background_network.final_convolution = nn.Sequential(*self.background_network.final_convolution[:-3])
 
