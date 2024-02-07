@@ -29,12 +29,12 @@ from doors_detection_long_term.doors_detector.models.model_names import FASTER_R
 from doors_detection_long_term.doors_detector.models.faster_rcnn import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
 from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_bboxes
-from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering import bounding_box_filtering_yolo, \
+from doors_detection_long_term.doors_detector.utilities.util.bboxes_fintering import  \
     check_bbox_dataset, plot_results, plot_grid_dataset
 
 torch.autograd.set_detect_anomaly(True)
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
-num_bboxes = 30
+num_bboxes = 50
 
 grid_dim = [(2**i, 2**i) for i in range(3, 6)][::-1]
 
@@ -49,8 +49,8 @@ dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='faster_rcnn_general_det
 train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
 
 print(len(train_bboxes), len(test_bboxes))
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=False, image_grid_dimensions=grid_dim), num_workers=4, shuffle=True)
-test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=False, image_grid_dimensions=grid_dim), num_workers=4)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=True)
+test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
 #check_bbox_dataset(test_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=(32, 32))
 
 # Calculate Metrics in real worlds
@@ -61,7 +61,7 @@ with torch.no_grad():
     for house in houses:
         dataset_loader = DatasetLoaderBBoxes(folder_name='faster_rcnn_general_detector_gibson_dd2_' + house)
         train_bboxes, test_bboxes = dataset_loader.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
-        datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=False, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
+        datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
 
 #check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold, scale_number=(32, 32))
 
@@ -159,7 +159,7 @@ for env, values in nms_performance_ap.items():
     plt.savefig(save_path + f'/AP_{env}.svg')
 
 
-bbox_model = BboxFilterNetworkGeometricBackground(initial_channels=6, image_grid_dimensions=grid_dim, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND, pretrained=False, dataset_name=FINAL_DOORS_DATASET,
+bbox_model = BboxFilterNetworkGeometricBackground(initial_channels=7, image_grid_dimensions=grid_dim, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND, pretrained=False, dataset_name=FINAL_DOORS_DATASET,
                                                   description=IMAGE_NETWORK_GEOMETRIC_BACKGROUND, description_background=IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL)
 bbox_model.to('cuda')
 
@@ -468,6 +468,7 @@ for epoch in range(60):
                 net_performance_ap[house][label].append(v['AP'])
 
         print(logs['train'], logs['test'])
+        print(logs['test_real_world'])
         #print(net_performance)
         for env, values in net_performance.items():
             fig = plt.figure()
@@ -493,6 +494,8 @@ for epoch in range(60):
             plt.legend()
             plt.savefig(save_path + f'/AP_{env}.svg')
             plt.close()
+
+        print(logs['train'])
         for l_type in logs['train'].keys():
             fig = plt.figure()
             plt.plot([i for i in range(len(logs['train'][l_type]))], logs['train'][l_type], label='Train loss')
