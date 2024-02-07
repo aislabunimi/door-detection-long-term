@@ -83,12 +83,12 @@ class MaskNetwork(nn.Module):
 
 
 class BboxFilterNetworkGeometricBackground(GenericModel):
-    def __init__(self, model_name: ModelName, pretrained: bool, initial_channels: int, n_labels: int, dataset_name: DATASET, description: DESCRIPTION, description_background: DESCRIPTION, image_grid_dimensions: List[Tuple[int, int]]):
+    def __init__(self, model_name: ModelName, pretrained: bool, grid_network_pretrained: bool, initial_channels: int, n_labels: int, dataset_name: DATASET, description: DESCRIPTION, description_background: DESCRIPTION, image_grid_dimensions: List[Tuple[int, int]]):
         super(BboxFilterNetworkGeometricBackground, self).__init__(model_name, dataset_name, description)
         self._image_grid_dimensions = image_grid_dimensions
         self._initial_channels = initial_channels
 
-        self.background_network = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=image_grid_dimensions, n_labels=3, model_name=IMAGE_BACKGROUND_NETWORK, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=description_background)
+        self.background_network = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=image_grid_dimensions, n_labels=3, model_name=IMAGE_BACKGROUND_NETWORK, pretrained=pretrained, dataset_name=FINAL_DOORS_DATASET, description=description_background)
 
         self.background_network.final_convolution = nn.Sequential(*self.background_network.final_convolution[:-3])
 
