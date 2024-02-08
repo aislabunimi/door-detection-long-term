@@ -72,8 +72,8 @@ train_accuracy = {0: [], 1: []}
 test_accuracy = {0: [], 1: []}
 real_world_accuracy = {h: {0: [], 1: []} for h in houses}
 
-for epoch in range(20):
-    scheduler.step()
+for epoch in range(60):
+    #scheduler.step()
     bbox_model.train()
     criterion.train()
     optimizer.zero_grad()
