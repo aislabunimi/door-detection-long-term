@@ -46,10 +46,10 @@ confidence_threshold = 0.75
 confidence_threshold_metric = 0.38
 
 dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name='faster_rcnn_general_detector_gibson_deep_doors_2')
-train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=False, shuffle_boxes=False)
+train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
 
 print(len(train_bboxes), len(test_bboxes))
-train_dataset_bboxes = DataLoader(train_bboxes, batch_size=8, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=True)
+train_dataset_bboxes = DataLoader(train_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=True)
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
 #check_bbox_dataset(test_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=(32, 32))
 
@@ -175,7 +175,7 @@ optimizer = optim.Adam(bbox_model.parameters(), lr=0.001)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
 
 for n, p in bbox_model.named_parameters():
-    if any([x in n for x in ['fpn.conv1', 'fpn.bn1', 'fpn.layer0']]):
+    if any([x in n for x in ['fpn.conv1', 'fpn.bn1', 'fpn.layer0', 'background_network']]):
         p.requires_grad = False
         #print(n)
 # Fix parameters of background network

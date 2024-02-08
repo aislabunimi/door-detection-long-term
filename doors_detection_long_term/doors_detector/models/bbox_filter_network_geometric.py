@@ -101,15 +101,15 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         self.shared_mlp_suppress_background = SharedMLP(channels=[128, 64, 32, 16, 1], last_activation=None)
         self.batch_norm = nn.BatchNorm1d(num_features=1)
         self.sigmoid = nn.Sigmoid()
+
         # Geometric
         self.shared_mlp_geometric_1 = SharedMLP(channels=[initial_channels, 16, 32, 64, 128])
         self.shared_mlp_geometric_2 = SharedMLP(channels=[128, 256, 512])
         self.shared_mlp_mix_geometric = SharedMLP(channels=[512+128, 512, 256, 128])
-        self.shared_mlp_new_labels = SharedMLP(channels=[256, 128, 64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
 
         # Mixed
         self.shared_mlp_new_confidences = SharedMLP(channels=[256, 128, 64, 32, 10], last_activation=nn.Softmax(dim=1))
-
+        self.shared_mlp_new_labels = SharedMLP(channels=[256, 128, 64, 32, 16, n_labels], last_activation=nn.Softmax(dim=1))
 
         if pretrained:
             if pretrained:
