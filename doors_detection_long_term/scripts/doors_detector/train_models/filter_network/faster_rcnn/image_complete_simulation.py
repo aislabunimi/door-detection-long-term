@@ -275,7 +275,7 @@ for epoch in range(60):
             detected_bboxes[:, :, 4] = new_confidences_indexes
 
             # Remove bboxes with background network
-            new_labels_indexes[preds[1] < 0.5] = 0
+            new_labels_indexes[torch.max(preds[1], dim=2)[1] == 0] = 0
 
             # Filtering bboxes according to new labels
             detected_bboxes = torch.unbind(detected_bboxes, 0)
@@ -350,7 +350,7 @@ for epoch in range(60):
             detected_bboxes[:, :, 4] = new_confidences_indexes
 
             # Remove bboxes with background network
-            new_labels_indexes[preds[1] < 0.5] = 0
+            new_labels_indexes[torch.max(preds[1], dim=2)[1] == 0] = 0
 
             # Filtering bboxes according to new labels
             detected_bboxes = torch.unbind(detected_bboxes, 0)
@@ -426,7 +426,7 @@ for epoch in range(60):
                 detected_bboxes[:, :, 4] = new_confidences_indexes
 
                 # Remove bboxes with background network
-                new_labels_indexes[preds[1] < 0.5] = 0
+                new_labels_indexes[torch.max(preds[1], dim=2)[1] == 0] = 0
 
                 # Filtering bboxes according to new labels
                 detected_bboxes = torch.unbind(detected_bboxes, 0)

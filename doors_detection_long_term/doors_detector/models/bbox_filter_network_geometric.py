@@ -88,17 +88,21 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         self._image_grid_dimensions = image_grid_dimensions
         self._initial_channels = initial_channels
 
+        # Background
         self.background_network = ImageGridNetwork(fpn_channels=256, image_grid_dimensions=image_grid_dimensions, n_labels=3, model_name=IMAGE_BACKGROUND_NETWORK, pretrained=grid_network_pretrained, dataset_name=FINAL_DOORS_DATASET, description=description_background)
 
         self.background_network.final_convolution = nn.Sequential(*self.background_network.final_convolution[:-3])
 
         self.mask_network = MaskNetwork(image_size=image_grid_dimensions[0])
 
+        # Suppress bounding box using background
+        self.shared_mlp_suppress_background = SharedMLP(channels=[8, 4, 2], last_activation=nn.Softmax(dim=1))
+
         self.shared_mlp_background_1 = SharedMLP(channels=[8, 16, 32, 64, 128])
         self.shared_mlp_background_2 = SharedMLP(channels=[128, 256, 512])
 
         self.shared_mlp_mix_background = SharedMLP(channels=[512+128, 512, 256, 128])
-        self.shared_mlp_suppress_background = SharedMLP(channels=[128, 64, 32, 16, 1], last_activation=None)
+
         self.batch_norm = nn.BatchNorm1d(num_features=1)
         self.sigmoid = nn.Sigmoid()
 
@@ -128,7 +132,9 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         mask = mask.view(images.size(0), bboxes.size(-1), *mask.size()[1:])
         # Max
         background_features = background_features.unsqueeze(1)
-        bounding_boxes_background_features = torch.amax(mask * background_features, dim=(3, 4)).transpose(1, 2)
+        bounding_boxes_background_features = (mask * background_features).mean(dim=4).mean(dim=3).transpose(1, 2)
+        #bounding_boxes_background_features = torch.amax(mask * background_features, dim=(3, 4)).transpose(1, 2)
+
         # Mean
         #background_features = background_features.unsqueeze(1)
         #bounding_boxes_background_features = ((mask * background_features).sum(dim=(3, 4)) / mask.sum(dim=(3, 4))).transpose(1, 2)
@@ -142,9 +148,8 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         mixed_features_background = self.shared_mlp_mix_background(mixed_features_background)
 
         # Output suppress background
-        suppress_background = self.sigmoid(torch.clamp(self.batch_norm(self.shared_mlp_suppress_background(mixed_features_background)),
-            min=-1e1, max=1e1))
-        suppress_background = torch.squeeze(suppress_background, dim=1)
+        suppress_background = self.shared_mlp_suppress_background(bounding_boxes_background_features)
+        suppress_background = torch.transpose(suppress_background, 1, 2)
 
         # Geometric part
         local_features_geometric = self.shared_mlp_geometric_1(bboxes)
@@ -188,9 +193,12 @@ class BboxFilterNetworkGeometricSuppressLoss(nn.Module):
         #suppress_features = torch.clamp(suppress_features, min=1e-10, max=1 - 1e-10)
         #confidence_loss = torch.mean(torch.mean(torch.abs(scores_features - confidences), dim=1))
         #print(-torch.sum(torch.log(scores_features) * confidences + torch.log(1-scores_features) * (1-confidences), dim=1).size())
-        confidence_loss = torch.mean(-torch.mean(torch.log(suppress_features) * confidences + torch.log(1-suppress_features) * (1-confidences), dim=1))
+        new_confidences = torch.nn.functional.one_hot(confidences.to(torch.int64), 2)
+        # last confidence_loss = torch.mean(-torch.mean(torch.log(suppress_features) * confidences + torch.log(1-suppress_features) * (1-confidences), dim=1))
+        suppress_loss = torch.log(suppress_features) * new_confidences
+        suppress_loss = torch.mean(torch.mean(torch.sum(suppress_loss, 2) * -1, 1))
         #print('SUPPRESS LOSS', suppress_features, confidences)
-        return confidence_loss
+        return suppress_loss
 
 class BboxFilterNetworkGeometricConfidenceLoss(nn.Module):
     def forward(self, confidence_features, ious):
