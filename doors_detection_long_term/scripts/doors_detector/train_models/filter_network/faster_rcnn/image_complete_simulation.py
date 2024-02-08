@@ -175,7 +175,7 @@ optimizer = optim.Adam(bbox_model.parameters(), lr=0.001)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
 
 for n, p in bbox_model.named_parameters():
-    if any([x in n for x in ['fpn.conv1', 'fpn.bn1', 'fpn.layer0', 'background_network']]):
+    if any([x in n for x in ['fpn.conv1', 'fpn.bn1', 'fpn.layer0',]]):
         p.requires_grad = False
         #print(n)
 # Fix parameters of background network
