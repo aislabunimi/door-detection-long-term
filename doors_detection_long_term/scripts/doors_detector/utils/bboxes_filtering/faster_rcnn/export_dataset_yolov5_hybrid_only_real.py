@@ -21,7 +21,7 @@ num_bboxes = 20
 
 for env in ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']:
     dataset_creator_bboxes = DatasetCreatorBBoxes()
-    dataset_creator_bboxes.set_folder_name('faster_rcnn_general_detector_hybrid_only_real' + env)
+    dataset_creator_bboxes.set_folder_name('faster_rcnn_general_detector_hybrid_only_real_' + env)
 
     train, validation, labels, _ = get_final_doors_dataset_real_hybrid(folder_name_to_exclude=env)
     data_loader_train = DataLoader(train, batch_size=1, collate_fn=collate_fn_faster_rcnn, shuffle=False, num_workers=4)

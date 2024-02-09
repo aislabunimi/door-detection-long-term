@@ -96,7 +96,7 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         self.mask_network = MaskNetwork(image_size=image_grid_dimensions[0])
 
         # Suppress bounding box using background
-        self.shared_mlp_suppress_background = SharedMLP(channels=[8, 4, 2], last_activation=nn.Softmax(dim=1))
+        self.shared_mlp_suppress_background = SharedMLP(channels=[128, 64, 32, 16,8, 2], last_activation=nn.Softmax(dim=1))
 
         self.shared_mlp_background_1 = SharedMLP(channels=[8, 16, 32, 64, 128])
         self.shared_mlp_background_2 = SharedMLP(channels=[128, 256, 512])
@@ -132,12 +132,12 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         mask = mask.view(images.size(0), bboxes.size(-1), *mask.size()[1:])
         # Max
         background_features = background_features.unsqueeze(1)
-        bounding_boxes_background_features = (mask * background_features).mean(dim=4).mean(dim=3).transpose(1, 2)
+        #bounding_boxes_background_features = (mask * background_features).mean(dim=4).mean(dim=3).transpose(1, 2)
         #bounding_boxes_background_features = torch.amax(mask * background_features, dim=(3, 4)).transpose(1, 2)
 
         # Mean
         #background_features = background_features.unsqueeze(1)
-        #bounding_boxes_background_features = ((mask * background_features).sum(dim=(3, 4)) / mask.sum(dim=(3, 4))).transpose(1, 2)
+        bounding_boxes_background_features = ((mask * background_features).sum(dim=(3, 4)) / mask.sum(dim=(3, 4))).transpose(1, 2)
 
         local_features_background = self.shared_mlp_background_1(bounding_boxes_background_features)
         global_features_background = self.shared_mlp_background_2(local_features_background)
@@ -148,7 +148,7 @@ class BboxFilterNetworkGeometricBackground(GenericModel):
         mixed_features_background = self.shared_mlp_mix_background(mixed_features_background)
 
         # Output suppress background
-        suppress_background = self.shared_mlp_suppress_background(bounding_boxes_background_features)
+        suppress_background = self.shared_mlp_suppress_background(mixed_features_background)
         suppress_background = torch.transpose(suppress_background, 1, 2)
 
         # Geometric part
