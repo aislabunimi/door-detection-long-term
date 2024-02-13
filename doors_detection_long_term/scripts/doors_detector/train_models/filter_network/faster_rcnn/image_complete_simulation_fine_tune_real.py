@@ -44,7 +44,7 @@ iou_threshold_matching = 0.5
 confidence_threshold = 0.75
 confidence_threshold_metric = 0.38
 
-for quantity in [0.25, 0.50, 0.75][::-1]:
+for quantity in [0.25, 0.50, 0.75]:
     for house in ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']:
 
         save_path = 'results/fine_tune_target'
