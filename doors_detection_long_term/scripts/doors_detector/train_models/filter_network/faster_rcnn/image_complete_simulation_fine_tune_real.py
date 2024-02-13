@@ -22,11 +22,8 @@ from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyE
 from doors_detection_long_term.doors_detector.evaluators.my_evaluators_complete_metric import MyEvaluatorCompleteMetric
 from doors_detection_long_term.doors_detector.models.background_grid_network import IMAGE_GRID_NETWORK, \
     IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL
-from doors_detection_long_term.doors_detector.models.bbox_filter_network_geometric import \
-    BboxFilterNetworkGeometricBackground, IMAGE_NETWORK_GEOMETRIC_BACKGROUND, bbox_filtering_nms, \
-    BboxFilterNetworkGeometricLabelLoss, BboxFilterNetworkGeometricSuppressLoss, \
-    BboxFilterNetworkGeometricConfidenceLoss, IMAGE_NETWORK_GEOMETRIC_BACKGROUND_HYBRID_FLOOR1, \
-    IMAGE_NETWORK_GEOMETRIC_BACKGROUND_HYBRID_HOUSE_MATTEO
+from doors_detection_long_term.doors_detector.models.bbox_filter_network_geometric import *
+
 from doors_detection_long_term.doors_detector.models.model_names import FASTER_RCNN, BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND
 from doors_detection_long_term.doors_detector.models.faster_rcnn import *
 from doors_detection_long_term.doors_detector.models.yolov5_repo.utils.general import non_max_suppression
@@ -47,8 +44,9 @@ iou_threshold_matching = 0.5
 confidence_threshold = 0.75
 confidence_threshold_metric = 0.38
 
-for house in ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']:
-    for quantity in [0.15, 0.25, 0.50, 0.75]:
+for quantity in [0.25, 0.50, 0.75][::-1]:
+    for house in ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']:
+
         save_path = 'results/fine_tune_target'
         if not os.path.exists(os.path.join(os.path.dirname(__file__), save_path)):
             os.mkdir(os.path.join(os.path.dirname(__file__), save_path))
@@ -57,12 +55,27 @@ for house in ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']:
         if not os.path.exists(os.path.join(os.path.dirname(__file__), save_path)):
             os.mkdir(os.path.join(os.path.dirname(__file__), save_path))
 
+        save_path += f'/{quantity}'
+        if not os.path.exists(os.path.join(os.path.dirname(__file__), save_path)):
+            os.mkdir(os.path.join(os.path.dirname(__file__), save_path))
+
+        if quantity == 0.25:
+            batch_size = 8
+            epochs = 60
+
+        elif quantity == 0.50:
+            batch_size = 16
+            epochs = 60
+        elif quantity == 0.75:
+            batch_size = 16
+            epochs = 60
+
         dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name=f'faster_rcnn_general_detector_gibson_dd2_{house}_{quantity}')
         train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
 
         print(len(train_bboxes), len(test_bboxes))
-        train_dataset_bboxes = DataLoader(train_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=True)
-        test_dataset_bboxes = DataLoader(test_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
+        train_dataset_bboxes = DataLoader(train_bboxes, batch_size=batch_size, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=True)
+        test_dataset_bboxes = DataLoader(test_bboxes, batch_size=batch_size, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
         #check_bbox_dataset(test_dataset_bboxes, confidence_threshold=confidence_threshold, scale_number=(32, 32))
 
 
@@ -171,7 +184,7 @@ for house in ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']:
 
         bbox_model = BboxFilterNetworkGeometricBackground(initial_channels=7, image_grid_dimensions=grid_dim, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND, pretrained=True, grid_network_pretrained=True, dataset_name=FINAL_DOORS_DATASET,
                                                           description=IMAGE_NETWORK_GEOMETRIC_BACKGROUND, description_background=IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL)
-        bbox_model.set_description(globals()[f'IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL_FINE_TUNE_{house}_{quantity}'.upper()])
+        bbox_model.set_description(globals()[f'IMAGE_NETWORK_GEOMETRIC_BACKGROUND_GIBSON_DD2_FINE_TUNE_{house}_{int(quantity*100)}'.upper()])
         bbox_model.to('cuda')
 
 
@@ -198,7 +211,7 @@ for house in ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']:
 
         logs = {'train': {'loss_label':[], 'loss_confidence':[], 'loss_final':[], 'loss_suppress':[]},
                 'test': {'loss_label':[], 'loss_confidence':[], 'loss_final':[],'loss_suppress':[]},
-                'test_real_world': {h:{'loss_label':[], 'loss_confidence':[], 'loss_final':[],'loss_suppress':[]} for h in houses},
+                'test_real_world': {h:{'loss_label':[], 'loss_confidence':[], 'loss_final':[],'loss_suppress':[]} for h in [house]},
                 'ap': {0: [], 1: []},
                 'complete_metric': {'TP': [], 'FP': [], 'BFD': []}}
 
@@ -214,8 +227,8 @@ for house in ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']:
             for metric, _ in metrics.items():
                 net_performance_ap[env][metric] = []
 
-        for epoch in range(60):
-
+        for epoch in range(epochs):
+            #scheduler.step()
             bbox_model.train()
             criterion_new_labels.train()
             criterion_suppress.train()
