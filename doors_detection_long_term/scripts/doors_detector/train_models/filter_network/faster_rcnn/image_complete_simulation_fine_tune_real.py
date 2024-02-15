@@ -59,6 +59,10 @@ for num_bboxes in [10, 25, 50, 100]:
             save_path += f'/{quantity}'
             if not os.path.exists(os.path.join(os.path.dirname(__file__), save_path)):
                 os.mkdir(os.path.join(os.path.dirname(__file__), save_path))
+
+            save_path += f'/{num_bboxes}'
+            if not os.path.exists(os.path.join(os.path.dirname(__file__), save_path)):
+                os.mkdir(os.path.join(os.path.dirname(__file__), save_path))
     
             if quantity == 0.15:
                 batch_size = 8
