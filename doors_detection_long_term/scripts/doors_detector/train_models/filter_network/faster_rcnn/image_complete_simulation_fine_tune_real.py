@@ -44,7 +44,7 @@ iou_threshold_matching = 0.5
 confidence_threshold = 0.75
 confidence_threshold_metric = 0.38
 
-for quantity in [0.25, 0.50, 0.75]:
+for quantity in [0.15, 0.25, 0.50, 0.75]:
     for house in ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']:
 
         save_path = 'results/fine_tune_target'
@@ -59,7 +59,10 @@ for quantity in [0.25, 0.50, 0.75]:
         if not os.path.exists(os.path.join(os.path.dirname(__file__), save_path)):
             os.mkdir(os.path.join(os.path.dirname(__file__), save_path))
 
-        if quantity == 0.25:
+        if quantity == 0.15:
+            batch_size = 8
+            epochs = 60
+        elif quantity == 0.25:
             batch_size = 8
             epochs = 60
 
