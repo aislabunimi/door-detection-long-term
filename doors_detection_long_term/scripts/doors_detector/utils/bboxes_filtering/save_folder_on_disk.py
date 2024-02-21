@@ -4,6 +4,7 @@ import torch
 from matplotlib import pyplot as plt
 from matplotlib.patches import Rectangle
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 from doors_detection_long_term.doors_detector.dataset.dataset_bboxes.DatasetLoaderBBoxes import DatasetLoaderBBoxes
 from doors_detection_long_term.doors_detector.evaluators.my_evaluator import MyEvaluator
@@ -41,9 +42,9 @@ with torch.no_grad():
     i = 0
     evaluator_complete_metric = MyEvaluatorCompleteMetric()
     evaluator_ap = MyEvaluator()
-    for data in test_dataset_bboxes:
+    for data in tqdm(test_dataset_bboxes, ):
         images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
-        print(detected_bboxes[0])
+        #print(detected_bboxes[0])
         # Inference
         images = images.to(device)
         for k, v in image_grids.items():
