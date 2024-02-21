@@ -17,10 +17,10 @@ torch.autograd.set_detect_anomaly(True)
 
 save_path = "/home/antonazzi/myfiles/save_bbox_filtering"
 
-house = 'floor4'
+house = 'floor1'
 
 quantity = 0.25
-num_bboxes = 30
+num_bboxes = 100
 iou_threshold_matching = 0.5
 confidence_threshold_original = 0.75
 grid_dim = [(2**i, 2**i) for i in range(3, 6)][::-1]
@@ -29,7 +29,7 @@ filter_description = globals()[f'IMAGE_NETWORK_GEOMETRIC_BACKGROUND_GIBSON_DD2_F
 print(filter_description)
 
 dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name=f'faster_rcnn_general_detector_gibson_dd2_{house}_{quantity}')
-train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=30, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
+train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
 
 test_dataset_bboxes = DataLoader(test_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
 
