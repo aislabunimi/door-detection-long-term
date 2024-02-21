@@ -408,7 +408,7 @@ for num_bboxes in [10, 25, 50, 100]:
     
                     metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
                     metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
-    
+                    print(f'1: {metrics}')
                     for label, values in metrics.items():
                         for k, v in values.items():
                             if len(net_performance['sim_test'][k]) == epoch:
@@ -489,7 +489,7 @@ for num_bboxes in [10, 25, 50, 100]:
     
                         metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
                         metrics_ap = evaluator_ap.get_metrics(confidence_threshold=confidence_threshold_metric, iou_threshold=iou_threshold_matching_metric)
-    
+                        print(f'2: {metrics}')
                         for label, values in metrics.items():
                             for k, v in values.items():
                                 if len(net_performance[h][k]) == epoch:
@@ -538,7 +538,7 @@ for num_bboxes in [10, 25, 50, 100]:
                         plt.legend()
                         plt.savefig(save_path + f'/final_losses_{l_type}_{house}_{quantity}.svg')
                         plt.close()
-                bbox_model.save(epoch=epoch, optimizer_state_dict=optimizer.state_dict(), params={}, logs=logs, lr_scheduler_state_dict={})
+                #bbox_model.save(epoch=epoch, optimizer_state_dict=optimizer.state_dict(), params={}, logs=logs, lr_scheduler_state_dict={})
 
 
 
