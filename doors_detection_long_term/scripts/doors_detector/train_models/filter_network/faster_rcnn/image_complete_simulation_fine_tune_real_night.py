@@ -44,8 +44,8 @@ iou_threshold_matching = 0.5
 confidence_threshold = 0.75
 confidence_threshold_metric = 0.38
 
-for num_bboxes in [10, 25, 50, 100]:
-    for quantity in [0.15, 0.25, 0.50, 0.75]:
+for num_bboxes in [30, 50, 100]:
+    for quantity in [0.25, 0.50, 0.75]:
         for house in ['floor1_evening', 'floor4_evening']:
 
             save_path = 'results/fine_tune_target'
@@ -92,7 +92,7 @@ for num_bboxes in [10, 25, 50, 100]:
                 for h in [house, house.replace('_evening', '')]:
                     dataset_loader = DatasetLoaderBBoxes(folder_name=f'faster_rcnn_general_detector_gibson_dd2_{h}_{quantity}')
                     train_bboxes, test_bboxes = dataset_loader.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
-                    datasets_real_worlds[house] = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
+                    datasets_real_worlds[h] = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4, shuffle=False)
     
             #check_bbox_dataset(datasets_real_worlds['floor4'], confidence_threshold, scale_number=(32, 32))
     
@@ -146,7 +146,7 @@ for num_bboxes in [10, 25, 50, 100]:
                 nms_performance_ap['sim_test'][label] = v['AP']
     
     
-            for h in [house]:
+            for h in [house, house.replace('_evening', '')]:
                 nms_performance[h] = {}
                 nms_performance_ap[h] = {}
                 evaluator_complete_metric = MyEvaluatorCompleteMetric()
@@ -163,13 +163,13 @@ for num_bboxes in [10, 25, 50, 100]:
     
                 for label, values in metrics.items():
                     for k, v in values.items():
-                        if k not in nms_performance[house]:
-                            nms_performance[house][k] = v
+                        if k not in nms_performance[h]:
+                            nms_performance[h][k] = v
                         else:
-                            nms_performance[house][k] += v
+                            nms_performance[h][k] += v
                 print(f'{h} ->', metrics)
                 for label, v in metrics_ap['per_bbox'].items():
-                    nms_performance_ap[house][label] = v['AP']
+                    nms_performance_ap[h][label] = v['AP']
     
             # Plots
             for env, values in nms_performance.items():
@@ -219,7 +219,7 @@ for num_bboxes in [10, 25, 50, 100]:
     
             logs = {'train': {'loss_label':[], 'loss_confidence':[], 'loss_final':[], 'loss_suppress':[]},
                     'test': {'loss_label':[], 'loss_confidence':[], 'loss_final':[],'loss_suppress':[]},
-                    'test_real_world': {h:{'loss_label':[], 'loss_confidence':[], 'loss_final':[],'loss_suppress':[]} for h in [house]},
+                    'test_real_world': {h:{'loss_label':[], 'loss_confidence':[], 'loss_final':[],'loss_suppress':[]} for h in [house, house.replace('_evening', '')]},
                     'ap': {0: [], 1: []},
                     'complete_metric': {'TP': [], 'FP': [], 'BFD': []}}
     
@@ -426,6 +426,7 @@ for num_bboxes in [10, 25, 50, 100]:
     
                     # Test with real world data
                     for h, dataset_real_world in datasets_real_worlds.items():
+                        print(h)
                         temp_losses_final = {'loss_label':[], 'loss_confidence':[], 'loss_final':[], 'loss_suppress':[]}
                         temp_accuracy = {0: 0, 1: 0}
                         evaluator_complete_metric = MyEvaluatorCompleteMetric()
@@ -503,6 +504,7 @@ for num_bboxes in [10, 25, 50, 100]:
                     print(logs['test_real_world'])
                     #print(net_performance)
                     for env, values in net_performance.items():
+                        print(env)
                         fig = plt.figure()
                         plt.axhline(nms_performance[env]['TP'], label='nms TP', color='green', linestyle='--')
                         plt.axhline(nms_performance[env]['FP'], label='nms FP', color='blue', linestyle='--')
@@ -532,8 +534,8 @@ for num_bboxes in [10, 25, 50, 100]:
                         fig = plt.figure()
                         plt.plot([i for i in range(len(logs['train'][l_type]))], logs['train'][l_type], label='Train loss')
                         plt.plot([i for i in range(len(logs['test'][l_type]))], logs['test'][l_type], label='Test loss')
-                        for h in [house]:
-                            plt.plot([i for i in range(len(logs['test_real_world'][house][l_type]))], logs['test_real_world'][house][l_type], label=f'Loss in {h}')
+                        for h in [house, house.replace('_evening', '')]:
+                            plt.plot([i for i in range(len(logs['test_real_world'][h][l_type]))], logs['test_real_world'][h][l_type], label=f'Loss in {h}')
                         plt.title(f'Losses {l_type}')
                         plt.legend()
                         plt.savefig(save_path + f'/final_losses_{l_type}_{house}_{quantity}.svg')
