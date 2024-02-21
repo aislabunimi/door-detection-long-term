@@ -17,15 +17,15 @@ torch.autograd.set_detect_anomaly(True)
 
 save_path = "/home/antonazzi/myfiles/save_bbox_filtering"
 
-house = 'floor1'
+house = 'floor4'
 
-quantity = 0.75
+quantity = 0.25
 num_bboxes = 30
 iou_threshold_matching = 0.5
 confidence_threshold_original = 0.75
 grid_dim = [(2**i, 2**i) for i in range(3, 6)][::-1]
 device = 'cuda'
-filter_description = globals()[f'IMAGE_NETWORK_GEOMETRIC_BACKGROUND_GIBSON_DD2_FINE_TUNE_{house}_{int(quantity*100)}_bbox_{num_bboxes}'.upper()]
+filter_description = globals()[f'IMAGE_NETWORK_GEOMETRIC_BACKGROUND_GIBSON_DD2_FINE_TUNE_{house.replace("_evening", "")}_{int(quantity*100)}_bbox_{num_bboxes}'.upper()]
 print(filter_description)
 
 dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name=f'faster_rcnn_general_detector_gibson_dd2_{house}_{quantity}')
@@ -42,6 +42,9 @@ with torch.no_grad():
     i = 0
     evaluator_complete_metric = MyEvaluatorCompleteMetric()
     evaluator_ap = MyEvaluator()
+
+    evaluator_complete_metric_tasknet = MyEvaluatorCompleteMetric()
+    evaluator_ap_tasknet = MyEvaluator()
     for data in tqdm(test_dataset_bboxes, ):
         images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
         #print(detected_bboxes[0])
@@ -56,7 +59,7 @@ with torch.no_grad():
         detected_bboxes_cuda = detected_bboxes.to(device)
 
         preds = bbox_model(images, detected_bboxes_cuda, detected_boxes_grid)
-        print(preds[0])
+        #print(preds[0])
 
 
         new_labels, new_labels_indexes = torch.max(preds[0].to('cpu'), dim=2, keepdim=False)
@@ -89,7 +92,8 @@ with torch.no_grad():
 
         detected_bboxes = detected_bboxes.transpose(1, 2)
         detected_bboxes_tasknet = bbox_filtering_nms(detected_bboxes, confidence_threshold=confidence_threshold_original, iou_threshold=0.5, img_size=images.size()[::-1][:2])
-
+        evaluator_ap_tasknet.add_predictions_bboxes_filtering(detected_bboxes_tasknet, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
+        evaluator_complete_metric_tasknet.add_predictions_bboxes_filtering(detected_bboxes_tasknet, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
         for image, detected_bboxes_tasknet_image, target_boxes_image, detected_bboxes_image, labels_encoded_image, detected_bboxes_predicted_image in zip(images, detected_bboxes_tasknet, target_boxes, detected_bboxes, labels_encoded, detected_bboxes_predicted):
             w_image, h_image = image.size()[1:][::-1]
             image = image.to('cpu')
@@ -244,6 +248,29 @@ with torch.no_grad():
             plt.close()
 
         metrics = evaluator_complete_metric.get_metrics(confidence_threshold=0.38, iou_threshold=0.5)
-        print(metrics)
+        metrics_ap = evaluator_ap.get_metrics(confidence_threshold=0.38, iou_threshold=0.5)
+
+        metrics_tasknet = evaluator_complete_metric_tasknet.get_metrics(confidence_threshold=0.75, iou_threshold=0.5)
+        metrics_ap_tasknet = evaluator_ap_tasknet.get_metrics(confidence_threshold=0.75, iou_threshold=0.5)
+
+        performance = {'tasknet': {}, 'filternet': {}}
+        performance_ap = {'tasknet': {}, 'filternet': {}}
+        for (label_t, values_t), (label, values) in zip(metrics_tasknet.items(), metrics.items()):
+            for k, v in values_t.items():
+                if k not in performance['tasknet']:
+                    performance['tasknet'][k] = v
+                else:
+                    performance['tasknet'][k] += v
+            for k, v in values.items():
+                if k not in performance['filternet']:
+                    performance['filternet'][k] = v
+                else:
+                    performance['filternet'][k] += v
+
+        for (label_t, v_t), (label, v) in zip(metrics_ap_tasknet['per_bbox'].items(), metrics_ap['per_bbox'].items()):
+            performance_ap['tasknet'][label_t] = v_t['AP']
+            performance_ap['filternet'][label] = v['AP']
+
+        print(performance, performance_ap)
 
 
