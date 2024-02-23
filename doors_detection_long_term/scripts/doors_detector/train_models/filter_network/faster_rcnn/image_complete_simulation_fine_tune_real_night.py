@@ -44,7 +44,7 @@ iou_threshold_matching = 0.5
 confidence_threshold = 0.75
 confidence_threshold_metric = 0.38
 
-for num_bboxes in [30, 50, 100]:
+for num_bboxes in [10, 30, 50, 100]:
     for quantity in [0.25, 0.50, 0.75]:
         for house in ['floor1_evening', 'floor4_evening']:
 
@@ -78,7 +78,7 @@ for num_bboxes in [30, 50, 100]:
                 batch_size = 16
                 epochs = 60
     
-            dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name=f'faster_rcnn_general_detector_gibson_dd2_{house.replace("_evening", "")}_{quantity}')
+            dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name=f'faster_rcnn_general_detector_gibson_dd2_{house}_{quantity}')
             train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=num_bboxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=True, shuffle_boxes=False)
     
             print(len(train_bboxes), len(test_bboxes))
