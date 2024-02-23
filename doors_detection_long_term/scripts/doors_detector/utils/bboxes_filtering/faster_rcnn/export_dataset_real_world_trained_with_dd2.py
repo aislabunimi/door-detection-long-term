@@ -19,7 +19,7 @@ from doors_detection_long_term.scripts.doors_detector.dataset_configurator impor
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 num_bboxes = 20
 
-houses = ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']
+houses = ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo', 'floor1_evening', 'floor4_evening']
 
 for house in houses:
     for quantity in [0.15, 0.25, 0.50, 0.75]:
