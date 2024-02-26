@@ -15,17 +15,20 @@ from doors_detection_long_term.doors_detector.utilities.collate_fn_functions imp
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 torch.autograd.set_detect_anomaly(True)
 
-save_path = "/home/antonazzi/myfiles/save_bbox_filtering"
+house = 'floor4'
+save_path = f"/home/antonazzi/myfiles/{house}"
 
-house = 'floor1'
+if not os.path.exists(save_path):
+    os.mkdir(save_path)
 
-quantity = 0.25
-num_bboxes = 100
+
+quantity = 0.75
+num_bboxes = 30
 iou_threshold_matching = 0.5
 confidence_threshold_original = 0.75
 grid_dim = [(2**i, 2**i) for i in range(3, 6)][::-1]
 device = 'cuda'
-filter_description = globals()[f'IMAGE_NETWORK_GEOMETRIC_BACKGROUND_GIBSON_DD2_FINE_TUNE_{house.replace("_evening", "")}_{int(quantity*100)}_bbox_{num_bboxes}'.upper()]
+filter_description = globals()[f'IMAGE_NETWORK_GEOMETRIC_BACKGROUND_GIBSON_DD2_FINE_TUNE_{house}_{int(quantity*100)}_bbox_{num_bboxes}'.upper()]
 print(filter_description)
 
 dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name=f'faster_rcnn_general_detector_gibson_dd2_{house}_{quantity}')
@@ -37,6 +40,7 @@ bbox_model = BboxFilterNetworkGeometricBackground(initial_channels=7, image_grid
                                                   description=filter_description, description_background=IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL)
 
 bbox_model.to(device)
+
 with torch.no_grad():
     bbox_model.eval()
     i = 0
@@ -106,7 +110,7 @@ with torch.no_grad():
 
             fig, ((gt_image, image_original, tasknet_prediction_unfiltered,),
                   ( correct_predicitions_unfiltered, wrong_predicitions_unfiltered, all_predicitions_unfiltered),
-                  (predicted_filternet, predicted_filternet_nms, _)) = plt.subplots(3, 3)
+                  (predicted_filternet, predicted_filternet_conf, _)) = plt.subplots(3, 3)
             image_original.imshow((image*255).astype(np.uint8))
             image_original.axis('off')
 
@@ -132,6 +136,9 @@ with torch.no_grad():
             # Wrong prediction unfiltered
             predicted_filternet.imshow((image*255).astype(np.uint8))
             predicted_filternet.axis('off')
+
+            predicted_filternet_conf.imshow((image*255).astype(np.uint8))
+            predicted_filternet_conf.axis('off')
 
             # Filternet output
 
@@ -160,13 +167,13 @@ with torch.no_grad():
             for x, y, w, h, c, closed, open in list_coords:
 
                 color = [1, 0, 0] if closed == 1 else [0, 1, 0]
-                image_original.add_patch(Rectangle((x+w-57, y-32), 60, 32,
+                image_original.add_patch(Rectangle((x+w-70, y-38), 70, 35,
                                               fc=color + [0.3], ec=color + [1],
                                               linestyle='-',
 
                                               lw=1))
 
-                image_original.text(x+w-45 if len(str(round(c, 2))) == 3 else x+w-54, y-8, round(c, 2), fontsize = 10)
+                image_original.text(x+w-59 if len(str(round(c, 2))) == 3 else x+w-69, y-10, round(c, 2), fontsize = 10)
 
 
             for (cx, cy, w, h, c, closed, open) in detected_bboxes_image.tolist():
@@ -225,7 +232,7 @@ with torch.no_grad():
                                                                   lw=3))
 
             for (cx, cy, w, h, c, closed, open) in detected_bboxes_predicted_image.tolist():
-                labels = [round(closed, 2), round(open, 2)]
+                labels = [round(closed, 8), round(open, 8)]
                 label = labels.index(max(labels))
 
                 #print(cx, cy, w, h)
@@ -241,6 +248,38 @@ with torch.no_grad():
                                                                 edgecolor=color,
                                                                 facecolor='none',
                                                                 lw=3))
+
+            for (cx, cy, w, h, c, closed, open) in detected_bboxes_predicted_image.tolist():
+
+                labels = [round(closed, 2), round(open, 2)]
+                label = labels.index(max(labels))
+
+                #print(cx, cy, w, h)
+                x, y, x2, y2 = np.array([cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2]) * np.array([w_image, h_image, w_image, h_image])
+                x, y, x2, y2 = round(x), round(y), round(x2), round(y2)
+
+                if label == 0:
+                    color = (1, 0, 0)
+                else:
+                    color = (0, 1, 0)
+
+                predicted_filternet_conf.add_patch(Rectangle((max(2,x), max(42, y)),min(x2-x, w_image-2),min(237, y2- y),
+                                                        edgecolor=color,
+                                                        facecolor='none',
+                                                        lw=3))
+                color = [1, 0, 0] if label == 0 else [0, 1, 0]
+                predicted_filternet_conf.add_patch(Rectangle((x2-70, y-38), 70, 35,
+                                                   fc=color + [0.3], ec=color + [1],
+                                                   linestyle='-',
+
+                                                   lw=1))
+
+                predicted_filternet_conf.text(x2-59 if len(str(round(c, 2))) == 3 else x2-69, y-10, round(c, 2), fontsize = 10)
+
+
+
+
+
             fig.tight_layout()
             plt.savefig(save_path+ f'/{i}.png')
             i+=1
