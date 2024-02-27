@@ -42,7 +42,7 @@ if __name__ == '__main__':
     print(images.size())
     print(detected_boxes_grid[(32, 32)].size())
     torch.onnx.export(model, args=(images, detected_bboxes, detected_boxes_grid[(32, 32)]), f=model_path, input_names=['input1', 'input2', 'input3'],
-                      output_names=['output'], export_params=True, do_constant_folding=True, )
+                      output_names=['output'], export_params=True, do_constant_folding=True, opset_version=11)
 
     onnx_model = onnx.load("filternet_onnx.onnx")
     #onnx_model = float16.convert_float_to_float16(onnx_model)
