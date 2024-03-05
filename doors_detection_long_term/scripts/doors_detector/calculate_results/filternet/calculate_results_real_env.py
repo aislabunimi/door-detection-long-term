@@ -18,7 +18,7 @@ torch.autograd.set_detect_anomaly(True)
 
 grid_dim = [(2**i, 2**i) for i in range(3, 6)][::-1]
 iou_threshold_matching = 0.5
-confidence_threshold_filternet = 0.5
+confidence_threshold_filternet = 0.38
 iou_threshold_filternet = 0.5
 
 device = 'cuda'
@@ -42,15 +42,58 @@ for house in houses:
             train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=boxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=False, shuffle_boxes=False)
 
             test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
-
+            evaluator_complete_metric = MyEvaluatorCompleteMetric()
+            evaluator_ap = MyEvaluator()
             evaluator_complete_metric_tasknet = MyEvaluatorCompleteMetric()
             evaluator_ap_tasknet = MyEvaluator()
             for data in tqdm(test_dataset_bboxes, ):
                 images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
 
+                # Filternet
+                images = images.to(device)
+                for k, v in image_grids.items():
+                    image_grids[k] = v.to(device)
+
+                for k, v in detected_boxes_grid.items():
+                    detected_boxes_grid[k] = v.to(device)
+
+                detected_bboxes_cuda = detected_bboxes.to(device)
+
+                preds = bbox_model(images, detected_bboxes_cuda, detected_boxes_grid)
+                #print(preds[0])
+
+
+                new_labels, new_labels_indexes = torch.max(preds[0].to('cpu'), dim=2, keepdim=False)
+                detected_bboxes_predicted = detected_bboxes_cuda.transpose(1, 2).to('cpu')
+
+                # Modify confidences according to the model output
+
+                new_confidences = preds[2]
+                _, new_confidences_indexes = torch.max(new_confidences, dim=2)
+                new_confidences_indexes = new_confidences_indexes
+                new_confidences_indexes[new_confidences_indexes < 0] = 0
+                new_confidences_indexes[new_confidences_indexes > 9] = 9
+                new_confidences_indexes = new_confidences_indexes * 0.1
+
+                detected_bboxes_predicted[:, :, 4] = new_confidences_indexes
+
+                # Remove bboxes with background network
+                new_labels_indexes[torch.max(preds[1], dim=2)[1] == 0] = 0
+
+                # Filtering bboxes according to new labels
+                detected_bboxes_predicted = torch.unbind(detected_bboxes_predicted, 0)
+                detected_bboxes_predicted = [b[i != 0, :] for b, i in zip(detected_bboxes_predicted, new_labels_indexes)]
+
+                detected_bboxes_predicted = [torch.cat([b[:, :5], p[i != 0][:, 1:]], dim=1) for b, p, i in zip(detected_bboxes_predicted, preds[0].to('cpu'), new_labels_indexes)]
+                # Delete bboxes according to the background network
+                detected_bboxes_predicted = bbox_filtering_nms(detected_bboxes_predicted, confidence_threshold=0, iou_threshold=0.5, img_size=images.size()[::-1][:2])
+                evaluator_complete_metric.add_predictions_bboxes_filtering(bboxes=detected_bboxes_predicted, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
+                evaluator_ap.add_predictions_bboxes_filtering(bboxes=detected_bboxes_predicted, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
+
+                # Tasknet
                 detected_bboxes = detected_bboxes.transpose(1, 2)
 
-                detected_bboxes_tasknet = bbox_filtering_nms(detected_bboxes, confidence_threshold=0.75, iou_threshold=0.5, img_size=images.size()[::-1][:2])
+                detected_bboxes_tasknet = bbox_filtering_nms(detected_bboxes, confidence_threshold=0.0, iou_threshold=0.5, img_size=images.size()[::-1][:2])
                 evaluator_ap_tasknet.add_predictions_bboxes_filtering(detected_bboxes_tasknet, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
                 evaluator_complete_metric_tasknet.add_predictions_bboxes_filtering(detected_bboxes_tasknet, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
 
@@ -62,12 +105,24 @@ for house in houses:
             metrics_ap_tasknet = evaluator_ap_tasknet.get_metrics(confidence_threshold=confidence_threshold_tasknet, iou_threshold=iou_threshold_tasknet)
 
 
+            metrics = evaluator_complete_metric.get_metrics(confidence_threshold=confidence_threshold_filternet, iou_threshold=iou_threshold_filternet)
+            metrics_ap = evaluator_ap.get_metrics(confidence_threshold=0.38, iou_threshold=0.5)
+
             for label, values in sorted(metrics_ap_tasknet['per_bbox'].items(), key=lambda v: v[0]):
                 results += [['tasknet', house, quantity, boxes, iou_threshold_matching, confidence_threshold_tasknet, iou_threshold_tasknet, confidence_threshold_filternet, iou_threshold_filternet, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
 
             for label, values in sorted(metrics_tasknet.items(), key=lambda v: v[0]):
                 results_complete += [['tasknet', house, quantity, boxes, iou_threshold_matching, confidence_threshold_tasknet, iou_threshold_tasknet, confidence_threshold_filternet, iou_threshold_filternet, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
+
+            for label, values in sorted(metrics_ap['per_bbox'].items(), key=lambda v: v[0]):
+                results += [['filternet', house, quantity, boxes, iou_threshold_matching, confidence_threshold_tasknet, iou_threshold_tasknet, confidence_threshold_filternet, iou_threshold_filternet, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
+
+
+            for label, values in sorted(metrics.items(), key=lambda v: v[0]):
+                results_complete += [['filternet', house, quantity, boxes, iou_threshold_matching, confidence_threshold_tasknet, iou_threshold_tasknet, confidence_threshold_filternet, iou_threshold_filternet, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
+
+
 
 
 results = np.array(results).T
