@@ -46,6 +46,12 @@ for house in houses:
             evaluator_ap = MyEvaluator()
             evaluator_complete_metric_tasknet = MyEvaluatorCompleteMetric()
             evaluator_ap_tasknet = MyEvaluator()
+            filter_description = globals()[f'IMAGE_NETWORK_GEOMETRIC_BACKGROUND_GIBSON_DD2_FINE_TUNE_{house}_{int(quantity*100)}_bbox_{boxes}'.upper()]
+
+            bbox_model = BboxFilterNetworkGeometricBackground(initial_channels=7, image_grid_dimensions=grid_dim, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND, pretrained=True, grid_network_pretrained=False, dataset_name=FINAL_DOORS_DATASET,
+                                                              description=filter_description, description_background=IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL)
+
+            bbox_model.to(device)
             for data in tqdm(test_dataset_bboxes, ):
                 images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
 
