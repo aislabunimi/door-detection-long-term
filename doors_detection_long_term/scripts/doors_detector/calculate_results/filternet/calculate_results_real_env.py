@@ -23,7 +23,7 @@ iou_threshold_filternet = 0.5
 
 device = 'cuda'
 
-houses = ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']
+houses = ['floor1', 'floor4',]
 quantities = [0.25, 0.50, 0.75]
 
 num_boxes = [10, 30, 50, 100]
@@ -41,34 +41,37 @@ for house in houses:
             dataset_loader_bboxes = DatasetLoaderBBoxes(folder_name=f'faster_rcnn_general_detector_gibson_dd2_{house}_{quantity}')
             train_bboxes, test_bboxes = dataset_loader_bboxes.create_dataset(max_bboxes=boxes, iou_threshold_matching=iou_threshold_matching, apply_transforms_to_train=False, shuffle_boxes=False)
 
-            test_dataset_bboxes = DataLoader(test_bboxes, batch_size=16, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
+            test_dataset_bboxes = DataLoader(test_bboxes, batch_size=1, collate_fn=collate_fn_bboxes(use_confidence=True, image_grid_dimensions=grid_dim), num_workers=4)
 
             evaluator_complete_metric_tasknet = MyEvaluatorCompleteMetric()
             evaluator_ap_tasknet = MyEvaluator()
             for data in tqdm(test_dataset_bboxes, ):
                 images, detected_bboxes, fixed_bboxes, confidences, labels_encoded, ious, target_boxes, image_grids, target_boxes_grid, detected_boxes_grid = data
-                detected_bboxes_tasknet = bbox_filtering_nms(detected_bboxes, confidence_threshold=0.0, iou_threshold=0.5, img_size=images.size()[::-1][:2])
+
+                detected_bboxes = detected_bboxes.transpose(1, 2)
+
+                detected_bboxes_tasknet = bbox_filtering_nms(detected_bboxes, confidence_threshold=0.75, iou_threshold=0.5, img_size=images.size()[::-1][:2])
                 evaluator_ap_tasknet.add_predictions_bboxes_filtering(detected_bboxes_tasknet, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
                 evaluator_complete_metric_tasknet.add_predictions_bboxes_filtering(detected_bboxes_tasknet, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
 
 
             confidence_threshold_tasknet = 0.75
-            iou_threshold_tasknet = 0.75
+            iou_threshold_tasknet = 0.5
             # Calculate metrics
             metrics_tasknet = evaluator_complete_metric_tasknet.get_metrics(confidence_threshold=confidence_threshold_tasknet, iou_threshold=iou_threshold_tasknet)
             metrics_ap_tasknet = evaluator_ap_tasknet.get_metrics(confidence_threshold=confidence_threshold_tasknet, iou_threshold=iou_threshold_tasknet)
 
-            for (iou_threshold, confidence_threshold), metric in metrics_ap_tasknet.items():
-                for label, values in sorted(metric['per_bbox'].items(), key=lambda v: v[0]):
-                    results += [[house, quantity, boxes, iou_threshold_matching, confidence_threshold_tasknet, iou_threshold_tasknet, confidence_threshold_filternet, iou_threshold_filternet, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
 
-            for (iou_threshold, confidence_threshold), complete_metric in metrics_tasknet.items():
-                for label, values in sorted(complete_metric.items(), key=lambda v: v[0]):
-                    results_complete += [[house, quantity, boxes, iou_threshold_matching, confidence_threshold_tasknet, iou_threshold_tasknet, confidence_threshold_filternet, iou_threshold_filternet, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
+            for label, values in sorted(metrics_ap_tasknet['per_bbox'].items(), key=lambda v: v[0]):
+                results += [['tasknet', house, quantity, boxes, iou_threshold_matching, confidence_threshold_tasknet, iou_threshold_tasknet, confidence_threshold_filternet, iou_threshold_filternet, label, values['AP'], values['total_positives'], values['TP'], values['FP']]]
+
+
+            for label, values in sorted(metrics_tasknet.items(), key=lambda v: v[0]):
+                results_complete += [['tasknet', house, quantity, boxes, iou_threshold_matching, confidence_threshold_tasknet, iou_threshold_tasknet, confidence_threshold_filternet, iou_threshold_filternet, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
 
 results = np.array(results).T
-columns = ['house', 'quantity', 'boxes', 'iou_threshold_matching', 'confidence_threshold_tasknet', 'iou_threshold_tasknet',
+columns = ['model', 'house', 'quantity', 'boxes', 'iou_threshold_matching', 'confidence_threshold_tasknet', 'iou_threshold_tasknet',
            'confidence_threshold_filternet', 'iou_threshold_filternet', 'label',  'AP', 'total_positives', 'TP', 'FP']
 d = {}
 for i, column in enumerate(columns):
@@ -78,7 +81,7 @@ dataframe = pd.DataFrame(d)
 dataframe.to_csv('./../../../results/filternet_results_ap.csv', index=False)
 
 complete_results = np.array(results_complete).T
-columns = ['house', 'quantity', 'boxes', 'iou_threshold_matching', 'confidence_threshold_tasknet', 'iou_threshold_tasknet',
+columns = ['model', 'house', 'quantity', 'boxes', 'iou_threshold_matching', 'confidence_threshold_tasknet', 'iou_threshold_tasknet',
            'confidence_threshold_filternet', 'iou_threshold_filternet', 'label',  'total_positives', 'TP', 'FP', 'TPm', 'FPm', 'FPiou']
 d = {}
 for i, column in enumerate(columns):
