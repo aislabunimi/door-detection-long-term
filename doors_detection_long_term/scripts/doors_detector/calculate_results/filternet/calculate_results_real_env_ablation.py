@@ -71,8 +71,9 @@ for house in houses:
                     preds = bbox_model(images, detected_bboxes_cuda, detected_boxes_grid)
                     #print(preds[0])
 
+
                     for rel, res, sup in [(r1, r2, s) for r1 in range(2) for r2 in range(2) for s in range(2)]:
-                        new_labels, new_labels_indexes = torch.max(preds[0].to('cpu'), dim=2, keepdim=False)
+                        _, new_labels_indexes = torch.max(preds[0].to('cpu'), dim=2, keepdim=False)
                         detected_bboxes_predicted = detected_bboxes_cuda.transpose(1, 2).to('cpu')
 
                         # Modify confidences according to the model output
@@ -89,18 +90,18 @@ for house in houses:
 
                         # Remove bboxes with background network
                         detected_bboxes_predicted = torch.unbind(detected_bboxes_predicted, 0)
-                        new_labels_indexes = torch.unbind(new_labels_indexes, 0)
-
+                        new_labels_indexes = torch.unbind(new_labels_indexes.to('cpu'), 0)
+                        new_labels = torch.unbind(preds[0].to('cpu'), 0)
                         if sup == 1:
-
-                            new_labels_indexes = [new_labels[labels != 0, :] for labels, new_labels in zip(torch.max(preds[1], dim=2)[1], new_labels_indexes)]
-                            detected_bboxes_predicted = [bboxes_predicted[labels != 0, :] for labels, bboxes_predicted in zip(torch.max(preds[1], dim=2)[1], detected_bboxes_predicted)]
+                            new_labels_indexes = [new_labels[labels != 0] for labels, new_labels in zip(torch.max(preds[1].to('cpu'), dim=2)[1], new_labels_indexes)]
+                            new_labels = [nl[labels != 0, :] for labels, nl in zip(torch.max(preds[1].to('cpu'), dim=2)[1], new_labels)]
+                            detected_bboxes_predicted = [bboxes_predicted[labels != 0, :] for labels, bboxes_predicted in zip(torch.max(preds[1].to('cpu'), dim=2)[1], detected_bboxes_predicted)]
 
                         # Filtering bboxes according to new labels
-                        detected_bboxes_predicted = [b[i != 0, :] for b, i in zip(detected_bboxes_predicted, new_labels_indexes)]
-
-                        detected_bboxes_predicted = [torch.cat([b[:, :5], p[i != 0][:, 1:]], dim=1) for b, p, i in zip(detected_bboxes_predicted, preds[0].to('cpu'), new_labels_indexes)]
-                        # Delete bboxes according to the background network
+                        if rel == 1:
+                            detected_bboxes_predicted = [b[i != 0, :] for b, i in zip(detected_bboxes_predicted, new_labels_indexes)]
+                            detected_bboxes_predicted = [torch.cat([b[:, :5], p[i != 0][:, 1:]], dim=1) for b, p, i in zip(detected_bboxes_predicted, new_labels, new_labels_indexes)]
+                            # Delete bboxes according to the background network
                         detected_bboxes_predicted = bbox_filtering_nms(detected_bboxes_predicted, confidence_threshold=0, iou_threshold=0.5, img_size=images.size()[::-1][:2])
                         evaluators[(rel, res, sup)]['complete'].add_predictions_bboxes_filtering(bboxes=detected_bboxes_predicted, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
                         evaluators[(rel, res, sup)]['AP'].add_predictions_bboxes_filtering(bboxes=detected_bboxes_predicted, target_bboxes=target_boxes, img_size=images.size()[::-1][:2])
@@ -150,7 +151,7 @@ for i, column in enumerate(columns):
     d[column] = results[i]
 
 dataframe = pd.DataFrame(d)
-dataframe.to_csv('./../../../results/filternet_results_ap.csv', index=False)
+dataframe.to_csv('./../../../results/filternet_results_ap_ablation.csv', index=False)
 
 complete_results = np.array(results_complete).T
 columns = ['relabeling', 'rescoring', 'suppression', 'model', 'house', 'quantity', 'boxes', 'iou_threshold_matching', 'confidence_threshold_tasknet', 'iou_threshold_tasknet',
@@ -160,7 +161,7 @@ for i, column in enumerate(columns):
     d[column] = complete_results[i]
 
 dataframe = pd.DataFrame(d)
-dataframe.to_csv('./../../../results/filternet_results_complete.csv', index=False)
+dataframe.to_csv('./../../../results/filternet_results_complete_ablation.csv', index=False)
 
 
 
