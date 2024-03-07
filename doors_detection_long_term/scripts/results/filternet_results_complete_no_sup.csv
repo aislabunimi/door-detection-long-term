@@ -1,0 +1,17 @@
+model,house,quantity,boxes,iou_threshold_matching,confidence_threshold_tasknet,iou_threshold_tasknet,confidence_threshold_filternet,iou_threshold_filternet,label,total_positives,TP,FP,TPm,FPm,FPiou
+tasknet,floor1,0.75,100,0.5,0.75,0.5,0.38,0.5,0,124,63,20,0,1,8
+tasknet,floor1,0.75,100,0.5,0.75,0.5,0.38,0.5,1,111,37,4,0,0,26
+filternet,floor1,0.75,100,0.5,0.75,0.5,0.38,0.5,0,124,79,0,1,0,20
+filternet,floor1,0.75,100,0.5,0.75,0.5,0.38,0.5,1,111,77,6,8,0,32
+tasknet,floor4,0.75,100,0.5,0.75,0.5,0.38,0.5,0,138,22,9,0,0,23
+tasknet,floor4,0.75,100,0.5,0.75,0.5,0.38,0.5,1,131,70,5,0,0,30
+filternet,floor4,0.75,100,0.5,0.75,0.5,0.38,0.5,0,138,55,7,3,0,26
+filternet,floor4,0.75,100,0.5,0.75,0.5,0.38,0.5,1,131,100,12,22,0,41
+tasknet,chemistry_floor0,0.75,100,0.5,0.75,0.5,0.38,0.5,0,192,50,15,0,0,31
+tasknet,chemistry_floor0,0.75,100,0.5,0.75,0.5,0.38,0.5,1,135,30,9,1,0,81
+filternet,chemistry_floor0,0.75,100,0.5,0.75,0.5,0.38,0.5,0,192,83,7,8,0,35
+filternet,chemistry_floor0,0.75,100,0.5,0.75,0.5,0.38,0.5,1,135,75,13,14,1,53
+tasknet,house_matteo,0.75,100,0.5,0.75,0.5,0.38,0.5,0,88,60,13,0,2,13
+tasknet,house_matteo,0.75,100,0.5,0.75,0.5,0.38,0.5,1,155,58,3,2,0,24
+filternet,house_matteo,0.75,100,0.5,0.75,0.5,0.38,0.5,0,88,75,3,8,0,9
+filternet,house_matteo,0.75,100,0.5,0.75,0.5,0.38,0.5,1,155,123,4,29,0,27
