@@ -538,7 +538,7 @@ for num_bboxes in [100]:
                         plt.legend()
                         plt.savefig(save_path + f'/final_losses_{l_type}_{house}_{quantity}.svg')
                         plt.close()
-                #bbox_model.save(epoch=epoch, optimizer_state_dict=optimizer.state_dict(), params={}, logs=logs, lr_scheduler_state_dict={})
+                bbox_model.save(epoch=epoch, optimizer_state_dict=optimizer.state_dict(), params={}, logs=logs, lr_scheduler_state_dict={})
 
 
 
