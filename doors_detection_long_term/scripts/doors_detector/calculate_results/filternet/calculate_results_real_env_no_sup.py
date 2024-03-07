@@ -24,9 +24,9 @@ iou_threshold_filternet = 0.5
 device = 'cuda'
 
 houses = ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo']
-quantities = [0.25, 0.50, 0.75]
+quantities = [0.75]
 
-num_boxes = [10, 30, 50, 100]
+num_boxes = [100]
 
 results = []
 results_complete = []
@@ -46,7 +46,7 @@ for house in houses:
             evaluator_ap = MyEvaluator()
             evaluator_complete_metric_tasknet = MyEvaluatorCompleteMetric()
             evaluator_ap_tasknet = MyEvaluator()
-            filter_description = globals()[f'IMAGE_NETWORK_GEOMETRIC_BACKGROUND_GIBSON_DD2_FINE_TUNE_{house}_{int(quantity*100)}_bbox_{boxes}'.upper()]
+            filter_description = globals()[f'IMAGE_NETWORK_GEOMETRIC_BACKGROUND_GIBSON_DD2_FINE_TUNE_{house}_{int(quantity*100)}_bbox_{boxes}_no_sup'.upper()]
 
             bbox_model = BboxFilterNetworkGeometricBackground(initial_channels=7, image_grid_dimensions=grid_dim, n_labels=3, model_name=BBOX_FILTER_NETWORK_GEOMETRIC_BACKGROUND, pretrained=True, grid_network_pretrained=False, dataset_name=FINAL_DOORS_DATASET,
                                                               description=filter_description, description_background=IMAGE_GRID_NETWORK_GIBSON_DD2_SMALL)
@@ -86,7 +86,7 @@ for house in houses:
                     detected_bboxes_predicted[:, :, 4] = new_confidences_indexes
 
                     # Remove bboxes with background network
-                    new_labels_indexes[torch.max(preds[1], dim=2)[1] == 0] = 0
+                    #new_labels_indexes[torch.max(preds[1], dim=2)[1] == 0] = 0
 
                     # Filtering bboxes according to new labels
                     detected_bboxes_predicted = torch.unbind(detected_bboxes_predicted, 0)
@@ -141,7 +141,7 @@ for i, column in enumerate(columns):
     d[column] = results[i]
 
 dataframe = pd.DataFrame(d)
-dataframe.to_csv('./../../../results/filternet_results_ap.csv', index=False)
+dataframe.to_csv('./../../../results/filternet_results_ap_no_sup.csv', index=False)
 
 complete_results = np.array(results_complete).T
 columns = ['model', 'house', 'quantity', 'boxes', 'iou_threshold_matching', 'confidence_threshold_tasknet', 'iou_threshold_tasknet',
@@ -151,4 +151,4 @@ for i, column in enumerate(columns):
     d[column] = complete_results[i]
 
 dataframe = pd.DataFrame(d)
-dataframe.to_csv('./../../../results/filternet_results_complete.csv', index=False)
+dataframe.to_csv('./../../../results/filternet_results_complete_no_sup.csv', index=False)
