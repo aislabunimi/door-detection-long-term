@@ -1,5 +1,11 @@
 # Development and Adaptation of Robotic Vision in the Real–World: the Challenge of Door Detection
-
+```
+@misc{antonazzi2024development,
+      title={Development and Adaptation of Robotic Vision in the Real-World: the Challenge of Door Detection}, 
+      author={Michele Antonazzi and Matteo Luperto and N. Alberto Borghese and Nicola Basilico},
+      year={2024},
+}
+```
 Here you can find the code and the datasets of the article entitled **Development and Adaptation of Robotic Vision in the Real–World: the Challenge of Door Detection**
 
 Usefull links:
