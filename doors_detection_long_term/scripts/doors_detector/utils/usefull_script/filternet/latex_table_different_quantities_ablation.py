@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 boxes = 100
@@ -26,14 +27,23 @@ metric_complete['FPiou_p'] = metric_complete['FPiou'] / metric_complete['total_p
 
 table = ''
 for i, (sup, res, rel) in enumerate([(r1, r2, s) for r1 in range(2) for r2 in range(2) for s in range(2)]):
-    if len([e for e in (rel, res, sup) if e == 1]) == 2:
-        continue
+    #if len([e for e in (rel, res, sup) if e == 1]) == 2:
+        #continue
     model = 'filternet'
-    table += f" \\{'Xmark' if rel == 0 else 'Vmark'} & \\{'Xmark' if res == 0 else 'Vmark'} & \\{'Xmark' if sup == 0 else 'Vmark'} "
+    table += f" \\{'' if rel == 0 else 'Vmark'} & \\{'' if res == 0 else 'Vmark'} & \\{'' if sup == 0 else 'Vmark'} "
+    APs =[]
+    TPs = []
+    FPs = []
+    FPious = []
     for e in houses:
-        table += (f'&{int(round(metric_ap.loc[(metric_ap["house"] == e) & (metric_ap["model"] == model) & (metric_ap["relabeling"] == rel)& (metric_ap["rescoring"] == res)& (metric_ap["suppression"] == sup), "AP"].tolist()[0]/2*100, 0))} &'
-                  f'{int(round(metric_complete.loc[(metric_complete["house"] == e) & (metric_complete["model"] == model) & (metric_complete["relabeling"] == rel)& (metric_complete["rescoring"] == res)& (metric_complete["suppression"] == sup), "TP_p"].tolist()[0]*100, 0))}\\% & '
-                  f'{int(round(metric_complete.loc[(metric_complete["house"] == e) & (metric_complete["model"] == model) & (metric_complete["relabeling"] == rel)& (metric_complete["rescoring"] == res)& (metric_complete["suppression"] == sup), "FP_p"].tolist()[0]*100, 0))}\\%  & '
-                  f'{int(round(metric_complete.loc[(metric_complete["house"] == e) & (metric_complete["model"] == model) & (metric_complete["relabeling"] == rel)& (metric_complete["rescoring"] == res)& (metric_complete["suppression"] == sup), "FPiou_p"].tolist()[0]*100, 0))}\\% ')
+        APs.append(metric_ap.loc[(metric_ap["house"] == e) & (metric_ap["model"] == model) & (metric_ap["relabeling"] == rel)& (metric_ap["rescoring"] == res)& (metric_ap["suppression"] == sup), "AP"].tolist()[0]/2*100)
+        TPs.append(metric_complete.loc[(metric_complete["house"] == e) & (metric_complete["model"] == model) & (metric_complete["relabeling"] == rel)& (metric_complete["rescoring"] == res)& (metric_complete["suppression"] == sup), "TP_p"].tolist()[0]*100)
+        FPs.append(metric_complete.loc[(metric_complete["house"] == e) & (metric_complete["model"] == model) & (metric_complete["relabeling"] == rel)& (metric_complete["rescoring"] == res)& (metric_complete["suppression"] == sup), "FP_p"].tolist()[0]*100)
+        FPious.append(metric_complete.loc[(metric_complete["house"] == e) & (metric_complete["model"] == model) & (metric_complete["relabeling"] == rel)& (metric_complete["rescoring"] == res)& (metric_complete["suppression"] == sup), "FPiou_p"].tolist()[0]*100)
+
+    table += (f'&{int(round(np.array(APs).mean(), 0))} &'
+                  f'{int(round(np.array(TPs).mean(), 0))}\\% & '
+                  f'{int(round(np.array(FPs).mean(), 0))}\\%  & '
+                  f'{int(round(np.array(FPious).mean(), 0))}\\% ')
     table += '\\\\\n'
 print(table)
