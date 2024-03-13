@@ -15,7 +15,7 @@ from doors_detection_long_term.doors_detector.utilities.collate_fn_functions imp
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 torch.autograd.set_detect_anomaly(True)
 
-house = 'floor1'
+house = 'floor4'
 save_path = f"/home/antonazzi/myfiles/{house}"
 
 if not os.path.exists(save_path):
@@ -185,7 +185,7 @@ with torch.no_grad():
                 tasknet_prediction_unfiltered.add_patch(Rectangle((max(2,x), max(42, y)),min(x2-x, w_image-2),min(237, y2- y),
                                                    edgecolor=(1, 0, 0) if closed else (0, 1, 0),
                                                    facecolor='none',
-                                                   lw=1))
+                                                   lw=2))
 
             for (cx, cy, w, h, c, _, _), (background, closed, open) in zip(detected_bboxes_image.tolist(), labels_encoded_image.tolist()):
 
