@@ -27,11 +27,11 @@ metric_complete['FP_p'] = metric_complete['FP'] / metric_complete['total_positiv
 metric_complete['FPiou_p'] = metric_complete['FPiou'] / metric_complete['total_positives']
 
 
-colors = ['#1F77B4', '#2CA02C', '#FF7F0E', '#D62728']
+colors = ['#1F77B4', '#2CA02C', '#FF7F0E', '#D62728', '#8c564b']
 fig, ax = subplots(figsize=(10, 5))
-for i, (color, boxes) in enumerate(zip(colors, [0, 30, 50, 100])):
+for i, (color, boxes) in enumerate(zip(colors, [0, 10, 30, 50, 100])):
     APs = []
-    X = np.arange(4)
+    X = np.arange(4) *1.15
 
     model = 'tasknet' if boxes == 0 else 'filternet'
     boxes = 100 if boxes == 0 else boxes
@@ -51,7 +51,7 @@ ax.tick_params(axis='y', labelsize=16)
 #ax.set_ylabel('%', fontsize=17)
 ax.axhline(y=0.0, linewidth=1, color='black')
 ax.set_ylim([0, 79])
-ax.set_xticks([i+0.34 for i in range(4)])
+ax.set_xticks([i*1.15+0.44 for i in range(4)])
 ax.set_xticklabels(['$e_1$', '$e_2$', '$e_3$', '$e_4$',], fontsize=17)
 #ax.set_xlabel('Environment', fontsize=17)
 

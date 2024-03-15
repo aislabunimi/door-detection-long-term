@@ -24,11 +24,18 @@ metric_complete['FPiou_p'] = metric_complete['FPiou'] / metric_complete['total_p
 table = ''
 for i, quantity in enumerate([0.25, 0.25, 0.5, 0.75]):
     model = 'tasknet' if i == 0 else 'filternet'
-    table += ' e '
+    table  += 'TaskNet' if i == 0 else '$\\text{R2S}^{30}_{' +str(int(quantity*100)) +'}$'
+    #table += ' e '
     for e in houses:
         table += (f'&{int(round(metric_ap.loc[(metric_ap["house"] == e) & (metric_ap["model"] == model) & (metric_ap["quantity"] == quantity), "AP"].tolist()[0]/2*100, 0))} &'
                   f'{int(round(metric_complete.loc[(metric_complete["house"] == e) & (metric_complete["model"] == model) & (metric_complete["quantity"] == quantity), "TP_p"].tolist()[0]*100, 0))}\\% & '
                   f'{int(round(metric_complete.loc[(metric_complete["house"] == e) & (metric_complete["model"] == model) & (metric_complete["quantity"] == quantity), "FP_p"].tolist()[0]*100, 0))}\\%  & '
-                  f'{int(round(metric_complete.loc[(metric_complete["house"] == e) & (metric_complete["model"] == model) & (metric_complete["quantity"] == quantity), "FPiou_p"].tolist()[0]*100, 0))}\\% ')
+                  f'{int(round(metric_complete.loc[(metric_complete["house"] == e) & (metric_complete["model"] == model) & (metric_complete["quantity"] == quantity), "FPiou_p"].tolist()[0]*100, 0))}\\%')
+
+    table += (f'&{int(round(metric_ap.loc[(metric_ap["model"] == model) & (metric_ap["quantity"] == quantity), "AP"].mean()/2*100, 0))} &'
+              f'{int(round(metric_complete.loc[(metric_complete["model"] == model) & (metric_complete["quantity"] == quantity), "TP_p"].mean()*100, 0))}\\% & '
+              f'{int(round(metric_complete.loc[(metric_complete["model"] == model) & (metric_complete["quantity"] == quantity), "FP_p"].mean()*100, 0))}\\%  & '
+              f'{int(round(metric_complete.loc[(metric_complete["model"] == model) & (metric_complete["quantity"] == quantity), "FPiou_p"].mean()*100, 0))}\\%')
     table += '\\\\\n'
+
 print(table)
