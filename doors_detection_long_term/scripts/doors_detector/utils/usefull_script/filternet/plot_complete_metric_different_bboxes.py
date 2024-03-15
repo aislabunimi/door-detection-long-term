@@ -73,6 +73,7 @@ ax.set_xticklabels(['$e_1$', '$e_2$', '$e_3$', '$e_4$','$\overline{e}$'], fontsi
 ax.set_xlabel('Environment', fontsize=17)
 
 ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.97), loc='upper center', ncol=4, alignment='left')
+ax.set_yticklabels([item.get_text().replace(chr(8722), '') for item in ax.get_yticklabels()])
 
 def tikzplotlib_fix_ncols(obj):
     if hasattr(obj, "_ncols"):
