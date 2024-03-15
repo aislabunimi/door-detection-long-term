@@ -29,7 +29,7 @@ for i, (color, boxes) in enumerate(zip(colors, [0, 10, 30, 50, 100])):
     TPs = []
     FPious = []
     FPs = []
-    X = np.arange(4)*1.15
+    X = np.arange(5)*1.15
 
     model = 'tasknet' if boxes == 0 else 'filternet'
     boxes = 100 if boxes == 0 else boxes
@@ -42,15 +42,23 @@ for i, (color, boxes) in enumerate(zip(colors, [0, 10, 30, 50, 100])):
         FPs.append(metric_complete.loc[(metric_complete['model'] == model) & (metric_complete['boxes'] == boxes)
                                           & (metric_complete['house'] == h), 'FP_p'].tolist()[0]*-100)
 
-    print(TPs)
+    TPs.append(sum(TPs) / len(TPs))
+    FPs.append(sum(FPs) / len(FPs))
+    FPious.append(sum(FPious) / len(FPious))
+    rects = ax.patches
+
+
     ax.bar(X + i * 0.2 + 0.04, TPs,
            width=0.16,  color=color, edgecolor='#000000',alpha=0.9,
            linewidth=2)
+    ax.text(
+        rects[-1].get_x() + rects[-1].get_width() / 2, TPs[-1] + 1, int(round(TPs[-1])), fontsize='x-large', ha="center", va="bottom"
+    )
     ax.bar(X + i * 0.2 + 0.04,FPs,
            width=0.16, #fc=(0, 0, 0, 0.0),
            color=color, edgecolor='#000000', hatch='/',
            linewidth=2)
-    plt.vlines(x=X + i * 0.2 + 0.04, ymin=[0 for _ in range(4)], ymax=FPious, colors='#000000', ls='-', lw=4)
+    plt.vlines(x=X + i * 0.2 + 0.04, ymin=[0 for _ in range(5)], ymax=FPious, colors='#000000', ls='-', lw=4)
     plt.plot(X + i * 0.2 + 0.04, FPious, color='#000000', marker='o', linestyle='None')
 
 #ax.set_title(f'Complete metrics', fontsize=18)
@@ -60,8 +68,8 @@ ax.tick_params(axis='y', labelsize=16)
 #ax.set_ylabel('%', fontsize=17)
 ax.axhline(y=0.0, linewidth=1, color='black')
 ax.set_ylim([-40, 89])
-ax.set_xticks([i*1.15+0.44 for i in range(4)])
-ax.set_xticklabels(['$e_1$', '$e_2$', '$e_3$', '$e_4$',], fontsize=17)
+ax.set_xticks([i*1.15+0.44 for i in range(5)])
+ax.set_xticklabels(['$e_1$', '$e_2$', '$e_3$', '$e_4$','$\overline{e}$'], fontsize=17)
 ax.set_xlabel('Environment', fontsize=17)
 
 ax.legend(prop={"size": 16}, bbox_to_anchor=(0.5, 0.97), loc='upper center', ncol=4, alignment='left')
@@ -80,6 +88,8 @@ chart_code = chart_code.replace('ybar legend', 'area legend')
 chart_code = chart_code.replace('ytick style={color=black}', 'ytick style={color=black},\nylabel style={rotate=-90}')
 #chart_code = chart_code.replace('\\end{axis}', '\\input{graphics/legend_extended_metric_general_detector}\n\\end{axis}')
 chart_code = chart_code.replace('mark size=3', 'mark size=2')
+chart_code = chart_code.replace('scale=0.72', "scale=0.8")
+
 text_file = open(f"../../latex_plots/filternet_different_boxes.tex", "w")
 text_file.write(chart_code)
 
