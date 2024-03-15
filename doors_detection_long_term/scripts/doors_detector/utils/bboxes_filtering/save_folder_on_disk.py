@@ -15,7 +15,7 @@ from doors_detection_long_term.doors_detector.utilities.collate_fn_functions imp
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 torch.autograd.set_detect_anomaly(True)
 
-house = 'floor4'
+house = 'chemistry_floor0'
 save_path = f"/home/antonazzi/myfiles/{house}"
 
 if not os.path.exists(save_path):
@@ -149,7 +149,7 @@ with torch.no_grad():
                 gt_image.add_patch(Rectangle((max(x, 2), max(42, y)),min(x2-x, w_image-2),min(237, y2- y),
                                                    edgecolor=(1, 0, 0) if label == 0 else (0, 1, 0),
                                                    facecolor='none',
-                                                   lw=3))
+                                                   lw=1))
             # Detected by the plain network (without filternet)
 
             list_coords = []
@@ -163,7 +163,7 @@ with torch.no_grad():
                 image_original.add_patch(Rectangle((x, y),w,h,
                                               edgecolor=(1, 0, 0) if closed else (0, 1, 0),
                                               facecolor='none',
-                                              lw=3))
+                                              lw=1))
             for x, y, w, h, c, closed, open in list_coords:
 
                 color = [1, 0, 0] if closed == 1 else [0, 1, 0]
@@ -185,7 +185,7 @@ with torch.no_grad():
                 tasknet_prediction_unfiltered.add_patch(Rectangle((max(2,x), max(42, y)),min(x2-x, w_image-2),min(237, y2- y),
                                                    edgecolor=(1, 0, 0) if closed else (0, 1, 0),
                                                    facecolor='none',
-                                                   lw=3))
+                                                   lw=1))
 
             for (cx, cy, w, h, c, _, _), (background, closed, open) in zip(detected_bboxes_image.tolist(), labels_encoded_image.tolist()):
 
@@ -198,7 +198,7 @@ with torch.no_grad():
                 correct_predicitions_unfiltered.add_patch(Rectangle((max(2,x), max(42, y)),min(x2-x, w_image-2),min(237, y2- y),
                                                                   edgecolor=(1, 0, 0) if closed == 1 else (0, 1, 0),
                                                                   facecolor='none',
-                                                                  lw=3))
+                                                                  lw=1))
 
             for (cx, cy, w, h, c, _, _), (background, closed, open) in zip(detected_bboxes_image.tolist(), labels_encoded_image.tolist()):
 
@@ -211,7 +211,7 @@ with torch.no_grad():
                 wrong_predicitions_unfiltered.add_patch(Rectangle((max(2,x), max(42, y)),min(x2-x, w_image-2),min(237, y2- y),
                                                                     edgecolor=(0, 0, 1),
                                                                     facecolor='none',
-                                                                    lw=3))
+                                                                    lw=1))
 
             for (cx, cy, w, h, c, _, _), (background, closed, open) in zip(detected_bboxes_image.tolist(), labels_encoded_image.tolist()):
 
@@ -229,7 +229,7 @@ with torch.no_grad():
                 all_predicitions_unfiltered.add_patch(Rectangle((max(2,x), max(42, y)),min(x2-x, w_image-2),min(237, y2- y),
                                                                   edgecolor=color,
                                                                   facecolor='none',
-                                                                  lw=3))
+                                                                  lw=1))
 
             for (cx, cy, w, h, c, closed, open) in detected_bboxes_predicted_image.tolist():
                 labels = [round(closed, 8), round(open, 8)]
@@ -247,7 +247,7 @@ with torch.no_grad():
                 predicted_filternet.add_patch(Rectangle((max(2,x), max(42, y)),min(x2-x, w_image-2),min(237, y2- y),
                                                                 edgecolor=color,
                                                                 facecolor='none',
-                                                                lw=3))
+                                                                lw=1))
 
             for (cx, cy, w, h, c, closed, open) in detected_bboxes_predicted_image.tolist():
 
@@ -266,7 +266,7 @@ with torch.no_grad():
                 predicted_filternet_conf.add_patch(Rectangle((max(2,x), max(42, y)),min(x2-x, w_image-2),min(237, y2- y),
                                                         edgecolor=color,
                                                         facecolor='none',
-                                                        lw=3))
+                                                        lw=1))
                 color = [1, 0, 0] if label == 0 else [0, 1, 0]
                 predicted_filternet_conf.add_patch(Rectangle((x2-70, y-38), 70, 35,
                                                    fc=color + [0.3], ec=color + [1],
