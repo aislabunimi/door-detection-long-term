@@ -24,9 +24,12 @@ class DatasetLoaderBBoxes:
                        iou_threshold_matching: float,
                        apply_transforms_to_train: bool = False,
                        shuffle_boxes: bool = False,
-                       random_state: int = 42):
+                       random_state: int = 42,
+                       shuffle_images: bool = True):
 
-        shuffled_dataframe = shuffle(self._dataframe, random_state=random_state)
+        shuffled_dataframe = self._dataframe
+        if shuffle_images:
+            shuffled_dataframe = shuffle(self._dataframe, random_state=random_state)
 
         train = shuffled_dataframe[(shuffled_dataframe.label == 0)]
         test = shuffled_dataframe[(shuffled_dataframe.label == 1)]
