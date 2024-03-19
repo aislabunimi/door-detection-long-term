@@ -23,7 +23,7 @@ import torchvision.transforms as T
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 num_bboxes = 20
 
-house = 'chemistry_floor0'
+house = 'house_matteo'
 folder = f"/home/antonazzi/myfiles/{house}"
 
 images = sorted(os.listdir(folder))

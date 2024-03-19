@@ -25,7 +25,7 @@ if not os.path.exists(save_tasknet):
 
 
 quantity = 0.75
-num_bboxes = 50
+num_bboxes = 30
 iou_threshold_matching = 0.5
 confidence_threshold_original = 0.75
 
@@ -126,7 +126,7 @@ with torch.no_grad():
             for x, y, w, h, c, closed, open in list_coords:
 
                 image_tasknet = cv2.rectangle(image_tasknet, (x, y), (x +w, y + h), (0, 0, 255) if closed else (0, 255, 0), 2)
-            cv2.imwrite(save_tasknet + f'/{i}.jpeg', image_tasknet)
+            cv2.imwrite(save_tasknet + f'/{i}.jpeg', image_tasknet[40:, :])
 
             for (cx, cy, w, h, c, closed, open) in detected_bboxes_predicted_image.tolist():
                 labels = [round(closed, 8), round(open, 8)]
@@ -142,7 +142,7 @@ with torch.no_grad():
                     color = (0, 255, 0)
 
                 image = cv2.rectangle(image, (max(1,x), max(41, y)), (min(x2, w_image-2),min(279, y2)), color, 2)
-            cv2.imwrite(save_filternet + f'/{i}.jpeg', image)
+            cv2.imwrite(save_filternet + f'/{i}.jpeg', image[40:, :])
             i+=1
 
         metrics = evaluator_complete_metric.get_metrics(confidence_threshold=0.38, iou_threshold=0.5)
