@@ -17,15 +17,15 @@ from doors_detection_long_term.doors_detector.utilities.collate_fn_functions imp
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 torch.autograd.set_detect_anomaly(True)
 
-house = 'house_matteo'
-save_path = f"/home/michele/myfiles/video/{house}"
+house = 'chemistry_floor0'
+save_path = f"/home/antonazzi/myfiles/video/{house}"
 save_tasknet = save_path + '/tasknet'
 if not os.path.exists(save_tasknet):
     os.makedirs(save_tasknet)
 
 
 quantity = 0.75
-num_bboxes = 30
+num_bboxes = 50
 iou_threshold_matching = 0.5
 confidence_threshold_original = 0.75
 

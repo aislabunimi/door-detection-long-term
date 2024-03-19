@@ -31,7 +31,7 @@ def image_callback(msg):
     else:
         # Save your OpenCV2 image as a jpeg
         time = msg.header.stamp
-        cv2.imwrite('house_matteo/'+str(i)+'.jpeg', cv2_img)
+        cv2.imwrite('house_matteo/frame'+''.join(['0' for _ in range(6 - len(str(i)))]) + str(i)+'.jpeg', cv2_img)
         i += 1
         rospy.sleep(0.5)
 

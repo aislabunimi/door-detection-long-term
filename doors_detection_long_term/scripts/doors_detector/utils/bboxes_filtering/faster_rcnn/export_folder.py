@@ -23,16 +23,16 @@ import torchvision.transforms as T
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 num_bboxes = 20
 
-houses = ['floor1', 'floor4', 'chemistry_floor0', 'house_matteo', 'floor1_evening', 'floor4_evening']
-folder = "/home/michele/myfiles/house_matteo"
+house = 'chemistry_floor0'
+folder = f"/home/antonazzi/myfiles/{house}"
 
-images = sorted([ ''.join(['0' for _ in range(10-len(file))]) + file  for file in os.listdir(folder)])
+images = sorted(os.listdir(folder))
 print(images)
 print(images)
 
 
 dataset_creator_bboxes = DatasetCreatorBBoxes()
-dataset_creator_bboxes.set_folder_name(f'faster_rcnn_general_detector_gibson_dd2_house_matteo_bag')
+dataset_creator_bboxes.set_folder_name(f'faster_rcnn_general_detector_gibson_dd2_{house}_bag')
 
 model = FasterRCNN(model_name=FASTER_RCNN, n_labels=3, pretrained=True, dataset_name=FINAL_DOORS_DATASET, description=EXP_GENERAL_DETECTOR_GIBSON_DEEP_DOORS_2_60_EPOCHS,
                    box_score_thresh=0.0, box_nms_thresh=1.0, box_detections_per_img=300)
@@ -45,8 +45,6 @@ transform = T.Compose([
 ])
 with torch.no_grad():
     for file in tqdm(images):
-        while file[0] == '0':
-            file = file[1:]
 
         image = cv2.imread(os.path.join(folder, file))
         img = transform(Image.fromarray(image[..., [2, 1, 0]])).unsqueeze(0).to('cuda')
