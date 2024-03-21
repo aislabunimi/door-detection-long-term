@@ -15,7 +15,7 @@ from doors_detection_long_term.doors_detector.utilities.collate_fn_functions imp
 colors = {0: (0, 0, 255), 1: (0, 255, 0)}
 torch.autograd.set_detect_anomaly(True)
 
-house = 'chemistry_floor0'
+house = 'floor1'
 save_path = f"/home/antonazzi/myfiles/{house}"
 
 if not os.path.exists(save_path):
@@ -110,7 +110,7 @@ with torch.no_grad():
 
             fig, ((gt_image, image_original, tasknet_prediction_unfiltered,),
                   ( correct_predicitions_unfiltered, wrong_predicitions_unfiltered, all_predicitions_unfiltered),
-                  (predicted_filternet, predicted_filternet_conf, _)) = plt.subplots(3, 3)
+                  (predicted_filternet, predicted_filternet_conf, plain_image)) = plt.subplots(3, 3)
             image_original.imshow((image*255).astype(np.uint8))
             image_original.axis('off')
 
@@ -119,17 +119,21 @@ with torch.no_grad():
             gt_image.axis('off')
 
             # Tasknet predicition
-            tasknet_prediction_unfiltered.imshow((image*255).astype(np.uint8))
+            new_image = np.copy(image) * 255
+            new_image[40:, :] = (233, 233, 233)
+            tasknet_prediction_unfiltered.imshow(new_image.astype(np.uint8))
             tasknet_prediction_unfiltered.axis('off')
 
             correct_predicitions_unfiltered.imshow((image*255).astype(np.uint8))
             correct_predicitions_unfiltered.axis('off')
 
             # Wrong prediction unfiltered
+
             wrong_predicitions_unfiltered.imshow((image*255).astype(np.uint8))
             wrong_predicitions_unfiltered.axis('off')
 
             # Wrong prediction unfiltered
+
             all_predicitions_unfiltered.imshow((image*255).astype(np.uint8))
             all_predicitions_unfiltered.axis('off')
 
@@ -139,7 +143,8 @@ with torch.no_grad():
 
             predicted_filternet_conf.imshow((image*255).astype(np.uint8))
             predicted_filternet_conf.axis('off')
-
+            plain_image.imshow((image*255).astype(np.uint8))
+            plain_image.axis('off')
             # Filternet output
 
             for (cx, cy, w, h, label) in target_boxes_image:
