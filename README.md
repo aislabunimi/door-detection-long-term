@@ -11,7 +11,7 @@ Usefull links:
 Code:
 * The R2SNet [implementation](doors_detection_long_term/doors_detector/models/bbox_filter_network_geometric.py).
 * The Background Feature extractor Network [architecture](doors_detection_long_term/doors_detector/models/background_grid_network.py).
-* The scripts to perform the training of the models are in the [train_models](doors_detection_long_term/scripts/doors_detector/train_models/filter_network) package.
+* The scripts to perform the training are in the [train_models](doors_detection_long_term/scripts/doors_detector/train_models/) package.
 
 ![](images/r2snet_experiments.gif)  
 
