@@ -28,7 +28,7 @@ transform = T.Compose([
     T.ToTensor(),
     T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
-load_path = '/home/antonazzi/Downloads/images_floor4'
+load_path = '/home/antonazzi/myfiles/final_doors_dataset_real/floor4/1/bgr_image'
 save_path = '/home/antonazzi/Downloads/floor_4_fine_tune_75'
 
 images_names = os.listdir(load_path)
@@ -37,7 +37,8 @@ images_names.sort()
 images = [cv2.imread(os.path.join(load_path, file_name)) for file_name in images_names]
 model.to('cuda')
 for i, image in tqdm(enumerate(images), total=len(images_names)):
-    #image = cv2.imread(os.path.join(load_path, file_name))
+    #print(image)
+    #image = cv2.imread(os.path.join(load_path, image))
 
     new_img = transform(Image.fromarray(image[..., [2, 1, 0]])).unsqueeze(0).to('cuda')
 
@@ -60,4 +61,5 @@ for i, image in tqdm(enumerate(images), total=len(images_names)):
             save_image = cv2.rectangle(save_image, (int(xmin), int(ymin)), (int(xmax), int(ymax)), colors[label])
             #ax.text(xmin, ymin, text, fontsize=15,
             #bbox=dict(facecolor='yellow', alpha=0.5))
+
         cv2.imwrite(os.path.join(save_path, 'image_{0:05d}.png'.format(i)), save_image)

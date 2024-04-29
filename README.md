@@ -9,6 +9,8 @@
 Here you can find the code and the datasets of the article entitled **Development and Adaptation of Robotic Vision in the Real–World: the Challenge of Door Detection** [link](
 https://doi.org/10.48550/arXiv.2401.17996)
 
+Installation: `pip3 install -e .`
+
 Examples inferece code:
 * YOLOv5 [here](doors_detection_long_term/scripts/doors_detector/utils/yolov5/yolov5_classify_folder_and_save_samples.py)
 * Faster R-CNN [here](doors_detection_long_term/scripts/doors_detector/utils/faster_rcnn/faster_rcnn_save_folder_classified.py)
