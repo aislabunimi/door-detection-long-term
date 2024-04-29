@@ -1,6 +1,5 @@
 # Enhancing Door Detection for Autonomous Mobile Robots with Environment-Specific Data Collection
 
-# Citation
 
 ```
 @INPROCEEDINGS{antonazzi2023doordetection,
