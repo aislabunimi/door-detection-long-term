@@ -12,6 +12,9 @@
   doi={10.1109/ECMR59166.2023.10256289}}
 ```
 
+![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) The new version of this repository with more models (DETR, Faster R-CNN and YOLOv5) can be found [here](https://github.com/aislabunimi/door-detection-long-term/tree/robotic-vision).
+
+
 Here you can find the code and the datasets used in the article entitled **Enhancing Door Detection for Autonomous Mobile Robots with Environment-Specific Data Collection**
 To use this package and install all the dependencies, clone this repository and run:
 
