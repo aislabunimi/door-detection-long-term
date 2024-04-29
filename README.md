@@ -6,7 +6,8 @@
       year={2024},
 }
 ```
-Here you can find the code and the datasets of the article entitled **Development and Adaptation of Robotic Vision in the Real–World: the Challenge of Door Detection**
+Here you can find the code and the datasets of the article entitled **Development and Adaptation of Robotic Vision in the Real–World: the Challenge of Door Detection** [link](
+https://doi.org/10.48550/arXiv.2401.17996)
 
 Usefull links:
 * The *DeepDoors2* dataset [link](https://unimi2013-my.sharepoint.com/:u:/g/personal/michele_antonazzi_unimi_it/EX1sP643dctKswmWsVBiCLoBtyOdkSsxi5fpZJy3mnoaBg?e=tGyuLU)
