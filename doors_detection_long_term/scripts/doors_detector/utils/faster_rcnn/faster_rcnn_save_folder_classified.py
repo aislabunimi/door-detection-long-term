@@ -10,8 +10,8 @@ from doors_detection_long_term.doors_detector.utilities.collate_fn_functions imp
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 import torchvision.transforms as T
 
-load_path = '/home/michele/Downloads/images'
-save_path = '/home/michele/Downloads/test_faster_rcnn'
+load_path = '/home/antonazzi/Downloads/images'
+save_path = '/home/antonazzi/Downloads/test_faster_rcnn'
 
 if not os.path.exists(save_path):
     os.mkdir(save_path)
