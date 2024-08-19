@@ -1,3 +1,5 @@
+from typing import List
+
 import numpy as np
 import math
 from random import shuffle
@@ -12,6 +14,8 @@ from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datase
     DatasetsCreatorRealData
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.dataset_creator_real_data_bbox_filter import \
     DatasetsCreatorRealDataBboxFilter
+from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.dataset_creator_real_data_multiple_houses_different_test import \
+    DatasetsCreatorRealDataMultipleHousesDifferentTest
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_final import DatasetsCreatorDoorsFinal
 from doors_detection_long_term.doors_detector.dataset.dataset_doors_final.datasets_creator_doors_final_bbox_filter import \
     DatasetsCreatorDoorsFinalBBoxFilter
@@ -105,6 +109,13 @@ def get_final_doors_dataset_real_data(folder_name: str, train_size: float = 0.1,
     labels = dataset_creator.get_labels()
 
     return train, test, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
+
+def get_final_doors_dataset_real_data_multiple_houses_different_test(folder_names_train: List[str], folder_names_test: List[str], train_size: float = 0.1, transform_train=True):
+    dataset_creator = DatasetsCreatorRealDataMultipleHousesDifferentTest(dataset_path=real_final_doors_dataset_path)
+    train, validation, test = dataset_creator.create_datasets(folder_names_train=folder_names_train, folder_names_test=folder_names_test, train_size=train_size, transform_train=transform_train)
+    labels = dataset_creator.get_labels()
+
+    return train, validation, test, labels, np.array([[1, 0, 0], [0, 1, 0]], dtype=float)
 
 def get_final_doors_dataset_bbox_filter(folder_name: str, train_size_student: float = .0):
     dataset_creator = DatasetsCreatorDoorsFinalBBoxFilter(dataset_path=final_doors_dataset_path)
