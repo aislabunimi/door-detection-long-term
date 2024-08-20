@@ -14,8 +14,8 @@ from doors_detection_long_term.scripts.doors_detector.dataset_configurator impor
     get_final_doors_dataset_epoch_analysis, get_final_doors_dataset_real_data
 
 houses = ['floor1', 'floor4',]# 'chemistry_floor0']
-epochs_general_detector = [40, 60]
-epochs_qualified_detector = [20, 40]
+epochs_general_detector = [60]
+epochs_qualified_detector = [40]
 fine_tune_quantity = [15, 25, 50, 75]
 datasets = ['GIBSON', 'DEEP_DOORS_2', 'GIBSON_DEEP_DOORS_2']
 device = 'cuda'

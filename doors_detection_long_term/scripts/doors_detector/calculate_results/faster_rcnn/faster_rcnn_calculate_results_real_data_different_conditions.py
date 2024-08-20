@@ -13,8 +13,8 @@ from doors_detection_long_term.scripts.doors_detector.dataset_configurator impor
 
 houses = ['floor1', 'floor4', ]#'chemistry_floor0']
 datasets = ['gibson', 'deep_doors_2', 'gibson_deep_doors_2']
-epochs_general_detector = [40, 60]
-epochs_qualified_detector = [20, 40]
+epochs_general_detector = [60]
+epochs_qualified_detector = [40]
 fine_tune_quantity = [15, 25, 50, 75]
 device = 'cuda'
 
