@@ -102,7 +102,7 @@ if __name__ == '__main__':
         train_envs = houses
         train_envs.remove(house)
         train, validation, test, labels, _ = get_final_doors_dataset_real_data_multiple_houses_different_test(
-            folder_names_train=train_envs, folder_names_test=[house], train_size=quantity
+            folder_names_train=train_envs, folder_names_test=[house], train_size=quantity/100
         )
         print(f'Train set size: {len(train)}', f'Test set size: {len(test)}')
         data_loader_train = DataLoader(train, batch_size=params['batch_size'], collate_fn=collate_fn_yolov5, shuffle=False, num_workers=4)
@@ -205,4 +205,4 @@ if __name__ == '__main__':
             # Change the model description on each epoch step
             if epoch == epochs_qualified_detectors[epoch_count] - 1 and epoch_count < len(epochs_qualified_detectors) -1:
                 epoch_count += 1
-                model.set_description(globals()[f'EXP_2_{house}_{gd_dataset}_EPOCHS_GD_{epochs_general}_EPOCHS_QD_{epochs_qualified_detectors[epoch_count]}_FINE_TUNE_{quantity}'.upper()])
+                model.set_description(globals()[f'EXP_2_{house}_{gd_dataset}_EPOCHS_GD_{epochs_general}_EPOCHS_QD_{epochs_qualified_detectors[epoch_count]}_MULTIPLE_TRAIN_FINE_TUNE_{quantity}'.upper()])
