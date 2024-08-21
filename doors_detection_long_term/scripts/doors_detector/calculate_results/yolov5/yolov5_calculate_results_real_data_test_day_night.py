@@ -132,4 +132,4 @@ for model_name, house, dataset, quantity, epochs_general, epochs_qualified in mo
         for label, values in sorted(complete_metric.items(), key=lambda v: v[0]):
             results_complete += [[iou_threshold, confidence_threshold, house.replace('_', ''), 'QD_' + str(quantity), dataset, epochs_general, epochs_qualified, label, values['total_positives'], values['TP'], values['FP'], values['TPm'], values['FPm'], values['FPiou']]]
 
-save_file(results, results_complete, 'yolov5_ap_real_data_test_only_one.xlsx', 'yolov5_complete_metric_real_data_test_only_one.xlsx')
+save_file(results, results_complete, 'yolov5_ap_real_data_test_day_night.xlsx', 'yolov5_complete_metric_real_data_test_day_night.xlsx')
