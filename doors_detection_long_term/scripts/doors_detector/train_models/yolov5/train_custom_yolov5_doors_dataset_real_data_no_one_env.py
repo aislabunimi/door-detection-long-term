@@ -99,7 +99,7 @@ if __name__ == '__main__':
     for house, gd_dataset, epochs_general, quantity in [(h, eg, e, q) for h in ['chemistry_floor0'] for eg in ['gibson_deep_doors_2'] for e in epochs_general_detector for q in fine_tune_quantity]:
         epoch_count = 0
         print(f'{house}, general detectors trained with {gd_dataset} for {epochs_general} epochs, fine tune train set: {quantity}')
-        train_envs = houses
+        train_envs = list(houses)
         train_envs.remove(house)
         train, validation, test, labels, _ = get_final_doors_dataset_real_data_multiple_houses_different_test(
             folder_names_train=train_envs, folder_names_test=[house], train_size=quantity/100
