@@ -112,7 +112,7 @@ if __name__ == '__main__':
         print_logs_every = 10
         last_opt_step = -1
         model.to('cuda')
-        model.set_description(globals()[f'EXP_2_{house}_{gd_dataset}_EPOCHS_GD_{epochs_general}_EPOCHS_QD_{epochs_qualified_detectors[epoch_count]}_MULTIPLE_TRAIN_TEST_{house}_{quantity}'.upper()])
+        model.set_description(globals()[f'EXP_2_{house}_{gd_dataset}_EPOCHS_GD_{epochs_general}_EPOCHS_QD_{epochs_qualified_detectors[epoch_count]}_MULTIPLE_TRAIN_FINE_TUNE_{quantity}'.upper()])
         print_logs_every = 10
 
         start_time = time.time()
