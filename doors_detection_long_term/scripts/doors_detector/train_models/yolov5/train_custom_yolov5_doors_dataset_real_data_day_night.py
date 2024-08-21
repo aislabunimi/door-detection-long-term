@@ -19,7 +19,7 @@ from doors_detection_long_term.doors_detector.utilities.plot import plot_losses
 from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import collate_fn_yolov5
 from doors_detection_long_term.scripts.doors_detector.dataset_configurator import *
 from doors_detection_long_term.doors_detector.utilities.collate_fn_functions import seed_everything
-
+torch.set_warn_always(False)
 
 device = 'cuda'
 
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     seed_everything(params['seed'])
 
     # Qualify the general detectors trained before
-    for house, gd_dataset, epochs_general, quantity in [(h, eg, e, q) for h in ['floor4_evening'] for eg in ['gibson_deep_doors_2'] for e in epochs_general_detector for q in fine_tune_quantity]:
+    for house, gd_dataset, epochs_general, quantity in [(h, eg, e, q) for h in ['floor4_run2'] for eg in ['gibson_deep_doors_2'] for e in epochs_general_detector for q in fine_tune_quantity]:
         epoch_count = 0
         print(f'{house}, general detectors trained with {gd_dataset} for {epochs_general} epochs, fine tune train set: {quantity}')
         train_envs = list(houses)
