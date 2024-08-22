@@ -10,7 +10,7 @@ import tikzplotlib
 iou_threshold = 0.5
 confidence_threshold = 0.75
 
-houses = pd.read_excel('./../../../results/faster_rcnn_ap_real_data_different_conditions.xlsx')
+houses = pd.read_excel('./../../../results/faster_rcnn_ap_real_data_crowded.xlsx')
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
@@ -19,7 +19,7 @@ houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) |
 houses_faster = houses
 
 # YOLO
-houses = pd.read_excel('./../../../results/yolov5_ap_real_data_different_condition.xlsx')
+houses = pd.read_excel('./../../../results/yolov5_ap_real_data_crowded.xlsx')
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
@@ -28,7 +28,7 @@ houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) |
 houses_yolo = houses
 
 # DETR
-houses = pd.read_excel('./../../../results/detr_ap_real_data_different_conditions.xlsx')
+houses = pd.read_excel('./../../../results/detr_ap_real_data_crowded.xlsx')
 houses['AP'] = houses['AP'].astype(np.float64)
 houses['AP'] = houses['AP'].apply(lambda x: x*100).round()
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
@@ -56,7 +56,7 @@ colors = ['#1F77B4','#2CA02C', '#FF7F0E', '#D62728', '#8C564B']
 #B0B0B0
 #17B0CF
 #8C564B
-for env_number, house in enumerate(['floor1', 'floor4',]): # 'chemistry_floor0', 'house_matteo']):
+for env_number, house in enumerate(['floor4',]): # 'chemistry_floor0', 'house_matteo']):
     fig, ax = subplots(figsize=(10, 5))
     dataframes = [houses_detr,
                   houses_yolo,
@@ -112,7 +112,7 @@ for env_number, house in enumerate(['floor1', 'floor4',]): # 'chemistry_floor0',
     chart_code = chart_code.replace('legend style={\n', 'legend cell align={left},\nlegend style={\n/tikz/every even column/.append style={column sep=0.3cm},\n')
     chart_code = chart_code.replace('ybar legend', 'area legend')
     chart_code = chart_code.replace('\\end{axis}', '\\input{graphics/legend_ap_qualified_detector}\n\\end{axis}')
-    text_file = open(f"../latex_plots/qualified_detector_stacked_mAP_e{env_number}_different_conditions.tex", "w")
+    text_file = open(f"../latex_plots/qualified_detector_stacked_mAP_e{env_number}_crowded.tex", "w")
 
     #write string to file
     text_file.write(chart_code)
@@ -122,14 +122,15 @@ for env_number, house in enumerate(['floor1', 'floor4',]): # 'chemistry_floor0',
 
     #tikzplotlib.save(f"../latex_plots/general_detector_{label}_e{env_number}.tex", axis_height='7cm', axis_width='12cm')
     plt.show()
-titles = ['\\Classrooms{} under light variations', '\\Offices{} under light variations', '\\Laboratories', '\\House']
+titles = ['\\Classrooms{} under light variations', '\\Offices{} with camera occlusions', '\\Laboratories', '\\House']
 
 
 # Plots comparison between dataset
 colors = ['#2CA02C', '#FF7F0E', '#D62728',]
 datasets = ['deep_doors_2', 'gibson', 'gibson_deep_doors_2']
 detectors_labels = ['$GD$', '$QD_{e}^{15}$', '$QD_{e}^{25}$', '$QD_{e}^{50}$', '$QD_{e}^{75}$']
-for env_number, house in enumerate(['floor1', 'floor4',]): # 'chemistry_floor0', 'house_matteo']):
+for env_number, house in enumerate(['floor4',]): # 'chemistry_floor0', 'house_matteo']):
+    env_number+=1
     fig, ax = subplots(figsize=(10, 5))
     #ax.bar(X, [0 for _ in range(3)], width=0.16)
     performance = pd.concat([houses_detr.reset_index(), houses_yolo.reset_index(), houses_faster.reset_index()], axis=0)
@@ -186,7 +187,7 @@ for env_number, house in enumerate(['floor1', 'floor4',]): # 'chemistry_floor0',
     chart_code = chart_code.replace('legend style={\n', 'legend cell align={left},\nlegend style={\n/tikz/every even column/.append style={column sep=0.3cm},\n')
     chart_code = chart_code.replace('ybar legend', 'area legend')
     #chart_code = chart_code.replace('\\end{axis}', '\\input{graphics/legend_ap_general_detector_over_dataset}\n\\end{axis}')
-    text_file = open(f"../latex_plots/qualified_detector_over_datasets_mAP_d_{env_number}_different_conditions.tex", "w")
+    text_file = open(f"../latex_plots/qualified_detector_over_datasets_mAP_d_{env_number}_crowded.tex", "w")
 
     #write string to file
     text_file.write(chart_code)
