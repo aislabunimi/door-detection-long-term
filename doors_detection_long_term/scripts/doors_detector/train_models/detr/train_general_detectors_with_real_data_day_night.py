@@ -255,7 +255,7 @@ if __name__ == '__main__':
             print(f'----> EPOCH SUMMARY TEST [{epoch}] -> [{i}/{len(data_loader_test)}]: ' + ', '.join([f'{k}: {v}' for k, v in logs['test'][epoch].items()]))
             #lr_scheduler.step()
 
-            plot_losses(logs)
+            #plot_losses(logs)
 
             model.save(epoch=epoch,
                        optimizer_state_dict=optimizer.state_dict(),
