@@ -96,7 +96,7 @@ if __name__ == '__main__':
     seed_everything(params['seed'])
 
     # Qualify the general detectors trained before
-    for house, gd_dataset, epochs_general, quantity in [(h, eg, e, q) for h in ['floor4_run2'] for eg in ['gibson', 'deep_doors_2'] for e in epochs_general_detector for q in fine_tune_quantity]:
+    for house, gd_dataset, epochs_general, quantity in [(h, eg, e, q) for h in ['floor4_run2'] for eg in ['gibson', 'deep_doors_2', 'gibson_deep_doors_2'] for e in epochs_general_detector for q in fine_tune_quantity]:
         epoch_count = 0
         print(f'{house}, general detectors trained with {gd_dataset} for {epochs_general} epochs, fine tune train set: {quantity}')
         train_envs = list(houses)
@@ -112,7 +112,7 @@ if __name__ == '__main__':
         print_logs_every = 10
         last_opt_step = -1
         model.to('cuda')
-        model.set_description(globals()[f'EXP_2_floor4_{gd_dataset}_EPOCHS_GD_{epochs_general}_EPOCHS_QD_{epochs_qualified_detectors[epoch_count]}_DAY_NIGHT_FINE_TUNE_{quantity}'.upper()])
+        model.set_description(globals()[f'EXP_2_{house}_{gd_dataset}_EPOCHS_GD_{epochs_general}_EPOCHS_QD_{epochs_qualified_detectors[epoch_count]}_DAY_NIGHT_FINE_TUNE_{quantity}'.upper()])
         print_logs_every = 10
 
         start_time = time.time()
@@ -205,4 +205,4 @@ if __name__ == '__main__':
             # Change the model description on each epoch step
             if epoch == epochs_qualified_detectors[epoch_count] - 1 and epoch_count < len(epochs_qualified_detectors) -1:
                 epoch_count += 1
-                model.set_description(globals()[f'EXP_2_floor4_{gd_dataset}_EPOCHS_GD_{epochs_general}_EPOCHS_QD_{epochs_qualified_detectors[epoch_count]}_DAY_NIGHT_FINE_TUNE_{quantity}'.upper()])
+                model.set_description(globals()[f'EXP_2_{house}_{gd_dataset}_EPOCHS_GD_{epochs_general}_EPOCHS_QD_{epochs_qualified_detectors[epoch_count]}_DAY_NIGHT_FINE_TUNE_{quantity}'.upper()])
