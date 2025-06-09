@@ -10,7 +10,7 @@ import tikzplotlib
 iou_threshold = 0.5
 confidence_threshold = 0.75
 
-houses = pd.read_excel('./../../../results/faster_rcnn_complete_metric_real_data_different_conditions.xlsx')
+houses = pd.read_excel('./../../../results/faster_rcnn_complete_metric_real_data_crowded.xlsx')
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
                     (houses['iou_threshold'] == iou_threshold) & (houses['confidence_threshold'] == confidence_threshold)]
 
@@ -24,7 +24,7 @@ houses_faster.loc[houses_faster['house'] == 'housematteo', 'house'] = 'house_mat
 
 
 # YOLO
-houses = pd.read_excel('./../../../results/yolov5_complete_metric_real_data_different_condition.xlsx')
+houses = pd.read_excel('./../../../results/yolov5_complete_metric_real_data_crowded.xlsx')
 
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
                     (houses['iou_threshold'] == iou_threshold) & (houses['confidence_threshold'] == confidence_threshold)]
@@ -39,7 +39,7 @@ houses_yolo.loc[houses_yolo['house'] == 'housematteo', 'house'] = 'house_matteo'
 
 
 # DETR
-houses = pd.read_excel('./../../../results/detr_complete_metrics_real_data_different_conditions.xlsx')
+houses = pd.read_excel('./../../../results/detr_complete_metrics_real_data_crowded.xlsx')
 
 houses = houses.loc[(houses['epochs_gd'] == 60) & ((houses['epochs_qd'] == 40) | (houses['epochs_qd'] == 60)) &
                     (houses['iou_threshold'] == iou_threshold) & (houses['confidence_threshold'] == confidence_threshold)]
@@ -70,7 +70,8 @@ colors = ['#1F77B4','#2CA02C', '#FF7F0E', '#D62728', '#8C564B']
 detectors = ['GD', 'QD_15', 'QD_25', 'QD_50', 'QD_75']
 detectors_labels = ['$GD$', '$QD_{e}^{15}$', '$QD_{e}^{25}$', '$QD_{e}^{50}$', '$QD_{e}^{75}$']
 
-for env_number, house in enumerate(['floor1', 'floor4',]):
+for env_number, house in enumerate(['floor4',]):
+    env_number+=1
     fig, ax = subplots(figsize=(10, 5))
     dataframes = [houses_detr.loc[houses_detr['dataset'] == 'gibson_deep_doors_2'],
                   houses_yolo.loc[houses_yolo['dataset'] == 'gibson_deep_doors_2'],
@@ -132,7 +133,7 @@ for env_number, house in enumerate(['floor1', 'floor4',]):
     chart_code = chart_code.replace('ybar legend', 'area legend')
     #chart_code = chart_code.replace('\\end{axis}', '\\input{graphics/legend_extended_metric_general_detector}\n\\end{axis}')
     chart_code = chart_code.replace('mark size=3', 'mark size=2')
-    text_file = open(f"../latex_plots/qualified_detectors_stacked_complete_metric_e{env_number}_different_conditions.tex", "w")
+    text_file = open(f"../latex_plots/qualified_detectors_stacked_complete_metric_e{env_number}_crowded.tex", "w")
 
     #write string to file
     text_file.write(chart_code)
@@ -147,7 +148,8 @@ for env_number, house in enumerate(['floor1', 'floor4',]):
 colors = ['#1F77B4','#2CA02C', '#FF7F0E', '#D62728', '#8C564B']
 detectors = ['GD', 'QD_15', 'QD_25', 'QD_50', 'QD_75']
 
-for env_number, house in enumerate(['floor1', 'floor4',]):
+for env_number, house in enumerate([ 'floor4',]):
+    env_number+=1
     fig, ax = subplots(figsize=(10, 5))
     dataframes = [houses_detr.loc[houses_detr['dataset'] == 'gibson_deep_doors_2'],
                   houses_yolo.loc[houses_yolo['dataset'] == 'gibson_deep_doors_2'],
@@ -216,7 +218,7 @@ for env_number, house in enumerate(['floor1', 'floor4',]):
     chart_code = chart_code.replace('ybar legend', 'area legend')
     #chart_code = chart_code.replace('\\end{axis}', '\\input{graphics/legend_extended_metric_general_detector}\n\\end{axis}')
     chart_code = chart_code.replace('mark size=3', 'mark size=2')
-    text_file = open(f"../latex_plots/qualified_detectors_stacked_complete_metric_e{env_number}_type_2_different_conditions.tex", "w")
+    text_file = open(f"../latex_plots/qualified_detectors_stacked_complete_metric_e{env_number}_type_2_crowded.tex", "w")
 
     #write string to file
     text_file.write(chart_code)
@@ -228,9 +230,10 @@ for env_number, house in enumerate(['floor1', 'floor4',]):
     plt.show()
 
 dataset_names = ['\\DDDtwo', '\\DG', '\\DDDtwoG']
-titles = ['\\Classrooms{} under light variations', '\\Offices{} under light variations', '\\Laboratories', '\\House']
+titles = ['\\Classrooms{} with camera occlusions', '\\Offices{} with camera occlusions', '\\Laboratories', '\\House']
 
-for env_number, house in enumerate(['floor1', 'floor4']):
+for env_number, house in enumerate([ 'floor4']):
+    env_number+=1
     fig, ax = subplots(figsize=(10, 5))
     performance = pd.concat([houses_detr.reset_index(), houses_yolo.reset_index(), houses_faster.reset_index()], axis=0)
     #dataframes = [houses_detr.loc[houses_detr['dataset'] == 'gibson_deep_doors_2'],
@@ -304,7 +307,7 @@ for env_number, house in enumerate(['floor1', 'floor4']):
     chart_code = chart_code.replace('ybar legend', 'area legend')
     #chart_code = chart_code.replace('\\end{axis}', '\\input{graphics/legend_extended_metric_general_detector}\n\\end{axis}')
     chart_code = chart_code.replace('mark size=3', 'mark size=2')
-    text_file = open(f"../latex_plots/qualified_detectors_mean_complete_metric_e{env_number}_type_2_different_conditions.tex", "w")
+    text_file = open(f"../latex_plots/qualified_detectors_mean_complete_metric_e{env_number}_type_2_crowded.tex", "w")
 
     #write string to file
     text_file.write(chart_code)
